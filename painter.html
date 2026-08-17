@@ -1,0 +1,48 @@
+<style>
+  body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+  h1 { color: #2e7d32; }
+  .worker-card { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; }
+  a { display: inline-block; background-color: #2e7d32; color: white; text-decoration: none; padding: 8px 12px; margin: 4px 4px 0 0; border-radius: 6px; }
+</style>
+
+<h1>Painters Near You</h1>
+<div id="workerList">Loading...</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
+    authDomain: "sahi-kaam-b32fa.firebaseapp.com",
+    projectId: "sahi-kaam-b32fa",
+    storageBucket: "sahi-kaam-b32fa.firebasestorage.app",
+    messagingSenderId: "187530591485",
+    appId: "1:187530591485:web:5f5973815c2b6ff5175294"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function loadWorkers() {
+    const listDiv = document.getElementById("workerList");
+    listDiv.innerHTML = "";
+    const querySnapshot = await getDocs(collection(db, "workers"));
+    querySnapshot.forEach((doc) => {
+      const worker = doc.data();
+      if (worker.skill.toLowerCase() === "painter") {
+        const card = document.createElement("div");
+        card.className = "worker-card";
+        card.innerHTML = `
+          <h2>${worker.name}</h2>
+          <p>Area: ${worker.area}</p>
+          <a href="tel:${worker.phone}">📞 Call</a>
+          <a href="sms:${worker.phone}">💬 Text</a>
+          <a href="https://wa.me/91${worker.phone}">🟢 WhatsApp</a>
+        `;
+        listDiv.appendChild(card);
+      }
+    });
+  }
+  loadWorkers();
+</script>
