@@ -1,8 +1,24 @@
 <style>
   body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
-  h1 { color: #2e7d32; }
-  .worker-card { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; }
-  a { display: inline-block; background-color: #2e7d32; color: white; text-decoration: none; padding: 8px 12px; margin: 4px 4px 0 0; border-radius: 6px; }
+  h1 { color: #fb8c00; }
+  .worker-card {
+    background: white; padding: 15px; margin: 10px 0; border-radius: 12px;
+    display: flex; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .worker-photo {
+    width: 60px; height: 60px; border-radius: 50%; background-color: #fb8c00;
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: bold; flex-shrink: 0;
+  }
+  .worker-info { flex: 1; }
+  .worker-info h2 { margin: 0 0 4px 0; font-size: 18px; }
+  .rating { color: #f9a825; font-weight: bold; }
+  .price { color: #333; font-weight: bold; float: right; }
+  .actions a {
+    display: inline-block; background-color: #fb8c00; color: white;
+    text-decoration: none; padding: 6px 10px; margin: 4px 4px 0 0;
+    border-radius: 6px; font-size: 14px;
+  }
 </style>
 
 <h1>Electricians Near You</h1>
@@ -30,19 +46,28 @@
     const querySnapshot = await getDocs(collection(db, "workers"));
     querySnapshot.forEach((doc) => {
       const worker = doc.data();
-      if (worker.skill.toLowerCase() === "electrician") {
+      if (worker.skill.toLowerCase().trim() === "electrician") {
+        const initial = worker.name.trim().charAt(0).toUpperCase();
+        const rating = worker.rating || "New";
+        const price = worker.price ? "₹" + worker.price : "";
         const card = document.createElement("div");
         card.className = "worker-card";
         card.innerHTML = `
-          <h2>${worker.name}</h2>
-          <p>Area: ${worker.area}</p>
-          <a href="tel:${worker.phone}">📞 Call</a>
-          <a href="sms:${worker.phone}">💬 Text</a>
-          <a href="https://wa.me/91${worker.phone}">🟢 WhatsApp</a>
+          <div class="worker-photo">${initial}</div>
+          <div class="worker-info">
+            <span class="price">${price}</span>
+            <h2>${worker.name}</h2>
+            <div class="rating">⭐ ${rating}</div>
+            <p>Area: ${worker.area}</p>
+            <div class="actions">
+              <a href="tel:${worker.phone}">📞 Call</a>
+              <a href="sms:${worker.phone}">💬 Text</a>
+              <a href="https://wa.me/91${worker.phone}">🟢 WhatsApp</a>
+            </div>
+          </div>
         `;
         listDiv.appendChild(card);
       }
     });
   }
   loadWorkers();
-      </script>

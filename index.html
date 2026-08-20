@@ -5,50 +5,35 @@
     padding: 20px;
   }
   h1 {
-    color: #2e7d32;
+    color: #333;
   }
   a {
     display: block;
-    background-color: #2e7d32;
     color: white;
     text-decoration: none;
-    padding: 12px;
-    margin: 8px 0;
-    border-radius: 8px;
+    padding: 16px;
+    margin: 10px 0;
+    border-radius: 10px;
     text-align: center;
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: bold;
   }
+  .plumber { background-color: #1e88e5; }
+  .electrician { background-color: #fb8c00; }
+  .carpenter { background-color: #6d4c41; }
+  .painter { background-color: #8e24aa; }
+  .cleaning { background-color: #00897b; }
 </style>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
-    authDomain: "sahi-kaam-b32fa.firebaseapp.com",
-    projectId: "sahi-kaam-b32fa",
-    storageBucket: "sahi-kaam-b32fa.firebasestorage.app",
-    messagingSenderId: "187530591485",
-    appId: "1:187530591485:web:5f5973815c2b6ff5175294"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.db = db;
-  window.collection = collection;
-  window.getDocs = getDocs;
-</script>
 
 <h1>Sahi Kaam</h1>
 <p>Find trusted help near you in Mumbai.</p>
 
 <h2>Choose a service</h2>
-<a href="plumber.html">Plumber</a>
-<a href="electrician.html">Electrician</a>
-<a href="carpenter.html">Carpenter</a>
-<a href="cleaning.html">House Cleaning</a>
+<a href="plumber.html" class="plumber">🔧 Plumber</a>
+<a href="electrician.html" class="electrician">⚡ Electrician</a>
+<a href="carpenter.html" class="carpenter">🪚 Carpenter</a>
+<a href="painter.html" class="painter">🎨 Painter</a>
+<a href="cleaning.html" class="cleaning">🧹 House Cleaning</a>
 
 <h2>Or search directly</h2>
 <input type="text" id="searchBox" placeholder="Type: plumber, electrician...">
@@ -57,19 +42,11 @@
 <script>
 function searchService() {
   var input = document.getElementById("searchBox").value.toLowerCase();
-  
-  if (input.includes("plumb")) {
-    window.location.href = "plumber.html";
-  } else if (input.includes("electric")) {
-    window.location.href = "electrician.html";
-  } else if (input.includes("carpen")) {
-    window.location.href = "carpenter.html";
-  } else if (input.includes("paint")) {
-    window.location.href = "painter.html";
-  } else if (input.includes("clean")) {
-    window.location.href = "cleaning.html";
-  } else {
-    alert("Sorry, we don't have that service yet!");
-  }
+  if (input.includes("plumb")) window.location.href = "plumber.html";
+  else if (input.includes("electric")) window.location.href = "electrician.html";
+  else if (input.includes("carpen")) window.location.href = "carpenter.html";
+  else if (input.includes("paint")) window.location.href = "painter.html";
+  else if (input.includes("clean")) window.location.href = "cleaning.html";
+  else alert("Sorry, we don't have that service yet!");
 }
 </script>
