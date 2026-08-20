@@ -23,30 +23,11 @@
   .carpenter { background-color: #6d4c41; }
   .painter { background-color: #8e24aa; }
   .cleaning { background-color: #00897b; }
-</style>
-
-<h1>Sahi Kaam</h1>
-<p>Find trusted help near you in Mumbai.</p>
-
-<h2>Choose a service</h2>
-<a href="plumber.html" class="plumber">🔧 Plumber</a>
-<a href="electrician.html" class="electrician">⚡ Electrician</a>
-<a href="carpenter.html" class="carpenter">🪚 Carpenter</a>
-<a href="painter.html" class="painter">🎨 Painter</a>
-<a href="cleaning.html" class="cleaning">🧹 House Cleaning</a>
-
-<h2>Or search directly</h2>
-<input type="text" id="searchBox" placeholder="Type: plumber, electrician...">
-<button onclick="searchService()">Search</button>
-
-<script>
-function searchService() {
-  var input = document.getElementById("searchBox").value.toLowerCase();
-  if (input.includes("plumb")) window.location.href = "plumber.html";
-  else if (input.includes("electric")) window.location.href = "electrician.html";
-  else if (input.includes("carpen")) window.location.href = "carpenter.html";
-  else if (input.includes("paint")) window.location.href = "painter.html";
-  else if (input.includes("clean")) window.location.href = "cleaning.html";
-  else alert("Sorry, we don't have that service yet!");
-}
-</script>
+  input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin: 10px 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border
