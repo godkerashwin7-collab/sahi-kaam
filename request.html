@@ -1,0 +1,75 @@
+<style>
+  body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+  h1 { color: #1e88e5; }
+  input, select {
+    width: 100%; padding: 12px; font-size: 16px; margin: 8px 0;
+    box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px;
+  }
+  button {
+    width: 100%; padding: 14px; font-size: 18px; background-color: #1e88e5;
+    color: white; border: none; border-radius: 8px; margin-top: 10px;
+  }
+  #status { margin-top: 15px; font-weight: bold; }
+</style>
+
+<h1>Request Help</h1>
+<p>Tell us what you need and we'll connect you with someone.</p>
+
+<input type="text" id="name" placeholder="Your Name">
+<select id="skill">
+  <option value="">What do you need?</option>
+  <option value="plumber">Plumber</option>
+  <option value="electrician">Electrician</option>
+  <option value="carpenter">Carpenter</option>
+  <option value="painter">Painter</option>
+  <option value="cleaning">House Cleaning</option>
+  <option value="other">Something else</option>
+</select>
+<input type="text" id="area" placeholder="Your Area (e.g. Bandra)">
+<input type="tel" id="phone" placeholder="Your Phone Number">
+<button onclick="submitRequest()">Send Request</button>
+<p id="status"></p>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
+    authDomain: "sahi-kaam-b32fa.firebaseapp.com",
+    projectId: "sahi-kaam-b32fa",
+    storageBucket: "sahi-kaam-b32fa.firebasestorage.app",
+    messagingSenderId: "187530591485",
+    appId: "1:187530591485:web:5f5973815c2b6ff5175294"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.submitRequest = async function() {
+    const name = document.getElementById("name").value.trim();
+    const skill = document.getElementById("skill").value;
+    const area = document.getElementById("area").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const statusEl = document.getElementById("status");
+
+    if (!name || !skill || !area || !phone) {
+      statusEl.innerText = "Please fill all fields.";
+      statusEl.style.color = "red";
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "customer_requests"), {
+        name, skill, area, phone,
+        submittedAt: new Date().toISOString()
+      });
+      statusEl.innerText = "Request sent! We'll contact you soon.";
+      statusEl.style.color = "green";
+    } catch (error) {
+      statusEl.innerText = "Something went wrong. Try again.";
+      statusEl.style.color = "red";
+      console.log(error);
+    }
+  }
+</script>

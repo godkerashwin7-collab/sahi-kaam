@@ -1,0 +1,95 @@
+<<style>
+  body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+  h1 { color: #2e7d32; }
+  input, select {
+    width: 100%; padding: 12px; font-size: 16px; margin: 8px 0;
+    box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px;
+  }
+  button {
+    width: 100%; padding: 14px; font-size: 18px; background-color: #2e7d32;
+    color: white; border: none; border-radius: 8px; margin-top: 10px;
+  }
+  #status { margin-top: 15px; font-weight: bold; }
+  label { font-weight: bold; margin-top: 10px; display: block; }
+</style>
+
+<h1>Join as a Worker</h1>
+<p>Fill this form and we'll verify your details before listing you.</p>
+
+<input type="text" id="name" placeholder="Full Name">
+<select id="skill">
+  <option value="">Select your skill</option>
+  <option value="plumber">Plumber</option>
+  <option value="electrician">Electrician</option>
+  <option value="carpenter">Carpenter</option>
+  <option value="painter">Painter</option>
+  <option value="cleaning">House Cleaning</option>
+</select>
+<input type="text" id="area" placeholder="Area (e.g. Andheri)">
+<input type="tel" id="phone" placeholder="Phone Number (10 digits)">
+
+<label>ID Verification</label>
+<select id="idType">
+  <option value="">Select ID Type</option>
+  <option value="Aadhaar">Aadhaar Card</option>
+  <option value="PAN">PAN Card</option>
+  <option value="Driving License">Driving License</option>
+  <option value="Passport">Passport</option>
+</select>
+<input type="text" id="idNumber" placeholder="ID Number">
+
+<button onclick="submitApplication()">Submit Application</button>
+<p id="status"></p>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
+    authDomain: "sahi-kaam-b32fa.firebaseapp.com",
+    projectId: "sahi-kaam-b32fa",
+    storageBucket: "sahi-kaam-b32fa.firebasestorage.app",
+    messagingSenderId: "187530591485",
+    appId: "1:187530591485:web:5f5973815c2b6ff5175294"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.submitApplication = async function() {
+    const name = document.getElementById("name").value.trim();
+    const skill = document.getElementById("skill").value;
+    const area = document.getElementById("area").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const idType = document.getElementById("idType").value;
+    const idNumber = document.getElementById("idNumber").value.trim();
+    const statusEl = document.getElementById("status");
+
+    if (!name || !skill || !area || !phone || !idType || !idNumber) {
+      statusEl.innerText = "Please fill all fields, including ID verification.";
+      statusEl.style.color = "red";
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "worker_applications"), {
+        name, skill, area, phone, idType, idNumber,
+        status: "pending",
+        submittedAt: new Date().toISOString()
+      });
+      statusEl.innerText = "Thank you! We'll verify and contact you soon.";
+      statusEl.style.color = "green";
+      document.getElementById("name").value = "";
+      document.getElementById("area").value = "";
+      document.getElementById("phone").value = "";
+      document.getElementById("skill").value = "";
+      document.getElementById("idType").value = "";
+      document.getElementById("idNumber").value = "";
+    } catch (error) {
+      statusEl.innerText = "Something went wrong. Try again.";
+      statusEl.style.color = "red";
+      console.log(error);
+    }
+  }
+</script>
