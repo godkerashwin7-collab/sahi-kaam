@@ -1,3 +1,6 @@
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#333333">
+
 <style>
   body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
   h1 { color: #8e24aa; }
@@ -70,8 +73,10 @@
       }
     });
   }
-  loadWorkers();
-</script>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#333333">
+  loadWorkers();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>

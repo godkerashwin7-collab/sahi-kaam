@@ -1,3 +1,6 @@
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#333333">
+
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -83,7 +86,6 @@ async function aiSearch() {
     console.log(error);
   }
 }
-</script>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#333333">
+if ('serviceWorker' in navigator) {
+  navigator.servi
