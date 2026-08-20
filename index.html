@@ -30,4 +30,57 @@
     margin: 10px 0;
     box-sizing: border-box;
     border: 1px solid #ccc;
-    border
+    border-radius: 8px;
+  }
+  button {
+    padding: 12px 20px;
+    font-size: 16px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+  }
+</style>
+
+<h1>Sahi Kaam</h1>
+<p>Find trusted help near you in Mumbai.</p>
+
+<h2>Choose a service</h2>
+<a href="plumber.html" class="plumber">🔧 Plumber</a>
+<a href="electrician.html" class="electrician">⚡ Electrician</a>
+<a href="carpenter.html" class="carpenter">🪚 Carpenter</a>
+<a href="painter.html" class="painter">🎨 Painter</a>
+<a href="cleaning.html" class="cleaning">🧹 House Cleaning</a>
+
+<h2>Or describe your problem</h2>
+<input type="text" id="aiSearchBox" placeholder="e.g. my tap is leaking">
+<button onclick="aiSearch()">Find Help</button>
+<p id="aiStatus"></p>
+
+<script>
+async function aiSearch() {
+  const input = document.getElementById("aiSearchBox").value;
+  const statusEl = document.getElementById("aiStatus");
+  statusEl.innerText = "Thinking...";
+
+  try {
+    const response = await fetch("https://ashwingodker--71945ff89cc7e.web.val.run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: input })
+    });
+
+    const data = await response.json();
+
+    if (data.category) {
+      window.location.href = data.category + ".html";
+    } else {
+      statusEl.innerText = "Hmm, couldn't understand. Try again?";
+      console.log(data);
+    }
+  } catch (error) {
+    statusEl.innerText = "Something went wrong. Try again.";
+    console.log(error);
+  }
+}
+</script>
