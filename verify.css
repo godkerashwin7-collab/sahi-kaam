@@ -118,11 +118,13 @@ body.sk-verified .sk-verify-hint {
 .sr-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.55);
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 16px;
+  box-sizing: border-box;
 }
 .sr-hidden {
   display: none;
@@ -133,13 +135,18 @@ body.sk-verified .sk-verify-hint {
 .sr-modal {
   background: #fff;
   width: 100%;
-  max-width: 480px;
-  max-height: 88vh;
+  max-width: 440px;
+  max-height: 85vh;
   overflow-y: auto;
-  border-radius: 16px 16px 0 0;
-  padding: 20px 20px 28px;
+  border-radius: 18px;
+  padding: 22px 20px 24px;
   position: relative;
   box-sizing: border-box;
+  animation: sr-pop-in 0.18s ease-out;
+}
+@keyframes sr-pop-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
 }
 .sr-modal label {
   font-weight: bold;
@@ -160,6 +167,15 @@ body.sk-verified .sk-verify-hint {
   min-height: 60px;
   resize: vertical;
 }
+/* Prevent Android long-press text-select/search on shared tap-targets */
+.sr-close, .sr-submit, .sa-tab, .sk-request-btn, button,
+.category-badge, .chevron, .cb-preset-btn, .sc-fab, .sc-chip{
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  touch-action:manipulation;
+}
+
 .sr-close {
   position: absolute;
   top: 10px;
