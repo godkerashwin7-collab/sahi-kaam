@@ -1,5 +1,7 @@
+<meta charset="UTF-8">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#333333">
+<meta name="theme-color" content="#fb8c00">
+<link rel="stylesheet" href="verify.css">
 
 <style>
   body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
@@ -22,14 +24,20 @@
     text-decoration: none; padding: 6px 10px; margin: 4px 4px 0 0;
     border-radius: 6px; font-size: 14px;
   }
+  .sk-request-btn { background-color: #1565c0; }
 </style>
 
 <h1>Electricians Near You</h1>
+
+<div id="phoneVerifyBox"></div>
+
 <div id="workerList">Loading...</div>
 
+<script src="verify.js"></script>
+<script src="request.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
@@ -42,14 +50,27 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const SKILL = "electrician";
+
+  // Phone verification unlocks Call/Text/WhatsApp + Request buttons site-wide on this page
+  SahiVerify.mount("phoneVerifyBox", () => {
+    document.body.classList.add("sk-verified");
+  });
+
+  // Wire the shared request modal to write into Firestore
+  SahiRequest.init(async (requestData) => {
+    await addDoc(collection(db, "customer_requests"), requestData);
+  });
 
   async function loadWorkers() {
     const listDiv = document.getElementById("workerList");
     listDiv.innerHTML = "";
     const querySnapshot = await getDocs(collection(db, "workers"));
+    let count = 0;
     querySnapshot.forEach((doc) => {
       const worker = doc.data();
-      if (worker.skill.toLowerCase().trim() === "electrician") {
+      if (worker.skill.toLowerCase().trim() === SKILL) {
+        count++;
         const initial = worker.name.trim().charAt(0).toUpperCase();
         const rating = worker.rating || "New";
         const price = worker.price ? "₹" + worker.price : "";
@@ -62,16 +83,24 @@
             <h2>${worker.name}</h2>
             <div class="rating">⭐ ${rating}</div>
             <p>Area: ${worker.area}</p>
-            <div class="actions">
+            <div class="actions sk-locked-actions">
               <a href="tel:${worker.phone}">📞 Call</a>
               <a href="sms:${worker.phone}">💬 Text</a>
               <a href="https://wa.me/91${worker.phone}">🟢 WhatsApp</a>
+              <button type="button" class="sk-request-btn" data-id="${doc.id}" data-name="${worker.name}">📋 Request</button>
             </div>
+            <p class="sk-verify-hint">Verify your phone above to contact or request this worker.</p>
           </div>
         `;
+        card.querySelector(".sk-request-btn").addEventListener("click", (e) => {
+          SahiRequest.open({ id: doc.id, name: worker.name, skill: SKILL });
+        });
         listDiv.appendChild(card);
       }
     });
+    if (count === 0) {
+      listDiv.innerHTML = "<p>No electricians listed yet — check back soon.</p>";
+    }
   }
 
   loadWorkers();

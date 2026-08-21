@@ -83,3 +83,110 @@ button:disabled {
   background-color: #a5a5a5 !important;
   cursor: not-allowed;
 }
+
+/* ---- Locked contact actions until phone is verified ---- */
+.sk-locked-actions {
+  opacity: 0.45;
+  pointer-events: none;
+  filter: grayscale(40%);
+}
+body.sk-verified .sk-locked-actions {
+  opacity: 1;
+  pointer-events: auto;
+  filter: none;
+}
+.sk-verify-hint {
+  font-size: 12px;
+  color: #b71c1c;
+  margin: 4px 0 0;
+}
+body.sk-verified .sk-verify-hint {
+  display: none;
+}
+.sk-request-btn {
+  display: inline-block;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  margin: 4px 4px 0 0;
+  cursor: pointer;
+  color: white;
+}
+
+/* ---- Request modal ---- */
+.sr-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+}
+.sr-overlay.sr-hidden {
+  display: none;
+}
+.sr-modal {
+  background: #fff;
+  width: 100%;
+  max-width: 480px;
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: 16px 16px 0 0;
+  padding: 20px 20px 28px;
+  position: relative;
+  box-sizing: border-box;
+}
+.sr-modal label {
+  font-weight: bold;
+  display: block;
+  margin-top: 12px;
+}
+.sr-modal input, .sr-modal textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-top: 6px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.sr-modal textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+.sr-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  border: none;
+  background: none;
+  font-size: 26px;
+  line-height: 1;
+  color: #888;
+  cursor: pointer;
+}
+.sr-verified-as {
+  font-size: 13px;
+  color: #2e7d32;
+  margin: -6px 0 6px;
+}
+.sr-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 17px;
+  background-color: #1565c0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+.sr-status {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 14px;
+}
+.sr-status-ok { color: #2e7d32; }
+.sr-status-error { color: #c62828; }
