@@ -124,6 +124,9 @@ body.sk-verified .sk-verify-hint {
   justify-content: center;
   z-index: 1000;
 }
+.sr-hidden {
+  display: none;
+}
 .sr-overlay.sr-hidden {
   display: none;
 }
@@ -190,3 +193,26 @@ body.sk-verified .sk-verify-hint {
 }
 .sr-status-ok { color: #2e7d32; }
 .sr-status-error { color: #c62828; }
+
+/* ---- Auth modal tabs ---- */
+.sa-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #eee;
+}
+.sa-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 10px 4px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+.sa-tab-active {
+  color: #14213D;
+  border-bottom: 3px solid #FF6A3D;
+}

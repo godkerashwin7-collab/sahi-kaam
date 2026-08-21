@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="verify.css">
 </head>
 <body>
 
@@ -20,8 +21,11 @@
           <p>Trusted help, at your doorstep.</p>
         </div>
       </div>
-      <div class="ticket-counter" id="ticketCounter">
-        <span id="selectedCount">0</span> selected
+      <div class="header-right">
+        <button type="button" id="profileBtn" class="profile-btn">Log In</button>
+        <div class="ticket-counter" id="ticketCounter">
+          <span id="selectedCount">0</span> selected
+        </div>
       </div>
     </div>
   </header>
@@ -88,6 +92,51 @@
     <p>Hello Mumbai · Household chores, repairs &amp; community care, sorted.</p>
   </footer>
 
+  <script src="auth.js"></script>
   <script src="script.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+      signInWithEmailAndPassword, updateProfile, signOut
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
+      authDomain: "sahi-kaam-b32fa.firebaseapp.com",
+      projectId: "sahi-kaam-b32fa",
+      storageBucket: "sahi-kaam-b32fa.firebasestorage.app",
+      messagingSenderId: "187530591485",
+      appId: "1:187530591485:web:5f5973815c2b6ff5175294"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const profileBtn = document.getElementById("profileBtn");
+
+    SahiAuth.init({
+      auth,
+      fns: { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut },
+      onChange: (user) => {
+        if (user) {
+          const label = user.displayName ? user.displayName.split(" ")[0] : user.email.split("@")[0];
+          profileBtn.textContent = "Hi, " + label + " · Log out";
+          profileBtn.onclick = () => SahiAuth.logout();
+        } else {
+          profileBtn.textContent = "Log In";
+          profileBtn.onclick = () => SahiAuth.open("login");
+        }
+      }
+    });
+
+    // Let script.js's Continue button gate on login before showing category links
+    window.sahiRequireLogin = function(onSuccess) {
+      if (SahiAuth.isLoggedIn()) {
+        onSuccess();
+      } else {
+        SahiAuth.open("login", onSuccess);
+      }
+    };
+  </script>
 </body>
 </html>

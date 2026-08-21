@@ -67,6 +67,22 @@ h1,h2,h3{font-family: var(--font-display);}
   font-size:12px;
   color:#C9D2E3;
 }
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.profile-btn{
+  font-size:12px;
+  font-weight:700;
+  color:#fff;
+  background: rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.25);
+  padding:6px 10px;
+  border-radius:20px;
+  white-space:nowrap;
+  cursor:pointer;
+}
 .ticket-counter{
   font-size:12px;
   background: rgba(255,255,255,0.08);
@@ -389,6 +405,44 @@ h1,h2,h3{font-family: var(--font-display);}
   line-height:1.6;
   color:#C9D2E3;
   margin:0;
+}
+
+/* ---- Continue panel (post-login category links) ---- */
+.continue-panel{
+  max-width:720px;
+  margin:20px auto 0;
+  padding:20px 18px;
+  text-align:center;
+}
+.continue-panel h3{
+  font-size:17px;
+  font-weight:600;
+  color: var(--navy);
+  margin:0 0 14px;
+}
+.continue-links{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.continue-link{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background: var(--card);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px 16px;
+  text-decoration:none;
+  color: var(--navy);
+  font-weight:600;
+  font-size:15px;
+  box-shadow: var(--shadow);
+}
+.continue-link span{
+  color: var(--safety-dark);
+  font-weight:700;
+  margin-left:6px;
 }
 
 /* ---- Bottom tray ---- */

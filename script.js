@@ -314,18 +314,50 @@ function render() {
   updateCounts();
 }
 
+const CATEGORY_PAGES = {
+  carpenter: "carpenter.html",
+  electrician: "electrician.html",
+  painter: "painter.html",
+  cleaning: "cleaning.html",
+  plumber: "plumber.html",
+  "women-aid": "women-aid.html",
+  "medical-aid": "medical-aid.html",
+  "old-age-assistance": "old-age-assistance.html"
+};
+
+function showCategoryLinks() {
+  let panel = document.getElementById("continuePanel");
+  if (!panel) {
+    panel = document.createElement("div");
+    panel.id = "continuePanel";
+    panel.className = "continue-panel";
+    document.getElementById("selectionTray").insertAdjacentElement("beforebegin", panel);
+  }
+
+  let linksHtml = "";
+  CATALOG.forEach(cat => {
+    if (selected[cat.id] && selected[cat.id].length) {
+      const href = CATEGORY_PAGES[cat.id] || "#";
+      linksHtml += `<a class="continue-link" href="${href}">${cat.icon} ${cat.name} <span>(${selected[cat.id].length})</span> →</a>`;
+    }
+  });
+
+  panel.innerHTML = `
+    <h3>You're all set — pick a category to browse workers:</h3>
+    <div class="continue-links">${linksHtml}</div>
+  `;
+  panel.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
 document.getElementById("continueBtn").addEventListener("click", () => {
   const total = totalSelectedCount();
   if (total === 0) return;
-  let summary = "Selected services:\n\n";
-  CATALOG.forEach(cat => {
-    if (selected[cat.id] && selected[cat.id].length) {
-      summary += `${cat.name}:\n`;
-      selected[cat.id].forEach(s => summary += `  • ${s}\n`);
-      summary += "\n";
-    }
-  });
-  alert(summary + "Wire this button up to your booking / checkout flow next.");
+
+  if (typeof window.sahiRequireLogin === "function") {
+    window.sahiRequireLogin(showCategoryLinks);
+  } else {
+    showCategoryLinks();
+  }
 });
 
 render();
