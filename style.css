@@ -203,6 +203,31 @@ h1,h2,h3{font-family: var(--font-display);}
   margin-top:20px;
 }
 
+/* ---- Booking review panel ---- */
+.booking-services-list{
+  margin:10px 0 16px;
+}
+.booking-cat-block{
+  background: var(--paper);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px 14px;
+  margin-bottom:8px;
+}
+.booking-cat-block strong{
+  color: var(--navy);
+  font-size:14px;
+}
+.booking-cat-block ul{
+  margin:6px 0 0;
+  padding-left:18px;
+  font-size:13px;
+  color:var(--muted);
+}
+.booking-cat-block li{
+  margin-bottom:2px;
+}
+
 /* ---- Hero ---- */
 .hero{
   position:relative;
@@ -348,14 +373,15 @@ h1,h2,h3{font-family: var(--font-display);}
   margin:6px 0 0;
 }
 .trust-list{
-  display:flex;
-  flex-direction:column;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
   gap:12px;
 }
 .trust-item{
   display:flex;
-  align-items:center;
-  gap:14px;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:8px;
   background: var(--card);
   border:1px solid var(--line);
   border-radius:14px;

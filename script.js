@@ -395,10 +395,18 @@ document.getElementById("continueBtn").addEventListener("click", () => {
   const total = totalSelectedCount();
   if (total === 0) return;
 
+  function proceedToReview() {
+    if (typeof window.sahiOpenBookingReview === "function") {
+      window.sahiOpenBookingReview(selected, CATALOG);
+    } else {
+      showCategoryLinks();
+    }
+  }
+
   if (typeof window.sahiRequireLogin === "function") {
-    window.sahiRequireLogin(showCategoryLinks);
+    window.sahiRequireLogin(proceedToReview);
   } else {
-    showCategoryLinks();
+    proceedToReview();
   }
 });
 

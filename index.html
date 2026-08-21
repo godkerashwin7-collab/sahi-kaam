@@ -197,6 +197,30 @@
     </div>
   </div>
 
+  <!-- Booking review panel (shown after login, before final confirm) -->
+  <div id="booking-overlay" class="sr-overlay sr-hidden">
+    <div class="sr-modal">
+      <button type="button" class="sr-close" id="booking-close">&times;</button>
+      <h2>Review Your Booking</h2>
+      <div id="booking-services-list" class="booking-services-list"></div>
+
+      <label>Address</label>
+      <textarea id="booking-address" placeholder="Flat/House no., building, street, landmark"></textarea>
+      <p class="sk-error-text" id="booking-addressError">Enter your full address (at least 10 characters).</p>
+
+      <label>Preferred Date</label>
+      <input type="date" id="booking-date">
+      <p class="sk-error-text" id="booking-dateError">Pick a valid date (today or later).</p>
+
+      <label>Preferred Time</label>
+      <input type="time" id="booking-time">
+      <p class="sk-error-text" id="booking-timeError">Pick a preferred time.</p>
+
+      <button type="button" class="sr-submit" id="booking-confirm-btn">Confirm Booking</button>
+      <p id="booking-status" class="sr-status"></p>
+    </div>
+  </div>
+
   <script src="auth.js"></script>
   <script src="payment.js"></script>
   <script src="chatbot.js"></script>
@@ -208,7 +232,7 @@
       signInWithEmailAndPassword, updateProfile, signOut
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import {
-      getFirestore, doc, setDoc, getDoc
+      getFirestore, doc, setDoc, getDoc, addDoc, collection
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -272,7 +296,7 @@
       }
     });
 
-    // Let script.js's Continue button gate on login before showing category links
+    // Let script.js's Continue button gate on login, then show the booking review step
     window.sahiRequireLogin = function(onSuccess) {
       if (SahiAuth.isLoggedIn()) {
         onSuccess();
@@ -280,6 +304,113 @@
         SahiAuth.open("login", onSuccess);
       }
     };
+
+    // ---- Booking review & confirm ----
+    const bookingOverlay = document.getElementById("booking-overlay");
+
+    function isValidAddress(addr) { return addr.trim().length >= 10; }
+    function isValidBookingDate(dateStr) {
+      if (!dateStr) return false;
+      const picked = new Date(dateStr + "T00:00:00");
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return picked >= today;
+    }
+    function toggleBookingErr(inputId, errId, ok) {
+      document.getElementById(inputId).classList.toggle("sk-field-error", !ok);
+      document.getElementById(errId).classList.toggle("sk-show", !ok);
+    }
+
+    // Called by script.js's Continue button once the user is logged in
+    window.sahiOpenBookingReview = function(selected, catalog) {
+      const listEl = document.getElementById("booking-services-list");
+      let html = "";
+      catalog.forEach(cat => {
+        if (selected[cat.id] && selected[cat.id].length) {
+          html += `<div class="booking-cat-block"><strong>${cat.icon} ${cat.name}</strong><ul>`;
+          selected[cat.id].forEach(s => html += `<li>${s}</li>`);
+          html += `</ul></div>`;
+        }
+      });
+      listEl.innerHTML = html;
+
+      document.getElementById("booking-address").value = "";
+      const dateInput = document.getElementById("booking-date");
+      dateInput.value = "";
+      dateInput.min = new Date().toISOString().split("T")[0];
+      document.getElementById("booking-time").value = "";
+      document.getElementById("booking-status").textContent = "";
+      bookingOverlay.classList.remove("sr-hidden");
+
+      // Stash for the confirm handler
+      bookingOverlay.dataset.pending = "1";
+      window.__sahiPendingSelected = selected;
+      window.__sahiPendingCatalog = catalog;
+    };
+
+    document.getElementById("booking-close").addEventListener("click", () => {
+      bookingOverlay.classList.add("sr-hidden");
+    });
+    bookingOverlay.addEventListener("click", (e) => {
+      if (e.target === bookingOverlay) bookingOverlay.classList.add("sr-hidden");
+    });
+
+    document.getElementById("booking-confirm-btn").addEventListener("click", async () => {
+      const address = document.getElementById("booking-address").value.trim();
+      const date = document.getElementById("booking-date").value;
+      const time = document.getElementById("booking-time").value;
+      const statusEl = document.getElementById("booking-status");
+
+      const addressOk = isValidAddress(address);
+      const dateOk = isValidBookingDate(date);
+      const timeOk = !!time;
+      toggleBookingErr("booking-address", "booking-addressError", addressOk);
+      toggleBookingErr("booking-date", "booking-dateError", dateOk);
+      toggleBookingErr("booking-time", "booking-timeError", timeOk);
+
+      if (!addressOk || !dateOk || !timeOk) {
+        statusEl.textContent = "Please fix the highlighted fields.";
+        statusEl.className = "sr-status sr-status-error";
+        return;
+      }
+
+      const user = SahiAuth.getUser();
+      if (!user) {
+        statusEl.textContent = "Please log in again.";
+        statusEl.className = "sr-status sr-status-error";
+        return;
+      }
+
+      const confirmBtn = document.getElementById("booking-confirm-btn");
+      confirmBtn.disabled = true;
+      statusEl.textContent = "Placing your booking...";
+      statusEl.className = "sr-status";
+
+      try {
+        await addDoc(collection(db, "bookings"), {
+          uid: user.uid,
+          customerName: user.displayName || "",
+          customerEmail: user.email || "",
+          services: window.__sahiPendingSelected,
+          address, preferredDate: date, preferredTime: time,
+          status: "submitted",
+          submittedAt: new Date().toISOString()
+        });
+        statusEl.textContent = "✅ Booking placed! Browse below to chat with specific professionals for each service.";
+        statusEl.className = "sr-status sr-status-ok";
+        setTimeout(() => {
+          bookingOverlay.classList.add("sr-hidden");
+          if (typeof window.showCategoryLinks === "function") {
+            window.showCategoryLinks();
+          }
+        }, 1400);
+      } catch (err) {
+        statusEl.textContent = "Something went wrong placing your booking. Please try again.";
+        statusEl.className = "sr-status sr-status-error";
+        console.log(err);
+      }
+      confirmBtn.disabled = false;
+    });
   </script>
 </body>
 </html>
