@@ -3,6 +3,7 @@
 const CATALOG = [
   {
     id: "carpenter",
+    group: "trade",
     icon: "🪚",
     name: "Carpenter",
     tagline: "Furniture, fittings & woodwork",
@@ -21,6 +22,7 @@ const CATALOG = [
   },
   {
     id: "electrician",
+    group: "trade",
     icon: "🔌",
     name: "Electrician",
     tagline: "Wiring, fittings & repairs",
@@ -39,6 +41,7 @@ const CATALOG = [
   },
   {
     id: "painter",
+    group: "trade",
     icon: "🎨",
     name: "Painter",
     tagline: "Interior, exterior & touch-ups",
@@ -57,6 +60,7 @@ const CATALOG = [
   },
   {
     id: "cleaning",
+    group: "trade",
     icon: "🧹",
     name: "Cleaning Services",
     tagline: "Home, office & deep cleaning",
@@ -75,6 +79,7 @@ const CATALOG = [
   },
   {
     id: "plumber",
+    group: "trade",
     icon: "🔧",
     name: "Plumber",
     tagline: "Leaks, fittings & installations",
@@ -93,6 +98,7 @@ const CATALOG = [
   },
   {
     id: "women-aid",
+    group: "care",
     icon: "🤝",
     name: "Women Aid",
     tagline: "Support, safety & empowerment",
@@ -111,6 +117,7 @@ const CATALOG = [
   },
   {
     id: "medical-aid",
+    group: "care",
     icon: "⚕️",
     name: "Medical Aid",
     tagline: "Home healthcare & emergency support",
@@ -129,6 +136,7 @@ const CATALOG = [
   },
   {
     id: "old-age-assistance",
+    group: "care",
     icon: "🧓",
     name: "Old Age Assistance",
     tagline: "Companionship & daily support for seniors",
@@ -213,11 +221,41 @@ function updateCounts() {
 }
 
 // ---- Render ----
+const GROUP_LABELS = {
+  trade: {
+    eyebrow: "Home & Repair",
+    title: "Skilled trades for the house",
+    desc: "Carpentry, wiring, painting, plumbing and cleaning — booked by the job."
+  },
+  care: {
+    eyebrow: "Community & Care",
+    title: "Support for people, not just repairs",
+    desc: "Help for women, medical needs and elderly care — handled with the same care as any home visit."
+  }
+};
+
 function render() {
   const grid = document.getElementById("categoryGrid");
   grid.innerHTML = "";
 
+  let lastGroup = null;
+
   CATALOG.forEach(cat => {
+    if (cat.group && cat.group !== lastGroup) {
+      const groupInfo = GROUP_LABELS[cat.group];
+      if (groupInfo) {
+        const header = document.createElement("div");
+        header.className = "group-header" + (lastGroup ? " group-header-spaced" : "");
+        header.innerHTML = `
+          <span class="intro-eyebrow">${groupInfo.eyebrow}</span>
+          <h3>${groupInfo.title}</h3>
+          <p>${groupInfo.desc}</p>
+        `;
+        grid.appendChild(header);
+      }
+      lastGroup = cat.group;
+    }
+
     const card = document.createElement("div");
     card.className = "category-card";
     card.id = `card-${cat.id}`;

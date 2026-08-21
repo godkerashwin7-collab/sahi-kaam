@@ -221,6 +221,29 @@ h1,h2,h3{font-family: var(--font-display);}
   gap:12px;
 }
 
+.group-header{
+  text-align:center;
+  padding:6px 6px 4px;
+}
+.group-header-spaced{
+  margin-top:18px;
+  padding-top:26px;
+  border-top:1px dashed var(--line);
+}
+.group-header h3{
+  font-size:20px;
+  font-weight:600;
+  margin:0 0 6px;
+  color: var(--navy);
+}
+.group-header p{
+  font-size:13px;
+  line-height:1.5;
+  color:var(--muted);
+  margin:0 auto;
+  max-width:42ch;
+}
+
 .category-card{
   background:var(--card);
   border:1px solid var(--line);
