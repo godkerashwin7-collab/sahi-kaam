@@ -22,13 +22,23 @@
         </div>
       </div>
       <div class="header-right">
-        <button type="button" id="profileBtn" class="profile-btn">Log In</button>
         <div class="ticket-counter" id="ticketCounter">
           <span id="selectedCount">0</span> selected
         </div>
+        <button type="button" id="profileBtn" class="profile-avatar" aria-label="Account">
+          <span id="profileAvatarIcon">👤</span>
+        </button>
       </div>
     </div>
   </header>
+
+  <div class="help-bar">
+    <span>Need help choosing a service?</span>
+    <div class="help-bar-links">
+      <a href="tel:+911234567890">📞 Call us</a>
+      <a href="https://wa.me/911234567890" target="_blank" rel="noopener">🟢 WhatsApp</a>
+    </div>
+  </div>
 
   <section class="hero">
     <div class="hero-media">
@@ -54,6 +64,10 @@
       <h3>Tap a trade, tick what you need</h3>
       <p>Open any category below, check off exactly what the job needs, and your list is saved automatically — pick up right where you left off.</p>
     </section>
+
+    <div class="search-bar-wrap">
+      <input type="text" id="serviceSearch" class="search-bar" placeholder="🔍 Search services — e.g. tap repair, wiring, deep cleaning">
+    </div>
 
     <div class="category-grid" id="categoryGrid">
       <!-- Categories are injected by script.js -->
@@ -92,6 +106,19 @@
     <p>Hello Mumbai · Household chores, repairs &amp; community care, sorted.</p>
   </footer>
 
+  <!-- Profile panel (shown when the avatar is tapped while logged in) -->
+  <div id="profile-overlay" class="sr-overlay sr-hidden">
+    <div class="sr-modal">
+      <button type="button" class="sr-close" id="profile-close">&times;</button>
+      <h2>My Account</h2>
+      <div class="profile-field"><span>Name</span><strong id="profile-name">—</strong></div>
+      <div class="profile-field"><span>Email</span><strong id="profile-email">—</strong></div>
+      <div class="profile-field"><span>Date of Birth</span><strong id="profile-dob">—</strong></div>
+      <div class="profile-field"><span>Gender</span><strong id="profile-gender">—</strong></div>
+      <button type="button" class="sr-submit profile-logout-btn" id="profile-logout-btn">Log Out</button>
+    </div>
+  </div>
+
   <script src="auth.js"></script>
   <script src="script.js"></script>
   <script type="module">
@@ -100,6 +127,9 @@
       getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
       signInWithEmailAndPassword, updateProfile, signOut
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import {
+      getFirestore, doc, setDoc, getDoc
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
@@ -112,18 +142,57 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
+
     const profileBtn = document.getElementById("profileBtn");
+    const profileAvatarIcon = document.getElementById("profileAvatarIcon");
+    const profileOverlay = document.getElementById("profile-overlay");
+
+    function openProfilePanel(user) {
+      document.getElementById("profile-name").textContent = user.displayName || "—";
+      document.getElementById("profile-email").textContent = user.email || "—";
+      document.getElementById("profile-dob").textContent = "Loading...";
+      document.getElementById("profile-gender").textContent = "Loading...";
+      profileOverlay.classList.remove("sr-hidden");
+
+      getDoc(doc(db, "users", user.uid)).then((snap) => {
+        const data = snap.exists() ? snap.data() : {};
+        document.getElementById("profile-dob").textContent = data.dob || "—";
+        document.getElementById("profile-gender").textContent = data.gender || "—";
+      }).catch(() => {
+        document.getElementById("profile-dob").textContent = "—";
+        document.getElementById("profile-gender").textContent = "—";
+      });
+    }
+
+    document.getElementById("profile-close").addEventListener("click", () => {
+      profileOverlay.classList.add("sr-hidden");
+    });
+    profileOverlay.addEventListener("click", (e) => {
+      if (e.target === profileOverlay) profileOverlay.classList.add("sr-hidden");
+    });
+    document.getElementById("profile-logout-btn").addEventListener("click", () => {
+      SahiAuth.logout();
+      profileOverlay.classList.add("sr-hidden");
+    });
 
     SahiAuth.init({
       auth,
       fns: { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut },
+      onSignupExtra: async ({ uid, dob, gender }) => {
+        await setDoc(doc(db, "users", uid), { dob, gender, updatedAt: new Date().toISOString() }, { merge: true });
+      },
       onChange: (user) => {
         if (user) {
-          const label = user.displayName ? user.displayName.split(" ")[0] : user.email.split("@")[0];
-          profileBtn.textContent = "Hi, " + label + " · Log out";
-          profileBtn.onclick = () => SahiAuth.logout();
+          const initial = (user.displayName || user.email || "?").trim().charAt(0).toUpperCase();
+          profileAvatarIcon.textContent = initial;
+          profileBtn.classList.add("profile-avatar-active");
+          profileBtn.setAttribute("aria-label", "My Account");
+          profileBtn.onclick = () => openProfilePanel(user);
         } else {
-          profileBtn.textContent = "Log In";
+          profileAvatarIcon.textContent = "👤";
+          profileBtn.classList.remove("profile-avatar-active");
+          profileBtn.setAttribute("aria-label", "Log In");
           profileBtn.onclick = () => SahiAuth.open("login");
         }
       }

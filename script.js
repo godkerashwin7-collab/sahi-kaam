@@ -220,6 +220,26 @@ function updateCounts() {
   }
 }
 
+// ---- Search ----
+let searchQuery = "";
+
+function categoryMatchesSearch(cat, query) {
+  if (!query) return true;
+  const q = query.toLowerCase();
+  if (cat.name.toLowerCase().includes(q)) return true;
+  return cat.services.some(s => s.toLowerCase().includes(q));
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("serviceSearch");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value.trim();
+      render();
+    });
+  }
+});
+
 // ---- Render ----
 const GROUP_LABELS = {
   trade: {
@@ -238,9 +258,17 @@ function render() {
   const grid = document.getElementById("categoryGrid");
   grid.innerHTML = "";
 
+  const query = searchQuery.toLowerCase();
+  const visibleCats = CATALOG.filter(cat => categoryMatchesSearch(cat, searchQuery));
+
+  if (query && visibleCats.length === 0) {
+    grid.innerHTML = `<p class="search-empty">No services match "${searchQuery}". Try a different word.</p>`;
+    return;
+  }
+
   let lastGroup = null;
 
-  CATALOG.forEach(cat => {
+  visibleCats.forEach(cat => {
     if (cat.group && cat.group !== lastGroup) {
       const groupInfo = GROUP_LABELS[cat.group];
       if (groupInfo) {
@@ -284,7 +312,12 @@ function render() {
     listWrap.className = "service-list";
 
     const ul = document.createElement("ul");
-    cat.services.forEach((service, i) => {
+    const servicesToShow = query
+      ? cat.services.filter(s => s.toLowerCase().includes(query) || cat.name.toLowerCase().includes(query))
+      : cat.services;
+
+    servicesToShow.forEach((service) => {
+      const i = cat.services.indexOf(service);
       const li = document.createElement("li");
       li.className = "service-item";
       const inputId = `${cat.id}-${i}`;
@@ -309,6 +342,15 @@ function render() {
     card.appendChild(head);
     card.appendChild(listWrap);
     grid.appendChild(card);
+
+    // Auto-expand matching categories while searching
+    if (query) {
+      card.classList.add("open");
+      head.setAttribute("aria-expanded", "true");
+      requestAnimationFrame(() => {
+        listWrap.style.maxHeight = listWrap.scrollHeight + "px";
+      });
+    }
   });
 
   updateCounts();
