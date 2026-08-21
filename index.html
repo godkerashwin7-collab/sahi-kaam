@@ -3,372 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sahi Kaam</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1B2A4A">
-
+<title>Hello Mumbai — Home & Care Services</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
-<style>
-  :root {
-    --navy: #1B2A4A;
-    --navy-deep: #10182c;
-    --marigold: #F2994A;
-    --marigold-deep: #E0672B;
-    --cream: #FFF8F0;
-    --ink: #22242b;
-    --muted: #6b7280;
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    font-family: 'Inter', Arial, sans-serif;
-    background-color: var(--cream);
-    color: var(--ink);
-  }
-
-  h1, h2, .brand {
-    font-family: 'Poppins', Arial, sans-serif;
-  }
-
-  /* ---------- HERO ---------- */
-  .hero {
-    position: relative;
-    min-height: 78vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    overflow: hidden;
-    isolation: isolate;
-  }
-
-  .hero-collage {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 3px;
-    z-index: -2;
-  }
-
-  .hero-collage img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    filter: saturate(1.05) contrast(1.03);
-  }
-
-  .hero-collage .tile-a { grid-row: 1 / 3; }
-
-  .hero-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      linear-gradient(180deg, rgba(16,24,44,0.15) 0%, rgba(16,24,44,0.35) 45%, rgba(16,24,44,0.92) 100%);
-  }
-
-  .hero-content {
-    position: relative;
-    padding: 28px 22px 34px;
-    color: #fff;
-  }
-
-  .brand {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 8px;
-    margin: 0 0 10px;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--marigold);
-  }
-
-  .brand::before {
-    content: "";
-    width: 22px;
-    height: 2px;
-    background: var(--marigold);
-    display: inline-block;
-    transform: translateY(-4px);
-  }
-
-  .hero h1 {
-    margin: 0 0 10px;
-    font-size: clamp(2.1rem, 9vw, 2.8rem);
-    font-weight: 800;
-    line-height: 1.08;
-    text-shadow: 0 2px 18px rgba(0,0,0,0.35);
-  }
-
-  .hero h1 span {
-    color: var(--marigold);
-  }
-
-  .hero p.tagline {
-    margin: 0 0 22px;
-    font-size: 1.05rem;
-    max-width: 34ch;
-    color: #E9ECF5;
-    font-weight: 500;
-  }
-
-  /* ---------- MAIN ---------- */
-  main {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 26px 18px 40px;
-  }
-
-  section + section { margin-top: 34px; }
-
-  .section-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0 0 16px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .section-label::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: #e3ddd2;
-  }
-
-  /* service cards */
-  .services {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
-  .svc {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    text-decoration: none;
-    background: #fff;
-    border-radius: 18px;
-    padding: 20px 16px;
-    box-shadow: 0 6px 20px rgba(27,42,74,0.08);
-    border: 1px solid rgba(27,42,74,0.06);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .svc:active { transform: scale(0.97); }
-
-  .svc .icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-  }
-
-  .svc .name {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--ink);
-  }
-
-  .svc.cleaning { grid-column: 1 / 3; flex-direction: row; align-items: center; }
-
-  .plumber .icon   { background: #E3F0FF; color: #1e88e5; }
-  .electrician .icon { background: #FFF1DE; color: #fb8c00; }
-  .carpenter .icon { background: #F1E7E2; color: #6d4c41; }
-  .painter .icon   { background: #F4E6FB; color: #8e24aa; }
-  .cleaning .icon  { background: #DFF5F1; color: #00897b; }
-
-  /* ai search */
-  .ai-box {
-    background: var(--navy);
-    border-radius: 20px;
-    padding: 22px;
-    color: #fff;
-    background-image: radial-gradient(circle at 100% 0%, rgba(242,153,74,0.25), transparent 55%);
-  }
-
-  .ai-box p.hint {
-    margin: 0 0 14px;
-    color: #C7CEE3;
-    font-size: 0.92rem;
-  }
-
-  .ai-box input {
-    width: 100%;
-    padding: 14px 16px;
-    font-size: 16px;
-    border: none;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-  }
-
-  .ai-box button {
-    width: 100%;
-    padding: 14px 20px;
-    font-size: 16px;
-    font-weight: 700;
-    font-family: 'Poppins', sans-serif;
-    background: var(--marigold);
-    color: #1a1200;
-    border: none;
-    border-radius: 12px;
-  }
-
-  .ai-box button:active { background: var(--marigold-deep); }
-
-  #aiStatus {
-    min-height: 1.2em;
-    margin: 10px 2px 0;
-    font-size: 0.88rem;
-    color: #C7CEE3;
-  }
-
-  /* join / request */
-  .cta-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
-  .cta {
-    text-decoration: none;
-    text-align: center;
-    padding: 18px 10px;
-    border-radius: 16px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 0.98rem;
-    color: #fff;
-  }
-
-  .cta.join    { background: linear-gradient(135deg, #2e7d32, #1b5e20); }
-  .cta.request { background: linear-gradient(135deg, #1e88e5, #145da0); }
-
-  footer {
-    text-align: center;
-    padding: 20px;
-    color: var(--muted);
-    font-size: 0.8rem;
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<section class="hero">
-  <div class="hero-collage">
-    <img class="tile-a" src="hero-2.jpg" alt="Sahi Kaam technicians repairing electrical and plumbing fixtures in a home">
-    <img src="hero-1.jpg" alt="Plumber and electrician at work in a Mumbai kitchen">
-    <img src="hero-4.jpg" alt="Sahi Kaam team fixing a ceiling fan and cleaning floors">
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark">HM</span>
+        <div class="brand-text">
+          <h1>Hello Mumbai</h1>
+          <p>Trusted help, at your doorstep.</p>
+        </div>
+      </div>
+      <div class="ticket-counter" id="ticketCounter">
+        <span id="selectedCount">0</span> selected
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-media">
+      <img src="img/hero-kitchen.jpg" alt="Verified plumber, electrician and cleaning professionals working in a Mumbai home" loading="eager">
+      <div class="hero-scrim"></div>
+    </div>
+    <div class="hero-content">
+      <span class="hero-eyebrow">Since your first call, sorted.</span>
+      <h2 class="hero-title">Every home,<br>every helper,<br><em>one tap away.</em></h2>
+      <p class="hero-sub">From a leaking tap at 8pm to a grandparent who needs company on Sunday — Hello Mumbai connects you with verified help across the city.</p>
+      <a href="#categoryGrid" class="hero-cta">Browse services ↓</a>
+      <div class="hero-stats">
+        <div><strong>8</strong><span>categories</span></div>
+        <div><strong>80+</strong><span>listed services</span></div>
+        <div><strong>24×7</strong><span>booking</span></div>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <section class="intro">
+      <span class="intro-eyebrow">How it works</span>
+      <h3>Tap a trade, tick what you need</h3>
+      <p>Open any category below, check off exactly what the job needs, and your list is saved automatically — pick up right where you left off.</p>
+    </section>
+
+    <div class="category-grid" id="categoryGrid">
+      <!-- Categories are injected by script.js -->
+    </div>
+
+    <section class="showcase">
+      <div class="showcase-card">
+        <img src="img/gallery-modern.jpg" alt="Plumber, electrician and housekeeping team working together in a modern Mumbai apartment" loading="lazy">
+        <div class="showcase-text">
+          <span class="intro-eyebrow">On the job</span>
+          <h3>One visit, every trade covered</h3>
+          <p>Our teams work in step — so your electrician, plumber and cleaner can finish the same visit together, not three separate ones.</p>
+        </div>
+      </div>
+      <div class="showcase-card reverse">
+        <img src="img/gallery-heritage.jpg" alt="Home service professionals working carefully in a traditionally furnished Mumbai home" loading="lazy">
+        <div class="showcase-text">
+          <span class="intro-eyebrow">Handled with care</span>
+          <h3>Your home, treated like ours</h3>
+          <p>Heirloom furniture, marble floors, or a rented 1BHK — every professional on Hello Mumbai works with the same respect for your space.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="tray" id="selectionTray">
+    <div class="tray-inner">
+      <div class="tray-summary">
+        <strong id="traySummaryCount">0</strong> service(s) selected
+      </div>
+      <button class="tray-btn" id="continueBtn">Continue →</button>
+    </div>
   </div>
-  <div class="hero-overlay"></div>
-  <div class="hero-content">
-    <p class="brand">Mumbai · On-demand home help</p>
-    <h1>Sahi <span>Kaam,</span><br>Sahi Waqt Pe.</h1>
-    <p class="tagline">Trusted plumbers, electricians, carpenters, painters &amp; cleaners — at your door, right on time.</p>
-  </div>
-</section>
 
-<main>
+  <footer class="site-footer">
+    <p>Hello Mumbai · Household chores, repairs &amp; community care, sorted.</p>
+  </footer>
 
-  <section>
-    <p class="section-label">Choose a service</p>
-    <div class="services">
-      <a href="plumber.html" class="svc plumber">
-        <span class="icon">🔧</span>
-        <span class="name">Plumber</span>
-      </a>
-      <a href="electrician.html" class="svc electrician">
-        <span class="icon">⚡</span>
-        <span class="name">Electrician</span>
-      </a>
-      <a href="carpenter.html" class="svc carpenter">
-        <span class="icon">🪚</span>
-        <span class="name">Carpenter</span>
-      </a>
-      <a href="painter.html" class="svc painter">
-        <span class="icon">🎨</span>
-        <span class="name">Painter</span>
-      </a>
-      <a href="cleaning.html" class="svc cleaning">
-        <span class="icon">🧹</span>
-        <span class="name">House Cleaning</span>
-      </a>
-    </div>
-  </section>
-
-  <section>
-    <p class="section-label">Not sure what you need?</p>
-    <div class="ai-box">
-      <p class="hint">Describe your problem and we'll match you with the right help.</p>
-      <input type="text" id="aiSearchBox" placeholder="e.g. my tap is leaking">
-      <button onclick="aiSearch()">Find Help</button>
-      <p id="aiStatus"></p>
-    </div>
-  </section>
-
-  <section>
-    <p class="section-label">Want to join or need help?</p>
-    <div class="cta-row">
-      <a href="join.html" class="cta join">👷 Work With Us</a>
-      <a href="request.html" class="cta request">🙋 Request Help</a>
-    </div>
-  </section>
-
-</main>
-
-<footer>Sahi Kaam · Mumbai</footer>
-
-<script>
-async function aiSearch() {
-  const input = document.getElementById("aiSearchBox").value;
-  const statusEl = document.getElementById("aiStatus");
-  statusEl.innerText = "Thinking...";
-
-  try {
-    const response = await fetch("https://ashwingodker--71945ff89cc7e.web.val.run", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: input })
-    });
-
-    const data = await response.json();
-
-    if (data.category) {
-      window.location.href = data.category + ".html";
-    } else {
-      statusEl.innerText = "Hmm, couldn't understand. Try again?";
-      console.log(data);
-    }
-  } catch (error) {
-    statusEl.innerText = "Something went wrong. Try again.";
-    console.log(error);
-  }
-}
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
-}
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
