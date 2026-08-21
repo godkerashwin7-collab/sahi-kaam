@@ -7,6 +7,11 @@
   body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
   h1 { color: #2e7d32; }
   .sk-sub { color: #555; margin-top: -8px; }
+  .sk-benefits {
+    background: #fff; border-radius: 10px; padding: 12px 16px; margin: 14px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 14px; color: #2e7d32;
+  }
+  .sk-benefits div { padding: 4px 0; }
   input, select, textarea {
     width: 100%; padding: 12px; font-size: 16px; margin: 8px 0 2px;
     box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px;
@@ -22,8 +27,15 @@
   fieldset { border: none; padding: 0; margin: 0; }
 </style>
 
-<h1>Join as a Worker</h1>
-<p class="sk-sub">Fill this form and we'll verify your details before listing you.</p>
+<h1>Become a Professional</h1>
+<p class="sk-sub">Get more customers, flexible working hours, and transparent payments — all through Sahi Kaamwala.</p>
+
+<div class="sk-benefits">
+  <div>✓ More customers, no marketing needed</div>
+  <div>✓ Work on your own schedule</div>
+  <div>✓ Transparent, direct payments</div>
+  <div>✓ A professional profile customers can trust</div>
+</div>
 
 <!-- Step 1: phone verification. Everything else is locked until this passes. -->
 <div id="phoneVerifyBox"></div>
@@ -66,12 +78,19 @@
   </select>
   <input type="text" id="idNumber" placeholder="ID Number">
 
-  <button type="button" class="sk-submit" id="submitBtn" onclick="submitApplication()">Submit Application</button>
+  <div class="fee-slogan">
+    💚 Don't look at it as ₹100 — it's what keeps this community safe. Every worker on Sahi Kaam is ID-verified, and your one-time fee also supports our cancer care cause.
+    <strong>One-time only — you'll never be charged again.</strong>
+  </div>
+
+  <button type="button" class="sk-submit" id="submitBtn" onclick="submitApplication()">Pay ₹100 &amp; Submit Application</button>
 </fieldset>
 
 <p id="status"></p>
 
 <script src="verify.js"></script>
+<script src="payment.js"></script>
+<script src="chatbot.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -156,25 +175,52 @@
       return;
     }
 
-    try {
-      await addDoc(collection(db, "worker_applications"), {
-        name, email, address, phone: verifiedPhone, skill, area, idType, idNumber,
-        status: "pending",
-        submittedAt: new Date().toISOString()
-      });
-      statusEl.innerText = "Thank you! We'll verify and contact you soon.";
-      statusEl.style.color = "green";
-      nameEl.value = "";
-      emailEl.value = "";
-      addressEl.value = "";
-      document.getElementById("area").value = "";
-      document.getElementById("skill").value = "";
-      document.getElementById("idType").value = "";
-      document.getElementById("idNumber").value = "";
-    } catch (error) {
-      statusEl.innerText = "Something went wrong. Try again.";
-      statusEl.style.color = "red";
-      console.log(error);
-    }
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    statusEl.innerText = "Opening secure payment...";
+    statusEl.style.color = "#1565c0";
+
+    SahiPayment.charge({
+      amountRupees: 100,
+      description: "Worker Registration Fee",
+      prefillName: name,
+      prefillEmail: email,
+      prefillPhone: verifiedPhone,
+      onSuccess: async (paymentId) => {
+        try {
+          await addDoc(collection(db, "worker_applications"), {
+            name, email, address, phone: verifiedPhone, skill, area, idType, idNumber,
+            status: "pending",
+            registrationFeePaid: true,
+            registrationPaymentId: paymentId,
+            submittedAt: new Date().toISOString()
+          });
+          statusEl.innerText = "Payment received — thank you! We'll verify and contact you soon.";
+          statusEl.style.color = "green";
+          nameEl.value = "";
+          emailEl.value = "";
+          addressEl.value = "";
+          document.getElementById("area").value = "";
+          document.getElementById("skill").value = "";
+          document.getElementById("idType").value = "";
+          document.getElementById("idNumber").value = "";
+        } catch (error) {
+          statusEl.innerText = "Payment succeeded, but saving your application failed. Please contact support with payment ID: " + paymentId;
+          statusEl.style.color = "red";
+          console.log(error);
+        }
+        submitBtn.disabled = false;
+      },
+      onFailure: (message) => {
+        statusEl.innerText = "Payment failed: " + message;
+        statusEl.style.color = "red";
+        submitBtn.disabled = false;
+      },
+      onCancel: () => {
+        statusEl.innerText = "Payment cancelled — your application was not submitted.";
+        statusEl.style.color = "red";
+        submitBtn.disabled = false;
+      }
+    });
   }
 </script>

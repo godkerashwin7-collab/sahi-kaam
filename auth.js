@@ -39,21 +39,6 @@ const SahiAuth = (() => {
   function isValidName(name) {
     return /^[A-Za-z\s.]{2,60}$/.test(name.trim());
   }
-  function calcAge(dobStr) {
-    const dob = new Date(dobStr);
-    if (isNaN(dob.getTime())) return null;
-    const today = new Date();
-    let age = today.getFullYear() - dob.getFullYear();
-    const m = today.getMonth() - dob.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
-    return age;
-  }
-  function isValidDob(dobStr) {
-    if (!dobStr) return false;
-    const age = calcAge(dobStr);
-    if (age === null) return false;
-    return age >= 13 && age <= 110;
-  }
 
   function friendlyError(err) {
     const code = (err && err.code) || "";
@@ -93,20 +78,6 @@ const SahiAuth = (() => {
           <input type="text" id="sa-signup-name" placeholder="Your name">
           <p class="sk-error-text" id="sa-nameError">Enter your name (letters only, at least 2 characters).</p>
 
-          <label>Date of Birth</label>
-          <input type="date" id="sa-signup-dob">
-          <p class="sk-error-text" id="sa-dobError">Enter your date of birth (must be 13+ years old).</p>
-
-          <label>Gender</label>
-          <select id="sa-signup-gender">
-            <option value="">Select gender</option>
-            <option value="Female">Female</option>
-            <option value="Male">Male</option>
-            <option value="Other">Other</option>
-            <option value="Prefer not to say">Prefer not to say</option>
-          </select>
-          <p class="sk-error-text" id="sa-genderError">Please select a gender.</p>
-
           <label>Email</label>
           <input type="email" id="sa-signup-email" placeholder="you@email.com">
           <p class="sk-error-text" id="sa-emailError">Enter a valid email address.</p>
@@ -115,7 +86,13 @@ const SahiAuth = (() => {
           <label>Confirm Password</label>
           <input type="password" id="sa-signup-confirm" placeholder="Re-enter password">
           <p class="sk-error-text" id="sa-passError">Passwords must match and be at least 6 characters.</p>
-          <button type="button" class="sr-submit" id="sa-signup-btn">Create Account</button>
+
+          <div class="fee-slogan">
+            💚 Don't look at it as ₹50 — it's your ticket to safety, protection, and a home-like experience with every booking on Sahi Kaam. It also supports our cancer care cause.
+            <strong>One-time only — you'll never be charged again.</strong>
+          </div>
+
+          <button type="button" class="sr-submit" id="sa-signup-btn">Pay ₹50 &amp; Create Account</button>
         </div>
 
         <p id="sa-status" class="sr-status"></p>
@@ -179,50 +156,71 @@ const SahiAuth = (() => {
 
   async function doSignup() {
     const name = document.getElementById("sa-signup-name").value.trim();
-    const dob = document.getElementById("sa-signup-dob").value;
-    const gender = document.getElementById("sa-signup-gender").value;
     const email = document.getElementById("sa-signup-email").value.trim();
     const password = document.getElementById("sa-signup-password").value;
     const confirm = document.getElementById("sa-signup-confirm").value;
     const statusEl = document.getElementById("sa-status");
 
     const nameOk = isValidName(name);
-    const dobOk = isValidDob(dob);
-    const genderOk = !!gender;
     const emailOk = isValidEmail(email);
     const passOk = password.length >= 6 && password === confirm;
 
     document.getElementById("sa-signup-name").classList.toggle("sk-field-error", !nameOk);
     document.getElementById("sa-nameError").classList.toggle("sk-show", !nameOk);
-    document.getElementById("sa-signup-dob").classList.toggle("sk-field-error", !dobOk);
-    document.getElementById("sa-dobError").classList.toggle("sk-show", !dobOk);
-    document.getElementById("sa-signup-gender").classList.toggle("sk-field-error", !genderOk);
-    document.getElementById("sa-genderError").classList.toggle("sk-show", !genderOk);
     document.getElementById("sa-signup-email").classList.toggle("sk-field-error", !emailOk);
     document.getElementById("sa-emailError").classList.toggle("sk-show", !emailOk);
     document.getElementById("sa-passError").classList.toggle("sk-show", !passOk);
 
-    if (!nameOk || !dobOk || !genderOk || !emailOk || !passOk) {
+    if (!nameOk || !emailOk || !passOk) {
       statusEl.textContent = "Please fix the highlighted fields.";
       statusEl.className = "sr-status sr-status-error";
       return;
     }
 
-    statusEl.textContent = "Creating your account...";
-    statusEl.className = "sr-status";
-    try {
-      const cred = await fns.createUserWithEmailAndPassword(auth, email, password);
-      await fns.updateProfile(cred.user, { displayName: name });
-      if (onSignupExtra) {
-        await onSignupExtra({ uid: cred.user.uid, name, dob, gender, email });
-      }
-      statusEl.textContent = "";
-      close();
-      if (pendingSuccessCb) { const cb = pendingSuccessCb; pendingSuccessCb = null; cb(); }
-    } catch (err) {
-      statusEl.textContent = friendlyError(err);
+    if (typeof SahiPayment === "undefined") {
+      statusEl.textContent = "Payment system not loaded on this page.";
       statusEl.className = "sr-status sr-status-error";
+      return;
     }
+
+    const signupBtn = document.getElementById("sa-signup-btn");
+    signupBtn.disabled = true;
+    statusEl.textContent = "Opening secure payment...";
+    statusEl.className = "sr-status";
+
+    SahiPayment.charge({
+      amountRupees: 50,
+      description: "Customer Registration Fee",
+      prefillName: name,
+      prefillEmail: email,
+      onSuccess: async (paymentId) => {
+        statusEl.textContent = "Payment received — creating your account...";
+        try {
+          const cred = await fns.createUserWithEmailAndPassword(auth, email, password);
+          await fns.updateProfile(cred.user, { displayName: name });
+          if (onSignupExtra) {
+            await onSignupExtra({ uid: cred.user.uid, name, email, registrationFeePaid: true, registrationPaymentId: paymentId });
+          }
+          statusEl.textContent = "";
+          close();
+          if (pendingSuccessCb) { const cb = pendingSuccessCb; pendingSuccessCb = null; cb(); }
+        } catch (err) {
+          statusEl.textContent = "Payment succeeded, but account creation failed: " + friendlyError(err) + " — contact support with payment ID: " + paymentId;
+          statusEl.className = "sr-status sr-status-error";
+        }
+        signupBtn.disabled = false;
+      },
+      onFailure: (message) => {
+        statusEl.textContent = "Payment failed: " + message;
+        statusEl.className = "sr-status sr-status-error";
+        signupBtn.disabled = false;
+      },
+      onCancel: () => {
+        statusEl.textContent = "Payment cancelled — account not created.";
+        statusEl.className = "sr-status sr-status-error";
+        signupBtn.disabled = false;
+      }
+    });
   }
 
   function open(mode, onSuccess) {
