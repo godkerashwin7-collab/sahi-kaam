@@ -367,6 +367,47 @@ const CATEGORY_PAGES = {
   "old-age-assistance": "old-age-assistance.html"
 };
 
+// ---- Pricing (EDIT ME) ----
+// Placeholder starting prices per category, in rupees. These are NOT
+// real rates — replace them with your actual pricing whenever ready.
+// You can also override a specific service's price below without
+// touching the category default.
+const CATEGORY_DEFAULT_PRICE = {
+  carpenter: 299,
+  electrician: 199,
+  painter: 249,
+  cleaning: 349,
+  plumber: 199,
+  "women-aid": 199,
+  "medical-aid": 199,
+  "old-age-assistance": 199
+};
+
+// Optional per-service overrides. Format: "categoryId::Exact Service Name": price
+// Example: "carpenter::Modular kitchen work": 999,
+const SERVICE_PRICE_OVERRIDES = {
+  // add overrides here as your real pricing firms up
+};
+
+function getServicePrice(categoryId, serviceName) {
+  const key = categoryId + "::" + serviceName;
+  if (SERVICE_PRICE_OVERRIDES.hasOwnProperty(key)) return SERVICE_PRICE_OVERRIDES[key];
+  return CATEGORY_DEFAULT_PRICE.hasOwnProperty(categoryId) ? CATEGORY_DEFAULT_PRICE[categoryId] : 199;
+}
+
+function getSelectedTotal(selectedObj) {
+  let total = 0;
+  Object.keys(selectedObj).forEach(catId => {
+    selectedObj[catId].forEach(service => {
+      total += getServicePrice(catId, service);
+    });
+  });
+  return total;
+}
+
+// Expose pricing so index.html's module script can use it for payment + display
+window.SahiPricing = { getServicePrice, getSelectedTotal, CATEGORY_DEFAULT_PRICE };
+
 function showCategoryLinks() {
   let panel = document.getElementById("continuePanel");
   if (!panel) {

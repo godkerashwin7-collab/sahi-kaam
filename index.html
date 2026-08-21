@@ -325,13 +325,20 @@
     window.sahiOpenBookingReview = function(selected, catalog) {
       const listEl = document.getElementById("booking-services-list");
       let html = "";
+      let total = 0;
       catalog.forEach(cat => {
         if (selected[cat.id] && selected[cat.id].length) {
           html += `<div class="booking-cat-block"><strong>${cat.icon} ${cat.name}</strong><ul>`;
-          selected[cat.id].forEach(s => html += `<li>${s}</li>`);
+          selected[cat.id].forEach(s => {
+            const price = window.SahiPricing.getServicePrice(cat.id, s);
+            total += price;
+            html += `<li><span>${s}</span><span class="booking-line-price">₹${price}</span></li>`;
+          });
           html += `</ul></div>`;
         }
       });
+      html += `<div class="booking-total-row"><span>Total (payable now)</span><strong>₹${total}</strong></div>`;
+      html += `<p class="booking-price-note">Prices shown are starting estimates and may be revised by the professional based on the actual job.</p>`;
       listEl.innerHTML = html;
 
       document.getElementById("booking-address").value = "";
@@ -343,9 +350,9 @@
       bookingOverlay.classList.remove("sr-hidden");
 
       // Stash for the confirm handler
-      bookingOverlay.dataset.pending = "1";
       window.__sahiPendingSelected = selected;
       window.__sahiPendingCatalog = catalog;
+      window.__sahiPendingTotal = total;
     };
 
     document.getElementById("booking-close").addEventListener("click", () => {
@@ -381,35 +388,65 @@
         return;
       }
 
+      const total = window.__sahiPendingTotal || 0;
       const confirmBtn = document.getElementById("booking-confirm-btn");
       confirmBtn.disabled = true;
-      statusEl.textContent = "Placing your booking...";
+
+      if (total <= 0) {
+        statusEl.textContent = "Nothing to charge — check your pricing setup.";
+        statusEl.className = "sr-status sr-status-error";
+        confirmBtn.disabled = false;
+        return;
+      }
+
+      statusEl.textContent = "Opening secure payment...";
       statusEl.className = "sr-status";
 
-      try {
-        await addDoc(collection(db, "bookings"), {
-          uid: user.uid,
-          customerName: user.displayName || "",
-          customerEmail: user.email || "",
-          services: window.__sahiPendingSelected,
-          address, preferredDate: date, preferredTime: time,
-          status: "submitted",
-          submittedAt: new Date().toISOString()
-        });
-        statusEl.textContent = "✅ Booking placed! Browse below to chat with specific professionals for each service.";
-        statusEl.className = "sr-status sr-status-ok";
-        setTimeout(() => {
-          bookingOverlay.classList.add("sr-hidden");
-          if (typeof window.showCategoryLinks === "function") {
-            window.showCategoryLinks();
+      SahiPayment.charge({
+        amountRupees: total,
+        description: "Sahi Kaamwala Booking Payment",
+        prefillName: user.displayName || "",
+        prefillEmail: user.email || "",
+        onSuccess: async (paymentId) => {
+          statusEl.textContent = "Payment received — placing your booking...";
+          try {
+            await addDoc(collection(db, "bookings"), {
+              uid: user.uid,
+              customerName: user.displayName || "",
+              customerEmail: user.email || "",
+              services: window.__sahiPendingSelected,
+              address, preferredDate: date, preferredTime: time,
+              amountPaid: total,
+              paymentId: paymentId,
+              status: "submitted",
+              submittedAt: new Date().toISOString()
+            });
+            statusEl.textContent = "✅ Payment received and booking placed! Browse below to chat with specific professionals for each service.";
+            statusEl.className = "sr-status sr-status-ok";
+            setTimeout(() => {
+              bookingOverlay.classList.add("sr-hidden");
+              if (typeof window.showCategoryLinks === "function") {
+                window.showCategoryLinks();
+              }
+            }, 1800);
+          } catch (err) {
+            statusEl.textContent = "Payment succeeded, but saving your booking failed. Contact support with payment ID: " + paymentId;
+            statusEl.className = "sr-status sr-status-error";
+            console.log(err);
           }
-        }, 1400);
-      } catch (err) {
-        statusEl.textContent = "Something went wrong placing your booking. Please try again.";
-        statusEl.className = "sr-status sr-status-error";
-        console.log(err);
-      }
-      confirmBtn.disabled = false;
+          confirmBtn.disabled = false;
+        },
+        onFailure: (message) => {
+          statusEl.textContent = "Payment failed: " + message;
+          statusEl.className = "sr-status sr-status-error";
+          confirmBtn.disabled = false;
+        },
+        onCancel: () => {
+          statusEl.textContent = "Payment cancelled — booking not placed.";
+          statusEl.className = "sr-status sr-status-error";
+          confirmBtn.disabled = false;
+        }
+      });
     });
   </script>
 </body>
