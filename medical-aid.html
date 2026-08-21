@@ -1,0 +1,124 @@
+<meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00838f">
+<link rel="stylesheet" href="verify.css">
+
+<style>
+  body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+  h1 { color: #00838f; }
+  .worker-card {
+    background: white; padding: 15px; margin: 10px 0; border-radius: 12px;
+    display: flex; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .worker-photo {
+    width: 60px; height: 60px; border-radius: 50%; background-color: #00838f;
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: bold; flex-shrink: 0;
+  }
+  .worker-info { flex: 1; }
+  .worker-info h2 { margin: 0 0 4px 0; font-size: 18px; }
+  .rating { color: #f9a825; font-weight: bold; }
+  .price { color: #333; font-weight: bold; float: right; }
+  .actions a {
+    display: inline-block; background-color: #00838f; color: white;
+    text-decoration: none; padding: 6px 10px; margin: 4px 4px 0 0;
+    border-radius: 6px; font-size: 14px;
+  }
+  .sk-request-btn { background-color: #1565c0; }
+</style>
+
+<h1>Medical Aid & Home Healthcare Near You</h1>
+
+<div class="emergency-bar">
+  <div class="emergency-header">
+    <span class="emergency-badge">🆘 IN AN EMERGENCY</span>
+    <p>These work instantly — no login or verification needed.</p>
+  </div>
+  <div class="emergency-grid">
+    <a class="emergency-btn emergency-primary" href="tel:112">📞<span>National Emergency<br>112</span></a>
+    <a class="emergency-btn" href="tel:108">🚑<span>Ambulance<br>108</span></a>
+    <a class="emergency-btn" href="tel:102">🚑<span>Ambulance (Alt)<br>102</span></a>
+    <a class="emergency-btn" href="tel:100">🚓<span>Police<br>100</span></a>
+  </div>
+</div>
+
+<div id="phoneVerifyBox"></div>
+
+<div id="workerList">Loading...</div>
+
+<script src="verify.js"></script>
+<script src="request.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
+    authDomain: "sahi-kaam-b32fa.firebaseapp.com",
+    projectId: "sahi-kaam-b32fa",
+    storageBucket: "sahi-kaam-b32fa.firebasestorage.app",
+    messagingSenderId: "187530591485",
+    appId: "1:187530591485:web:5f5973815c2b6ff5175294"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const SKILL = "medical-aid";
+
+  // Phone verification unlocks Call/Text/WhatsApp + Request buttons site-wide on this page
+  SahiVerify.mount("phoneVerifyBox", () => {
+    document.body.classList.add("sk-verified");
+  });
+
+  // Wire the shared request modal to write into Firestore
+  SahiRequest.init(async (requestData) => {
+    await addDoc(collection(db, "customer_requests"), requestData);
+  });
+
+  async function loadWorkers() {
+    const listDiv = document.getElementById("workerList");
+    listDiv.innerHTML = "";
+    const querySnapshot = await getDocs(collection(db, "workers"));
+    let count = 0;
+    querySnapshot.forEach((doc) => {
+      const worker = doc.data();
+      if (worker.skill.toLowerCase().trim() === SKILL) {
+        count++;
+        const initial = worker.name.trim().charAt(0).toUpperCase();
+        const rating = worker.rating || "New";
+        const price = worker.price ? "₹" + worker.price : "";
+        const card = document.createElement("div");
+        card.className = "worker-card";
+        card.innerHTML = `
+          <div class="worker-photo">${initial}</div>
+          <div class="worker-info">
+            <span class="price">${price}</span>
+            <h2>${worker.name}</h2>
+            <div class="rating">⭐ ${rating}</div>
+            <p>Area: ${worker.area}</p>
+            <div class="actions sk-locked-actions">
+              <a href="tel:${worker.phone}">📞 Call</a>
+              <a href="sms:${worker.phone}">💬 Text</a>
+              <a href="https://wa.me/91${worker.phone}">🟢 WhatsApp</a>
+              <button type="button" class="sk-request-btn" data-id="${doc.id}" data-name="${worker.name}">📋 Request</button>
+            </div>
+            <p class="sk-verify-hint">Verify your phone above to contact or request this worker.</p>
+          </div>
+        `;
+        card.querySelector(".sk-request-btn").addEventListener("click", (e) => {
+          SahiRequest.open({ id: doc.id, name: worker.name, skill: SKILL });
+        });
+        listDiv.appendChild(card);
+      }
+    });
+    if (count === 0) {
+      listDiv.innerHTML = "<p>No medical aid workers listed yet — the emergency numbers above are always available.</p>";
+    }
+  }
+
+  loadWorkers();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>

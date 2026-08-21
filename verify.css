@@ -216,3 +216,61 @@ body.sk-verified .sk-verify-hint {
   color: #14213D;
   border-bottom: 3px solid #FF6A3D;
 }
+
+/* ---- Emergency SOS block (always unlocked, no verification needed) ---- */
+.emergency-bar {
+  background: linear-gradient(135deg, #d32f2f, #8e0000);
+  color: #fff;
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+}
+.emergency-header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.emergency-badge {
+  display: inline-block;
+  background: #fff;
+  color: #c62828;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.emergency-header p {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #ffe0e0;
+}
+.emergency-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.emergency-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 10px;
+  padding: 12px 6px;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.emergency-btn span {
+  line-height: 1.25;
+}
+.emergency-primary {
+  grid-column: span 2;
+  background: #fff;
+  color: #c62828;
+  font-size: 16px;
+  padding: 16px 8px;
+}
