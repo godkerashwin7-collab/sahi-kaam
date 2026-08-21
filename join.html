@@ -1,46 +1,77 @@
-<<style>
+<meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2e7d32">
+<link rel="stylesheet" href="verify.css">
+
+<style>
   body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
   h1 { color: #2e7d32; }
-  input, select {
-    width: 100%; padding: 12px; font-size: 16px; margin: 8px 0;
+  .sk-sub { color: #555; margin-top: -8px; }
+  input, select, textarea {
+    width: 100%; padding: 12px; font-size: 16px; margin: 8px 0 2px;
     box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px;
+    font-family: inherit;
   }
-  button {
+  textarea { resize: vertical; min-height: 70px; }
+  button.sk-submit {
     width: 100%; padding: 14px; font-size: 18px; background-color: #2e7d32;
-    color: white; border: none; border-radius: 8px; margin-top: 10px;
+    color: white; border: none; border-radius: 8px; margin-top: 14px;
   }
   #status { margin-top: 15px; font-weight: bold; }
-  label { font-weight: bold; margin-top: 10px; display: block; }
+  label { font-weight: bold; margin-top: 14px; display: block; }
+  fieldset { border: none; padding: 0; margin: 0; }
 </style>
 
 <h1>Join as a Worker</h1>
-<p>Fill this form and we'll verify your details before listing you.</p>
+<p class="sk-sub">Fill this form and we'll verify your details before listing you.</p>
 
-<input type="text" id="name" placeholder="Full Name">
-<select id="skill">
-  <option value="">Select your skill</option>
-  <option value="plumber">Plumber</option>
-  <option value="electrician">Electrician</option>
-  <option value="carpenter">Carpenter</option>
-  <option value="painter">Painter</option>
-  <option value="cleaning">House Cleaning</option>
-</select>
-<input type="text" id="area" placeholder="Area (e.g. Andheri)">
-<input type="tel" id="phone" placeholder="Phone Number (10 digits)">
+<!-- Step 1: phone verification. Everything else is locked until this passes. -->
+<div id="phoneVerifyBox"></div>
 
-<label>ID Verification</label>
-<select id="idType">
-  <option value="">Select ID Type</option>
-  <option value="Aadhaar">Aadhaar Card</option>
-  <option value="PAN">PAN Card</option>
-  <option value="Driving License">Driving License</option>
-  <option value="Passport">Passport</option>
-</select>
-<input type="text" id="idNumber" placeholder="ID Number">
+<!-- Step 2: rest of the application — locked (greyed out) until verified -->
+<fieldset id="appFields" class="sk-locked" disabled>
 
-<button onclick="submitApplication()">Submit Application</button>
+  <label for="name">Full Name</label>
+  <input type="text" id="name" placeholder="e.g. Ramesh Kumar">
+  <p class="sk-error-text" id="nameError">Enter your full name (letters only, at least 3 characters).</p>
+
+  <label for="email">Email Address</label>
+  <input type="email" id="email" placeholder="e.g. ramesh@email.com">
+  <p class="sk-error-text" id="emailError">Enter a valid email address.</p>
+
+  <label for="address">Home Address</label>
+  <textarea id="address" placeholder="Flat/House no., building, street, landmark"></textarea>
+  <p class="sk-error-text" id="addressError">Enter your full address (at least 10 characters).</p>
+
+  <label for="skill">Your Skill</label>
+  <select id="skill">
+    <option value="">Select your skill</option>
+    <option value="plumber">Plumber</option>
+    <option value="electrician">Electrician</option>
+    <option value="carpenter">Carpenter</option>
+    <option value="painter">Painter</option>
+    <option value="cleaning">House Cleaning</option>
+  </select>
+
+  <label for="area">Area (e.g. Andheri)</label>
+  <input type="text" id="area" placeholder="Area you work in">
+
+  <label>ID Verification</label>
+  <select id="idType">
+    <option value="">Select ID Type</option>
+    <option value="Aadhaar">Aadhaar Card</option>
+    <option value="PAN">PAN Card</option>
+    <option value="Driving License">Driving License</option>
+    <option value="Passport">Passport</option>
+  </select>
+  <input type="text" id="idNumber" placeholder="ID Number">
+
+  <button type="button" class="sk-submit" id="submitBtn" onclick="submitApplication()">Submit Application</button>
+</fieldset>
+
 <p id="status"></p>
 
+<script src="verify.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -57,32 +88,86 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  // ---- Validation helpers ----
+  function isValidName(name) {
+    return /^[A-Za-z\s.]{3,60}$/.test(name.trim());
+  }
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
+  }
+  function isValidAddress(addr) {
+    return addr.trim().length >= 10;
+  }
+
+  function showFieldError(inputEl, errorEl, isValid) {
+    if (isValid) {
+      inputEl.classList.remove("sk-field-error");
+      errorEl.classList.remove("sk-show");
+    } else {
+      inputEl.classList.add("sk-field-error");
+      errorEl.classList.add("sk-show");
+    }
+  }
+
+  // Live validation as the user types/leaves each field
+  const nameEl = document.getElementById("name");
+  const emailEl = document.getElementById("email");
+  const addressEl = document.getElementById("address");
+  nameEl.addEventListener("blur", () => showFieldError(nameEl, document.getElementById("nameError"), nameEl.value === "" || isValidName(nameEl.value)));
+  emailEl.addEventListener("blur", () => showFieldError(emailEl, document.getElementById("emailError"), emailEl.value === "" || isValidEmail(emailEl.value)));
+  addressEl.addEventListener("blur", () => showFieldError(addressEl, document.getElementById("addressError"), addressEl.value === "" || isValidAddress(addressEl.value)));
+
+  // ---- Step 1: phone verification unlocks the rest of the form ----
+  let verifiedPhone = null;
+  SahiVerify.mount("phoneVerifyBox", (phone) => {
+    verifiedPhone = phone;
+    const fields = document.getElementById("appFields");
+    fields.classList.remove("sk-locked");
+    fields.disabled = false;
+  });
+
+  // ---- Step 2: submit ----
   window.submitApplication = async function() {
-    const name = document.getElementById("name").value.trim();
+    const name = nameEl.value.trim();
+    const email = emailEl.value.trim();
+    const address = addressEl.value.trim();
     const skill = document.getElementById("skill").value;
     const area = document.getElementById("area").value.trim();
-    const phone = document.getElementById("phone").value.trim();
     const idType = document.getElementById("idType").value;
     const idNumber = document.getElementById("idNumber").value.trim();
     const statusEl = document.getElementById("status");
 
-    if (!name || !skill || !area || !phone || !idType || !idNumber) {
-      statusEl.innerText = "Please fill all fields, including ID verification.";
+    if (!verifiedPhone) {
+      statusEl.innerText = "Please verify your phone number first.";
+      statusEl.style.color = "red";
+      return;
+    }
+
+    const nameOk = isValidName(name);
+    const emailOk = isValidEmail(email);
+    const addressOk = isValidAddress(address);
+    showFieldError(nameEl, document.getElementById("nameError"), nameOk);
+    showFieldError(emailEl, document.getElementById("emailError"), emailOk);
+    showFieldError(addressEl, document.getElementById("addressError"), addressOk);
+
+    if (!nameOk || !emailOk || !addressOk || !skill || !area || !idType || !idNumber) {
+      statusEl.innerText = "Please fix the highlighted fields and fill everything in.";
       statusEl.style.color = "red";
       return;
     }
 
     try {
       await addDoc(collection(db, "worker_applications"), {
-        name, skill, area, phone, idType, idNumber,
+        name, email, address, phone: verifiedPhone, skill, area, idType, idNumber,
         status: "pending",
         submittedAt: new Date().toISOString()
       });
       statusEl.innerText = "Thank you! We'll verify and contact you soon.";
       statusEl.style.color = "green";
-      document.getElementById("name").value = "";
+      nameEl.value = "";
+      emailEl.value = "";
+      addressEl.value = "";
       document.getElementById("area").value = "";
-      document.getElementById("phone").value = "";
       document.getElementById("skill").value = "";
       document.getElementById("idType").value = "";
       document.getElementById("idNumber").value = "";
