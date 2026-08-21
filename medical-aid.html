@@ -19,12 +19,13 @@
   .worker-info h2 { margin: 0 0 4px 0; font-size: 18px; }
   .rating { color: #f9a825; font-weight: bold; }
   .price { color: #333; font-weight: bold; float: right; }
-  .actions a {
+  .actions button {
     display: inline-block; background-color: #00838f; color: white;
-    text-decoration: none; padding: 6px 10px; margin: 4px 4px 0 0;
-    border-radius: 6px; font-size: 14px;
+    border: none; text-decoration: none; padding: 8px 12px; margin: 4px 4px 0 0;
+    border-radius: 6px; font-size: 14px; cursor: pointer;
   }
   .sk-request-btn { background-color: #1565c0; }
+  .sk-chat-btn { background-color: #2e7d32; }
 </style>
 
 <h1>Medical Aid & Home Healthcare Near You</h1>
@@ -47,10 +48,15 @@
 <div id="workerList">Loading...</div>
 
 <script src="verify.js"></script>
+<script src="chatbot.js"></script>
 <script src="request.js"></script>
+<script src="chat.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import {
+    getFirestore, collection, getDocs, addDoc,
+    doc, setDoc, updateDoc, arrayUnion, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
@@ -65,7 +71,7 @@
   const db = getFirestore(app);
   const SKILL = "medical-aid";
 
-  // Phone verification unlocks Call/Text/WhatsApp + Request buttons site-wide on this page
+  // Phone verification unlocks Chat + Request buttons site-wide on this page
   SahiVerify.mount("phoneVerifyBox", () => {
     document.body.classList.add("sk-verified");
   });
@@ -75,13 +81,19 @@
     await addDoc(collection(db, "customer_requests"), requestData);
   });
 
+  // Wire the limited chat box to Firestore
+  SahiChatBox.init({
+    db,
+    fns: { doc, setDoc, updateDoc, arrayUnion, onSnapshot }
+  });
+
   async function loadWorkers() {
     const listDiv = document.getElementById("workerList");
     listDiv.innerHTML = "";
     const querySnapshot = await getDocs(collection(db, "workers"));
     let count = 0;
-    querySnapshot.forEach((doc) => {
-      const worker = doc.data();
+    querySnapshot.forEach((docSnap) => {
+      const worker = docSnap.data();
       if (worker.skill.toLowerCase().trim() === SKILL) {
         count++;
         const initial = worker.name.trim().charAt(0).toUpperCase();
@@ -97,16 +109,17 @@
             <div class="rating">⭐ ${rating}</div>
             <p>Area: ${worker.area}</p>
             <div class="actions sk-locked-actions">
-              <a href="tel:${worker.phone}">📞 Call</a>
-              <a href="sms:${worker.phone}">💬 Text</a>
-              <a href="https://wa.me/91${worker.phone}">🟢 WhatsApp</a>
-              <button type="button" class="sk-request-btn" data-id="${doc.id}" data-name="${worker.name}">📋 Request</button>
+              <button type="button" class="sk-chat-btn" data-id="${docSnap.id}" data-name="${worker.name}">💬 Chat</button>
+              <button type="button" class="sk-request-btn" data-id="${docSnap.id}" data-name="${worker.name}">📋 Request</button>
             </div>
-            <p class="sk-verify-hint">Verify your phone above to contact or request this worker.</p>
+            <p class="sk-verify-hint">Verify your phone above to chat or request this worker.</p>
           </div>
         `;
-        card.querySelector(".sk-request-btn").addEventListener("click", (e) => {
-          SahiRequest.open({ id: doc.id, name: worker.name, skill: SKILL });
+        card.querySelector(".sk-chat-btn").addEventListener("click", () => {
+          SahiChatBox.open({ id: docSnap.id, name: worker.name, skill: SKILL });
+        });
+        card.querySelector(".sk-request-btn").addEventListener("click", () => {
+          SahiRequest.open({ id: docSnap.id, name: worker.name, skill: SKILL });
         });
         listDiv.appendChild(card);
       }

@@ -274,3 +274,180 @@ body.sk-verified .sk-verify-hint {
   font-size: 16px;
   padding: 16px 8px;
 }
+
+/* ---- Fee slogan (shown before payment on signup forms) ---- */
+.fee-slogan {
+  background: linear-gradient(135deg, #E8F5E9, #E3F2FD);
+  border: 1px solid #C8E6C9;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1B5E20;
+  margin: 14px 0;
+}
+.fee-slogan strong {
+  display: block;
+  margin-top: 4px;
+  color: #14213D;
+}
+
+/* ---- Live help chat widget ---- */
+.sc-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 18px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #14213D;
+  color: #fff;
+  border: none;
+  font-size: 24px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 900;
+}
+.sc-panel {
+  position: fixed;
+  bottom: 84px;
+  right: 18px;
+  width: min(340px, calc(100vw - 36px));
+  max-height: 70vh;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 900;
+}
+.sc-panel.sc-hidden {
+  display: none;
+}
+.sc-header {
+  background: #14213D;
+  color: #fff;
+  padding: 12px 14px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sc-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+.sc-body {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 180px;
+  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sc-msg {
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  max-width: 85%;
+}
+.sc-bot {
+  background: #F1F3F6;
+  color: #14213D;
+  align-self: flex-start;
+}
+.sc-user {
+  background: #14213D;
+  color: #fff;
+  align-self: flex-end;
+}
+.sc-quick-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.sc-chip {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #14213D;
+}
+.sc-footer {
+  display: flex;
+  border-top: 1px solid #eee;
+  padding: 8px;
+  gap: 6px;
+}
+.sc-footer input {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.sc-footer button {
+  background: #14213D;
+  color: #fff;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+}
+.sc-human-btn {
+  display: block;
+  text-align: center;
+  background: #25D366;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 10px;
+}
+
+/* ---- Limited worker chat box ---- */
+.cb-modal {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+.cb-note {
+  font-size: 12.5px;
+  color: #888;
+  margin: -6px 0 12px;
+}
+.cb-messages {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 160px;
+  max-height: 40vh;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+.cb-empty {
+  color: #999;
+  font-size: 13px;
+  text-align: center;
+  margin-top: 20px;
+}
+.cb-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
