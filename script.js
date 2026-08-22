@@ -1,9 +1,13 @@
 // ---- Service catalog ----
 // Edit this array to add/remove categories or services.
+// `active: false` hides a category from the homepage grid without deleting
+// its content — flip it to true once you actually have vetted workers
+// and (for the "care" group) proper protocols in place for that category.
 const CATALOG = [
   {
     id: "carpenter",
     group: "trade",
+    active: true,
     icon: "🪚",
     name: "Carpenter",
     tagline: "Furniture, fittings & woodwork",
@@ -23,6 +27,7 @@ const CATALOG = [
   {
     id: "electrician",
     group: "trade",
+    active: true,
     icon: "🔌",
     name: "Electrician",
     tagline: "Wiring, fittings & repairs",
@@ -42,6 +47,7 @@ const CATALOG = [
   {
     id: "painter",
     group: "trade",
+    active: true,
     icon: "🎨",
     name: "Painter",
     tagline: "Interior, exterior & touch-ups",
@@ -61,6 +67,7 @@ const CATALOG = [
   {
     id: "cleaning",
     group: "trade",
+    active: true,
     icon: "🧹",
     name: "Cleaning Services",
     tagline: "Home, office & deep cleaning",
@@ -80,6 +87,7 @@ const CATALOG = [
   {
     id: "plumber",
     group: "trade",
+    active: true,
     icon: "🔧",
     name: "Plumber",
     tagline: "Leaks, fittings & installations",
@@ -99,6 +107,7 @@ const CATALOG = [
   {
     id: "women-aid",
     group: "care",
+    active: false, // turn on only once trained/vetted staff + safety protocol are ready
     icon: "🤝",
     name: "Women Aid",
     tagline: "Support, safety & empowerment",
@@ -118,6 +127,7 @@ const CATALOG = [
   {
     id: "medical-aid",
     group: "care",
+    active: false, // turn on only once licensed medical/nursing staff are ready — do NOT advertise "ambulance"/"doctor on call" until genuinely arranged
     icon: "⚕️",
     name: "Medical Aid",
     tagline: "Home healthcare & emergency support",
@@ -137,6 +147,7 @@ const CATALOG = [
   {
     id: "old-age-assistance",
     group: "care",
+    active: false, // turn on only once trained/vetted staff + safety protocol are ready
     icon: "🧓",
     name: "Old Age Assistance",
     tagline: "Companionship & daily support for seniors",
@@ -224,6 +235,7 @@ function updateCounts() {
 let searchQuery = "";
 
 function categoryMatchesSearch(cat, query) {
+  if (!cat.active) return false;
   if (!query) return true;
   const q = query.toLowerCase();
   if (cat.name.toLowerCase().includes(q)) return true;

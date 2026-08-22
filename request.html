@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request Service — Sahi Kaamwala</title>
+<script src="business-info.js"></script>
 <style>
   body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
   h1 { color: #1e88e5; }
@@ -11,6 +18,8 @@
   }
   #status { margin-top: 15px; font-weight: bold; }
 </style>
+</head>
+<body>
 
 <h1>Request Help</h1>
 <p>Tell us what you need and we'll connect you with someone.</p>
@@ -59,6 +68,12 @@
       return;
     }
 
+    if (!/^[6-9]\d{9}$/.test(phone.replace(/\D/g, "").slice(-10))) {
+      statusEl.innerText = "Please enter a valid 10-digit Indian mobile number.";
+      statusEl.style.color = "red";
+      return;
+    }
+
     try {
       await addDoc(collection(db, "customer_requests"), {
         name, skill, area, phone,
@@ -73,3 +88,5 @@
     }
   }
 </script>
+</body>
+</html>

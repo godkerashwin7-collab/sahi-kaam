@@ -5,19 +5,20 @@
    live human agent. It answers common questions by keyword match
    and always offers a way to reach a real person (Call/WhatsApp).
 
-   Usage: just include this script on any page. It injects its own
-   floating button and panel. Optionally set before including it:
-     window.SAHI_HELP_PHONE = "+911234567890";
+   Usage: just include business-info.js BEFORE this script on the page.
+   It reads window.SAHI_BUSINESS.phoneLink / whatsappNumber automatically.
+   You can still override with window.SAHI_HELP_PHONE if needed.
    ============================================================ */
 
 (function () {
-  const HELP_PHONE = window.SAHI_HELP_PHONE || "+911234567890";
-  const HELP_WA = HELP_PHONE.replace(/[^\d]/g, "");
+  const biz = window.SAHI_BUSINESS || {};
+  const HELP_PHONE = window.SAHI_HELP_PHONE || biz.phoneLink || "+91XXXXXXXXXX";
+  const HELP_WA = biz.whatsappNumber || HELP_PHONE.replace(/[^\d]/g, "");
 
   const FAQ = [
     {
-      keywords: ["cost", "price", "fee", "charge", "money", "pay", "50", "100", "rupee", "₹"],
-      answer: "Workers pay a one-time ₹100 registration fee. Customers pay a one-time ₹50 registration fee. After that, it's completely free — no hidden charges, ever. A share of every fee supports our cancer care cause."
+      keywords: ["cost", "price", "fee", "charge", "money", "pay", "100", "rupee", "₹"],
+      answer: "Signing up as a customer is completely free. Workers pay a one-time ₹100 onboarding fee to get listed — after that, no hidden charges, ever. A share of every worker fee supports our cancer care cause."
     },
     {
       keywords: ["verify", "verified", "safe", "safety", "trust", "id", "aadhaar", "background"],

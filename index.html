@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="business-info.js"></script>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="verify.css">
 </head>
@@ -35,8 +36,8 @@
   <div class="help-bar">
     <span>Need help choosing a service?</span>
     <div class="help-bar-links">
-      <a href="tel:+911234567890">📞 Call us</a>
-      <a href="https://wa.me/911234567890?text=Hi%2C%20I%20need%20help%20with%20___.%20My%20location%20is%20___.%20Preferred%20time%3A%20___" target="_blank" rel="noopener">🟢 WhatsApp</a>
+      <a href="tel:" data-sk-phone-link>📞 Call us</a>
+      <a href="https://wa.me/" data-sk-whatsapp-link data-sk-whatsapp-msg="Hi, I need help with ___. My location is ___. Preferred time: ___" target="_blank" rel="noopener">🟢 WhatsApp</a>
     </div>
   </div>
 
@@ -56,14 +57,14 @@
     <div class="hero-content">
       <span class="hero-eyebrow">Since your first call, sorted.</span>
       <h2 class="hero-title">Every home, every helper —<br><em>one tap away.</em></h2>
-      <p class="hero-sub">From a leaking tap at 8pm to a grandparent who needs company on Sunday — Sahi Kaamwala connects you with verified help across the city.</p>
+      <p class="hero-sub">From a leaking tap at 8pm to a wobbly cupboard hinge — Sahi Kaamwala connects you with ID-verified home-service professionals across <span data-sk-service-areas>Mumbai</span>.</p>
       <a href="#categoryGrid" class="hero-cta">Book a Service ↓</a>
       <div class="hero-stats">
-        <div><strong>8</strong><span>categories</span></div>
-        <div><strong>80+</strong><span>listed services</span></div>
+        <div><strong>5</strong><span>categories</span></div>
+        <div><strong>50+</strong><span>listed services</span></div>
         <div><strong>Anytime</strong><span>submit a request</span></div>
       </div>
-      <p class="hero-fineprint">You can submit a request any time of day — actual visit timing depends on professional availability in your area.</p>
+      <p class="hero-fineprint">You can submit a request any time of day — actual visit timing depends on professional availability in your area (<span data-sk-service-areas>Mumbai</span> only, for now).</p>
     </div>
   </section>
 
@@ -103,12 +104,27 @@
         <span class="trust-icon-badge">🆘</span>
         <div class="trust-item-text">
           <strong>Emergency numbers always on</strong>
-          <p>Women Aid, Medical Aid, and Old Age Assistance pages show one-tap emergency numbers with no login needed.</p>
+          <p>Our Women Aid, Medical Aid, and Old Age Assistance pages show one-tap emergency helpline numbers with no login needed — these are genuine public helplines. Booking through those categories isn't open yet; we're starting with home-repair trades first.</p>
         </div>
       </div>
     </div>
-    </div>
     <p class="trust-honest-note">We're a growing platform and are honest about what's still on our roadmap — background checks, insurance, and formal training are not yet in place. We'll update this section the moment they are.</p>
+
+    <div class="about-us-block" style="max-width:640px; margin:28px auto 0; padding:0 20px;">
+      <span class="intro-eyebrow">Who we are</span>
+      <h3 style="margin-top:6px;">A Mumbai-based team, not a faceless app</h3>
+      <p style="color:#555; line-height:1.6;">
+        Sahi Kaamwala (<span data-sk-legal-name>REPLACE_ME_LEGAL_ENTITY_NAME</span>) is based in <span data-sk-service-areas>Mumbai</span>.
+        We're starting with trusted painters, carpenters and electricians, and growing carefully from there —
+        every professional we add gets ID checked, and we're working towards uniforms and formal licensing so you always know who's at your door.
+      </p>
+      <p style="color:#555; line-height:1.6;">
+        Questions or concerns any time: <a href="tel:" data-sk-phone-link data-sk-phone-text>call us</a>,
+        <a href="https://wa.me/" data-sk-whatsapp-link>WhatsApp us</a>, or email
+        <a href="mailto:" data-sk-email-link data-sk-email-text>support</a>.
+        Support hours: <span data-sk-support-hours>9:00 AM – 8:00 PM, all days</span>.
+      </p>
+    </div>
   </section>
 
   <main>
@@ -163,6 +179,8 @@
         <h4>Services</h4>
         <a href="carpenter.html">Carpenter</a>
         <a href="electrician.html">Electrician</a>
+        <a href="painter.html">Painter</a>
+        <a href="plumber.html">Plumber</a>
         <a href="cleaning.html">Cleaning</a>
         <a href="#categoryGrid">All Services</a>
       </div>
@@ -179,11 +197,14 @@
       </div>
       <div class="footer-col">
         <h4>Support</h4>
-        <a href="tel:+911234567890">📞 Call us</a>
-        <a href="https://wa.me/911234567890">💬 WhatsApp</a>
+        <a href="tel:" data-sk-phone-link>📞 Call us</a>
+        <a href="https://wa.me/" data-sk-whatsapp-link>💬 WhatsApp</a>
+        <a href="mailto:" data-sk-email-link data-sk-email-text>Email us</a>
       </div>
     </div>
-    <p class="footer-bottom">Sahi Kaamwala · Household chores, repairs &amp; community care, sorted.</p>
+    <p class="footer-bottom">
+      <span data-sk-legal-name>REPLACE_ME_LEGAL_ENTITY_NAME</span> · Based in <span data-sk-service-areas>Mumbai</span> · Household chores &amp; repairs, sorted.
+    </p>
   </footer>
 
   <!-- Profile panel (shown when the avatar is tapped while logged in) -->

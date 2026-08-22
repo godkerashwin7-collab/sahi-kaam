@@ -87,12 +87,7 @@ const SahiAuth = (() => {
           <input type="password" id="sa-signup-confirm" placeholder="Re-enter password">
           <p class="sk-error-text" id="sa-passError">Passwords must match and be at least 6 characters.</p>
 
-          <div class="fee-slogan">
-            💚 Don't look at it as ₹50 — it's your ticket to safety, protection, and a home-like experience with every booking on Sahi Kaam. It also supports our cancer care cause.
-            <strong>One-time only — you'll never be charged again.</strong>
-          </div>
-
-          <button type="button" class="sr-submit" id="sa-signup-btn">Pay ₹50 &amp; Create Account</button>
+          <button type="button" class="sr-submit" id="sa-signup-btn">Create Account</button>
         </div>
 
         <p id="sa-status" class="sr-status"></p>
@@ -177,50 +172,25 @@ const SahiAuth = (() => {
       return;
     }
 
-    if (typeof SahiPayment === "undefined") {
-      statusEl.textContent = "Payment system not loaded on this page.";
-      statusEl.className = "sr-status sr-status-error";
-      return;
-    }
-
     const signupBtn = document.getElementById("sa-signup-btn");
     signupBtn.disabled = true;
-    statusEl.textContent = "Opening secure payment...";
+    statusEl.textContent = "Creating your account...";
     statusEl.className = "sr-status";
 
-    SahiPayment.charge({
-      amountRupees: 50,
-      description: "Customer Registration Fee",
-      prefillName: name,
-      prefillEmail: email,
-      onSuccess: async (paymentId) => {
-        statusEl.textContent = "Payment received — creating your account...";
-        try {
-          const cred = await fns.createUserWithEmailAndPassword(auth, email, password);
-          await fns.updateProfile(cred.user, { displayName: name });
-          if (onSignupExtra) {
-            await onSignupExtra({ uid: cred.user.uid, name, email, registrationFeePaid: true, registrationPaymentId: paymentId });
-          }
-          statusEl.textContent = "";
-          close();
-          if (pendingSuccessCb) { const cb = pendingSuccessCb; pendingSuccessCb = null; cb(); }
-        } catch (err) {
-          statusEl.textContent = "Payment succeeded, but account creation failed: " + friendlyError(err) + " — contact support with payment ID: " + paymentId;
-          statusEl.className = "sr-status sr-status-error";
-        }
-        signupBtn.disabled = false;
-      },
-      onFailure: (message) => {
-        statusEl.textContent = "Payment failed: " + message;
-        statusEl.className = "sr-status sr-status-error";
-        signupBtn.disabled = false;
-      },
-      onCancel: () => {
-        statusEl.textContent = "Payment cancelled — account not created.";
-        statusEl.className = "sr-status sr-status-error";
-        signupBtn.disabled = false;
+    try {
+      const cred = await fns.createUserWithEmailAndPassword(auth, email, password);
+      await fns.updateProfile(cred.user, { displayName: name });
+      if (onSignupExtra) {
+        await onSignupExtra({ uid: cred.user.uid, name, email, registrationFeePaid: false, registrationPaymentId: null });
       }
-    });
+      statusEl.textContent = "";
+      close();
+      if (pendingSuccessCb) { const cb = pendingSuccessCb; pendingSuccessCb = null; cb(); }
+    } catch (err) {
+      statusEl.textContent = friendlyError(err);
+      statusEl.className = "sr-status sr-status-error";
+    }
+    signupBtn.disabled = false;
   }
 
   function open(mode, onSuccess) {
