@@ -403,6 +403,52 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   line-height:1.4;
 }
 
+/* ---- Trust mini strip (compact, above the fold) ---- */
+.trust-mini{
+  max-width:720px;
+  margin:0 auto;
+  padding:10px 18px;
+}
+.trust-mini-inner{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:10px 16px;
+  background: var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 14px;
+  box-shadow: var(--shadow);
+}
+.trust-mini-item{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  font-weight:600;
+  color: var(--navy);
+  white-space:nowrap;
+}
+.trust-mini-icon{
+  font-size:14px;
+}
+.trust-mini-more{
+  font-size:12px;
+  font-weight:700;
+  color:#FF6A3D;
+  text-decoration:none;
+  white-space:nowrap;
+  margin-left:auto;
+}
+.trust-mini-more:hover{
+  text-decoration:underline;
+}
+@media (max-width:420px){
+  .trust-mini-inner{ justify-content:flex-start; }
+  .trust-mini-more{ margin-left:0; }
+}
+
 /* ---- Trust section ---- */
 .trust-section{
   max-width:720px;

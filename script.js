@@ -248,6 +248,22 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.addEventListener("input", (e) => {
       searchQuery = e.target.value.trim();
       render();
+      // Scroll results into view once the person starts typing, so they're
+      // not left staring at the hero while filtered services sit below the fold.
+      if (searchQuery) {
+        const grid = document.getElementById("categoryGrid");
+        if (grid) grid.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
+
+  // Ticket counter in the header ("N selected") should jump straight to the
+  // services grid so people can review/continue their selections.
+  const ticketCounter = document.getElementById("ticketCounter");
+  if (ticketCounter) {
+    ticketCounter.addEventListener("click", () => {
+      const grid = document.getElementById("categoryGrid");
+      if (grid) grid.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 });
