@@ -377,6 +377,17 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   margin-bottom:16px;
   box-shadow: 0 4px 14px rgba(255,214,10,0.45);
 }
+.hero-cta-secondary{
+  display:block;
+  background: #FF6A3D;
+  color:#fff;
+  font-size:16px;
+  padding:14px 22px;
+  margin-left:0;
+  margin-top:-8px;
+  box-shadow: 0 4px 14px rgba(255,106,61,0.5);
+  text-align:center;
+}
 .hero-stats{
   display:flex;
   gap:24px;
@@ -581,22 +592,33 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   margin-top:10px;
 }
 
-/* ---- Intro ("How it works") — small, side-aligned note ---- */
+/* ---- Intro ("How it works") — optional, tap to open ---- */
 .intro{
   max-width:720px;
   margin:20px auto 0;
   padding:0 18px;
   text-align:right;
 }
-.intro-inner{
-  display:inline-block;
-  max-width:260px;
-  text-align:left;
+.intro-trigger{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
   background: var(--card);
   border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px 14px;
+  border-radius:20px;
+  padding:8px 14px;
+  font-size:12.5px;
+  font-weight:700;
+  color: var(--navy);
+  cursor:pointer;
   box-shadow: var(--shadow);
+  font-family: inherit;
+}
+.intro-trigger-icon{
+  font-size:13px;
+}
+.intro-trigger:active{
+  background: var(--bg-soft, #F4F6FA);
 }
 .intro-eyebrow{
   display:inline-block;
@@ -606,10 +628,6 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   text-transform:uppercase;
   color: var(--safety-dark);
   margin-bottom:8px;
-}
-.intro-inner .intro-eyebrow{
-  font-size:10px;
-  margin-bottom:4px;
 }
 .intro h3{
   font-size:14px;
@@ -625,7 +643,34 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
 }
 @media (max-width:480px){
   .intro{ text-align:left; }
-  .intro-inner{ max-width:100%; display:block; }
+}
+
+/* ---- How it works sliding sheet ---- */
+#how-it-works-overlay.sr-overlay{
+  align-items:flex-end;
+}
+.sr-sheet{
+  max-width:640px;
+  width:100%;
+  border-radius:18px 18px 0 0;
+  animation: sr-slide-up 0.22s ease-out;
+  padding:24px 22px 28px;
+}
+.sr-sheet .sheet-title{
+  font-size:19px;
+  font-weight:700;
+  margin:4px 0 8px;
+  color: var(--navy);
+}
+.sr-sheet .sheet-text{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+  margin:0;
+}
+@keyframes sr-slide-up {
+  from { opacity:0; transform: translateY(40px); }
+  to   { opacity:1; transform: translateY(0); }
 }
 
 /* ---- Category grid ---- */

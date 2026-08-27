@@ -59,10 +59,10 @@
       <h2 class="hero-title">Every home, every helper —<br><em>one tap away.</em></h2>
       <p class="hero-sub">From a leaking tap at 8pm to a wobbly cupboard hinge — Sahi Kaamwala connects you with ID-verified home-service professionals across <span data-sk-service-areas>Mumbai</span>.</p>
       <a href="#categoryGrid" class="hero-cta">Book a Service ↓</a>
+      <a href="#categoryGrid" class="hero-cta hero-cta-secondary">Submit a Request — Anytime →</a>
       <div class="hero-stats">
         <div><strong>5</strong><span>categories</span></div>
         <div><strong>50+</strong><span>listed services</span></div>
-        <div><strong>Anytime</strong><span>submit a request</span></div>
       </div>
       <p class="hero-fineprint">You can submit a request any time of day — actual visit timing depends on professional availability in your area (<span data-sk-service-areas>Mumbai</span> only, for now).</p>
     </div>
@@ -79,12 +79,20 @@
 
   <main>
     <section class="intro">
-      <div class="intro-inner">
-        <span class="intro-eyebrow">How it works</span>
-        <h3>Tap a trade, tick what you need</h3>
-        <p>Open any category below, check off exactly what the job needs, and your list is saved automatically — pick up right where you left off.</p>
-      </div>
+      <button type="button" class="intro-trigger" id="howItWorksTrigger">
+        <span class="intro-trigger-icon">ℹ️</span> How it works
+      </button>
     </section>
+
+    <!-- "How it works" — optional sliding sheet, closed by default -->
+    <div id="how-it-works-overlay" class="sr-overlay sr-hidden">
+      <div class="sr-modal sr-sheet">
+        <button type="button" class="sr-close" id="howItWorksClose" aria-label="Close">&times;</button>
+        <span class="intro-eyebrow">How it works</span>
+        <h3 class="sheet-title">Tap a trade, tick what you need</h3>
+        <p class="sheet-text">Open any category below, check off exactly what the job needs, and your list is saved automatically — pick up right where you left off.</p>
+      </div>
+    </div>
 
     <div class="category-grid" id="categoryGrid">
       <!-- Categories are injected by script.js -->
@@ -160,9 +168,11 @@
 
       <div class="about-us-block" style="max-width:640px; margin:28px auto 0; padding:0 20px;">
         <span class="intro-eyebrow">Who we are</span>
-        <h3 style="margin-top:6px;">A Mumbai-based team, not a faceless app</h3>
+        <h3 style="margin-top:6px;">An experienced Mumbai team, not a faceless app</h3>
         <p style="color:#555; line-height:1.6;">
-          Sahi Kaamwala (<span data-sk-legal-name>REPLACE_ME_LEGAL_ENTITY_NAME</span>) is based in <span data-sk-service-areas>Mumbai</span>.
+          Sahi Kaamwala (<span data-sk-legal-name>REPLACE_ME_LEGAL_ENTITY_NAME</span>) is run by <strong>Naresh Construction</strong>,
+          based in <span data-sk-service-areas>Mumbai</span>. Our team has been working in PWD (Public Works Department) projects
+          for over 25 years, and we're bringing that same hands-on construction and repair experience to everyday home services.
           We're starting with trusted painters, carpenters and electricians, and growing carefully from there —
           every professional we add gets ID checked, and we're working towards uniforms and formal licensing so you always know who's at your door.
         </p>
@@ -432,9 +442,22 @@
       if (e.target === bookingOverlay) bookingOverlay.classList.add("sr-hidden");
     });
 
+    // Sends a WhatsApp message to the business number so a real person
+    // actually sees the request immediately, instead of it just sitting
+    // in the database until someone happens to check.
+    function notifyBusinessOnWhatsApp(message) {
+      const waNumber = (window.SAHI_BUSINESS && window.SAHI_BUSINESS.whatsappNumber) || "";
+      if (!waNumber || waNumber.indexOf("REPLACE_ME") !== -1) {
+        console.warn("SAHI_BUSINESS.whatsappNumber is not set — skipping owner notification. Fill it in business-info.js.");
+        return;
+      }
+      const url = "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(message);
+      window.open(url, "_blank", "noopener");
+    }
+
     async function saveBooking(user, extra, statusEl, confirmBtn, successMsg) {
       try {
-        await addDoc(collection(db, "bookings"), Object.assign({
+        const bookingData = Object.assign({
           uid: user.uid,
           customerName: user.displayName || "",
           customerEmail: user.email || "",
@@ -445,9 +468,25 @@
           estimatedTotal: window.__sahiPendingTotal || 0,
           status: "submitted",
           submittedAt: new Date().toISOString()
-        }, extra));
+        }, extra);
+        await addDoc(collection(db, "bookings"), bookingData);
         statusEl.textContent = successMsg;
         statusEl.className = "sr-status sr-status-ok";
+
+        const serviceLines = Object.entries(window.__sahiPendingSelected || {})
+          .map(([catId, services]) => `- ${catId}: ${services.join(", ")}`)
+          .join("\n");
+        notifyBusinessOnWhatsApp(
+          `🔔 New booking on Sahi Kaamwala\n` +
+          `Name: ${bookingData.customerName || "N/A"}\n` +
+          `Email: ${bookingData.customerEmail || "N/A"}\n` +
+          `Address: ${bookingData.address}\n` +
+          `Date/Time: ${bookingData.preferredDate} ${bookingData.preferredTime}\n` +
+          `Services:\n${serviceLines}\n` +
+          `Estimated total: ₹${bookingData.estimatedTotal}\n` +
+          `Payment: ${extra.paymentMethod || "N/A"}`
+        );
+
         setTimeout(() => {
           bookingOverlay.classList.add("sr-hidden");
           if (typeof window.showCategoryLinks === "function") {

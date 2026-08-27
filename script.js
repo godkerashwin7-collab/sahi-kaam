@@ -266,6 +266,25 @@ document.addEventListener("DOMContentLoaded", () => {
       if (grid) grid.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
+
+  // "How it works" is optional reading — closed by default, opens as a
+  // sliding sheet only if someone taps to learn more.
+  const howItWorksTrigger = document.getElementById("howItWorksTrigger");
+  const howItWorksOverlay = document.getElementById("how-it-works-overlay");
+  const howItWorksClose = document.getElementById("howItWorksClose");
+  if (howItWorksTrigger && howItWorksOverlay) {
+    howItWorksTrigger.addEventListener("click", () => {
+      howItWorksOverlay.classList.remove("sr-hidden");
+    });
+    if (howItWorksClose) {
+      howItWorksClose.addEventListener("click", () => {
+        howItWorksOverlay.classList.add("sr-hidden");
+      });
+    }
+    howItWorksOverlay.addEventListener("click", (e) => {
+      if (e.target === howItWorksOverlay) howItWorksOverlay.classList.add("sr-hidden");
+    });
+  }
 });
 
 // ---- Render ----
