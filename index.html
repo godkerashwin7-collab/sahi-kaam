@@ -79,9 +79,11 @@
 
   <main>
     <section class="intro">
-      <span class="intro-eyebrow">How it works</span>
-      <h3>Tap a trade, tick what you need</h3>
-      <p>Open any category below, check off exactly what the job needs, and your list is saved automatically — pick up right where you left off.</p>
+      <div class="intro-inner">
+        <span class="intro-eyebrow">How it works</span>
+        <h3>Tap a trade, tick what you need</h3>
+        <p>Open any category below, check off exactly what the job needs, and your list is saved automatically — pick up right where you left off.</p>
+      </div>
     </section>
 
     <div class="category-grid" id="categoryGrid">
@@ -179,7 +181,7 @@
       <div class="tray-summary">
         <strong id="traySummaryCount">0</strong> service(s) selected
       </div>
-      <button class="tray-btn" id="continueBtn">Continue →</button>
+      <button class="tray-btn" id="continueBtn">Submit Request →</button>
     </div>
   </div>
 
@@ -260,7 +262,7 @@
       </div>
       <p class="sk-error-text" id="booking-methodError">Choose how you'd like to pay.</p>
 
-      <button type="button" class="sr-submit" id="booking-confirm-btn">Confirm Booking</button>
+      <button type="button" class="sr-submit cta-bold" id="booking-confirm-btn">Confirm Booking</button>
       <p id="booking-status" class="sr-status"></p>
     </div>
   </div>
