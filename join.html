@@ -87,19 +87,17 @@
   <input type="text" id="idNumber" placeholder="ID Number">
 
   <div class="fee-slogan">
-    💚 The ₹100 is a one-time onboarding fee — it covers ID collection and platform listing, and a share of it supports our cancer care cause.
-    <strong>One-time only — you'll never be charged again.</strong>
+    💚 Signing up as a professional is <strong>completely free</strong> — no onboarding fee, no hidden charges.
     <br><br>
-    <span style="font-weight:normal; display:block; margin-top:6px;">Please note: this fee covers ID collection and basic onboarding only. It is not a police verification or criminal background check. We'll clearly update this section the day full background checks are in place.</span>
+    <span style="font-weight:normal; display:block; margin-top:6px;">We still collect your ID for verification purposes so customers can trust who's coming to their home. Please note: this is ID collection and basic onboarding only — it is not a police verification or criminal background check. We'll clearly update this section the day full background checks are in place.</span>
   </div>
 
-  <button type="button" class="sk-submit" id="submitBtn" onclick="submitApplication()">Pay ₹100 &amp; Submit Application</button>
+  <button type="button" class="sk-submit" id="submitBtn" onclick="submitApplication()">Submit Application</button>
 </fieldset>
 
 <p id="status"></p>
 
 <script src="verify.js"></script>
-<script src="payment.js"></script>
 <script src="chatbot.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -187,51 +185,32 @@
 
     const submitBtn = document.getElementById("submitBtn");
     submitBtn.disabled = true;
-    statusEl.innerText = "Opening secure payment...";
+    statusEl.innerText = "Submitting your application...";
     statusEl.style.color = "#1565c0";
 
-    SahiPayment.charge({
-      amountRupees: 100,
-      description: "Worker Registration Fee",
-      prefillName: name,
-      prefillEmail: email,
-      prefillPhone: verifiedPhone,
-      onSuccess: async (paymentId) => {
-        try {
-          await addDoc(collection(db, "worker_applications"), {
-            name, email, address, phone: verifiedPhone, skill, area, idType, idNumber,
-            status: "pending",
-            registrationFeePaid: true,
-            registrationPaymentId: paymentId,
-            submittedAt: new Date().toISOString()
-          });
-          statusEl.innerText = "Payment received — thank you! We'll verify and contact you soon.";
-          statusEl.style.color = "green";
-          nameEl.value = "";
-          emailEl.value = "";
-          addressEl.value = "";
-          document.getElementById("area").value = "";
-          document.getElementById("skill").value = "";
-          document.getElementById("idType").value = "";
-          document.getElementById("idNumber").value = "";
-        } catch (error) {
-          statusEl.innerText = "Payment succeeded, but saving your application failed. Please contact support with payment ID: " + paymentId;
-          statusEl.style.color = "red";
-          console.log(error);
-        }
-        submitBtn.disabled = false;
-      },
-      onFailure: (message) => {
-        statusEl.innerText = "Payment failed: " + message;
-        statusEl.style.color = "red";
-        submitBtn.disabled = false;
-      },
-      onCancel: () => {
-        statusEl.innerText = "Payment cancelled — your application was not submitted.";
-        statusEl.style.color = "red";
-        submitBtn.disabled = false;
-      }
-    });
+    try {
+      await addDoc(collection(db, "worker_applications"), {
+        name, email, address, phone: verifiedPhone, skill, area, idType, idNumber,
+        status: "pending",
+        registrationFeePaid: false,
+        registrationPaymentId: null,
+        submittedAt: new Date().toISOString()
+      });
+      statusEl.innerText = "Application submitted — thank you! We'll verify and contact you soon.";
+      statusEl.style.color = "green";
+      nameEl.value = "";
+      emailEl.value = "";
+      addressEl.value = "";
+      document.getElementById("area").value = "";
+      document.getElementById("skill").value = "";
+      document.getElementById("idType").value = "";
+      document.getElementById("idNumber").value = "";
+    } catch (error) {
+      statusEl.innerText = "Something went wrong saving your application. Please try again.";
+      statusEl.style.color = "red";
+      console.log(error);
+    }
+    submitBtn.disabled = false;
   }
 </script>
 </body>

@@ -18,7 +18,7 @@
   const FAQ = [
     {
       keywords: ["cost", "price", "fee", "charge", "money", "pay", "100", "rupee", "₹"],
-      answer: "Signing up as a customer is completely free. Workers pay a one-time ₹100 onboarding fee to get listed — after that, no hidden charges, ever. A share of every worker fee supports our cancer care cause."
+      answer: "Signing up is completely free for everyone — customers and workers both. No onboarding fee, no hidden charges, ever."
     },
     {
       keywords: ["verify", "verified", "safe", "safety", "trust", "id", "aadhaar", "background"],
@@ -34,7 +34,7 @@
     },
     {
       keywords: ["join", "work", "register as worker", "become a worker", "sign up as worker"],
-      answer: "Tap 'Join as a Worker', verify your phone, fill in your details and ID, pay the one-time ₹100 fee, and submit. Our team reviews applications before listing you."
+      answer: "Tap 'Join as a Worker', verify your phone, fill in your details and ID, and submit — it's completely free. Our team reviews applications before listing you."
     },
     {
       keywords: ["human", "agent", "person", "talk", "call", "support", "real person"],
