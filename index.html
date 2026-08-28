@@ -27,12 +27,37 @@
         <button type="button" class="ticket-counter" id="ticketCounter">
           <span id="selectedCount">0</span> selected
         </button>
+        <button type="button" id="hamburgerBtn" class="hamburger-btn" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
         <button type="button" id="profileBtn" class="profile-avatar" aria-label="Account">
           <span id="profileAvatarIcon">👤</span>
         </button>
       </div>
     </div>
   </header>
+
+  <!-- Slide-out navigation menu -->
+  <div id="nav-drawer-overlay" class="sr-overlay sr-hidden nav-drawer-overlay">
+    <nav class="nav-drawer">
+      <div class="nav-drawer-head">
+        <span class="brand-mark">SK</span>
+        <button type="button" class="sr-close" id="navDrawerClose" aria-label="Close menu">&times;</button>
+      </div>
+      <div class="nav-drawer-links">
+        <a href="#categoryGrid" class="nav-drawer-link">🧰 <span>All Services</span></a>
+        <a href="#trust" class="nav-drawer-link">✅ <span>Why Trust Us</span></a>
+        <a href="#team" class="nav-drawer-link">👥 <span>Our Team</span></a>
+        <a href="#blog" class="nav-drawer-link">📝 <span>Blog</span></a>
+        <a href="#reviews" class="nav-drawer-link">⭐ <span>Reviews</span></a>
+        <a href="join.html" class="nav-drawer-link">🛠️ <span>Become a Professional</span></a>
+        <button type="button" class="nav-drawer-link nav-drawer-link-btn" id="navDrawerAccount">👤 <span>My Account</span></button>
+        <div class="nav-drawer-divider"></div>
+        <a href="tel:" data-sk-phone-link class="nav-drawer-link">📞 <span data-sk-phone-text>Call us</span></a>
+        <a href="https://wa.me/" data-sk-whatsapp-link class="nav-drawer-link">💬 <span>WhatsApp</span></a>
+      </div>
+    </nav>
+  </div>
 
   <div class="help-bar">
     <span>Need help choosing a service?</span>
@@ -232,8 +257,81 @@
         </div>
         <p class="team-note">Replace the placeholder names, roles, and bios above (in <code>index.html</code>) with your real team once ready — customers trust faces and names more than a logo.</p>
       </div>
+
+      <!-- Blog / posts -->
+      <div class="blog-section" id="blog">
+        <span class="intro-eyebrow">From the workshop</span>
+        <h3 class="team-heading">Tips, updates &amp; behind-the-scenes</h3>
+        <p class="team-subheading">Short posts on home maintenance, our latest work, and what's new on the platform.</p>
+
+        <div class="blog-grid">
+          <a href="#" class="blog-card">
+            <span class="blog-card-icon">🔧</span>
+            <span class="blog-card-tag">Maintenance Tips</span>
+            <strong class="blog-card-title">REPLACE_ME_BLOG_POST_1_TITLE</strong>
+            <p class="blog-card-excerpt">REPLACE_ME_BLOG_POST_1_EXCERPT — a couple of lines summarizing the post.</p>
+          </a>
+          <a href="#" class="blog-card">
+            <span class="blog-card-icon">🏠</span>
+            <span class="blog-card-tag">Before &amp; After</span>
+            <strong class="blog-card-title">REPLACE_ME_BLOG_POST_2_TITLE</strong>
+            <p class="blog-card-excerpt">REPLACE_ME_BLOG_POST_2_EXCERPT — a couple of lines summarizing the post.</p>
+          </a>
+          <a href="#" class="blog-card">
+            <span class="blog-card-icon">📣</span>
+            <span class="blog-card-tag">Platform Update</span>
+            <strong class="blog-card-title">REPLACE_ME_BLOG_POST_3_TITLE</strong>
+            <p class="blog-card-excerpt">REPLACE_ME_BLOG_POST_3_EXCERPT — a couple of lines summarizing the post.</p>
+          </a>
+        </div>
+        <p class="team-note">These are placeholder posts. Swap in real write-ups (or link to a blog.html page per post) whenever you're ready to publish.</p>
+      </div>
+
+      <!-- Ratings & reviews -->
+      <div class="reviews-section" id="reviews">
+        <span class="intro-eyebrow">Customer reviews</span>
+        <h3 class="team-heading">What people are saying</h3>
+
+        <div class="reviews-summary">
+          <div class="reviews-avg-number" id="reviewsAvgNumber">—</div>
+          <div class="reviews-summary-text">
+            <div class="reviews-avg-stars" id="reviewsAvgStars">☆☆☆☆☆</div>
+            <span id="reviewsCount">No reviews yet</span>
+          </div>
+        </div>
+
+        <button type="button" class="cta-bold reviews-write-btn" id="reviewsWriteBtn">⭐ Write a Review</button>
+
+        <div class="reviews-list" id="reviewsList">
+          <p class="activity-empty">Loading reviews...</p>
+        </div>
+      </div>
     </section>
   </main>
+
+  <!-- Write a review -->
+  <div id="review-overlay" class="sr-overlay sr-hidden">
+    <div class="sr-modal">
+      <button type="button" class="sr-close" id="review-close">&times;</button>
+      <h2>Write a Review</h2>
+      <label>Your Rating</label>
+      <div class="star-picker" id="starPicker">
+        <button type="button" class="star-btn" data-star="1">★</button>
+        <button type="button" class="star-btn" data-star="2">★</button>
+        <button type="button" class="star-btn" data-star="3">★</button>
+        <button type="button" class="star-btn" data-star="4">★</button>
+        <button type="button" class="star-btn" data-star="5">★</button>
+      </div>
+      <p class="sk-error-text" id="review-ratingError">Pick a star rating.</p>
+
+      <label>Your Review</label>
+      <textarea id="review-comment" placeholder="How was your experience with Sahi Kaamwala?"></textarea>
+      <p class="sk-error-text" id="review-commentError">Write a few words about your experience (at least 10 characters).</p>
+
+      <button type="button" class="sr-submit cta-bold" id="review-submit-btn">Submit Review</button>
+      <p id="review-status" class="sr-status"></p>
+    </div>
+  </div>
 
   <div class="tray" id="selectionTray">
     <div class="tray-inner">
@@ -250,6 +348,8 @@
         <h4>Company</h4>
         <a href="#trust">About Us</a>
         <a href="#team">Our Team</a>
+        <a href="#blog">Blog</a>
+        <a href="#reviews">Reviews</a>
         <a href="join.html">Become a Professional</a>
         <a href="#" onclick="document.getElementById('sc-fab').click(); return false;">Contact</a>
       </div>
@@ -469,6 +569,26 @@
     const profileAvatarIcon = document.getElementById("profileAvatarIcon");
     const profileOverlay = document.getElementById("profile-overlay");
 
+    // ---- Hamburger / slide-out nav drawer ----
+    const navDrawerOverlay = document.getElementById("nav-drawer-overlay");
+    document.getElementById("hamburgerBtn").addEventListener("click", () => {
+      navDrawerOverlay.classList.remove("sr-hidden");
+    });
+    document.getElementById("navDrawerClose").addEventListener("click", () => {
+      navDrawerOverlay.classList.add("sr-hidden");
+    });
+    navDrawerOverlay.addEventListener("click", (e) => {
+      if (e.target === navDrawerOverlay) navDrawerOverlay.classList.add("sr-hidden");
+    });
+    // Close the drawer automatically whenever a link inside it is tapped
+    navDrawerOverlay.querySelectorAll("a.nav-drawer-link").forEach(link => {
+      link.addEventListener("click", () => navDrawerOverlay.classList.add("sr-hidden"));
+    });
+    document.getElementById("navDrawerAccount").addEventListener("click", () => {
+      navDrawerOverlay.classList.add("sr-hidden");
+      profileBtn.click();
+    });
+
     function initials(nameOrEmail) {
       if (!nameOrEmail) return "👤";
       const parts = nameOrEmail.trim().split(/\s+/);
@@ -643,6 +763,151 @@
         SahiAuth.open("login", onSuccess);
       }
     };
+
+    // ---- Ratings & Reviews ----
+    const reviewOverlay = document.getElementById("review-overlay");
+    const reviewsList = document.getElementById("reviewsList");
+    const starPicker = document.getElementById("starPicker");
+    const starButtons = Array.from(starPicker.querySelectorAll(".star-btn"));
+    let selectedStars = 0;
+
+    function renderStars(container, value) {
+      container.textContent = "★★★★★☆☆☆☆☆".slice(5 - value, 10 - value);
+    }
+
+    function paintStarPicker(value) {
+      starButtons.forEach(btn => {
+        const n = parseInt(btn.getAttribute("data-star"), 10);
+        btn.classList.toggle("star-btn-active", n <= value);
+      });
+    }
+
+    starButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedStars = parseInt(btn.getAttribute("data-star"), 10);
+        paintStarPicker(selectedStars);
+        document.getElementById("review-ratingError").classList.remove("sk-show");
+      });
+    });
+
+    function timeAgo(iso) {
+      const then = new Date(iso).getTime();
+      const days = Math.floor((Date.now() - then) / 86400000);
+      if (days <= 0) return "Today";
+      if (days === 1) return "1 day ago";
+      if (days < 30) return `${days} days ago`;
+      const months = Math.floor(days / 30);
+      if (months < 12) return `${months} month${months === 1 ? "" : "s"} ago`;
+      return `${Math.floor(months / 12)} year${months >= 24 ? "s" : ""} ago`;
+    }
+
+    async function loadReviews() {
+      reviewsList.innerHTML = `<p class="activity-empty">Loading reviews...</p>`;
+      try {
+        const q = query(collection(db, "reviews"), orderBy("submittedAt", "desc"), limit(30));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+          document.getElementById("reviewsAvgNumber").textContent = "—";
+          renderStars(document.getElementById("reviewsAvgStars"), 0);
+          document.getElementById("reviewsCount").textContent = "No reviews yet — be the first!";
+          reviewsList.innerHTML = `<p class="activity-empty">No reviews yet. Once customers start booking, their reviews will show up here.</p>`;
+          return;
+        }
+
+        let total = 0;
+        let html = "";
+        snap.forEach(docSnap => {
+          const r = docSnap.data();
+          total += (r.rating || 0);
+          const starsStr = "★★★★★☆☆☆☆☆".slice(5 - (r.rating || 0), 10 - (r.rating || 0));
+          html += `
+            <div class="review-item">
+              <div class="review-item-top">
+                <strong>${r.name || "Customer"}</strong>
+                <span class="review-item-stars">${starsStr}</span>
+              </div>
+              <p class="review-item-comment">${(r.comment || "").replace(/</g, "&lt;")}</p>
+              <span class="review-item-date">${r.submittedAt ? timeAgo(r.submittedAt) : ""}</span>
+            </div>`;
+        });
+        reviewsList.innerHTML = html;
+
+        const avg = total / snap.size;
+        document.getElementById("reviewsAvgNumber").textContent = avg.toFixed(1);
+        renderStars(document.getElementById("reviewsAvgStars"), Math.round(avg));
+        document.getElementById("reviewsCount").textContent =
+          `Based on ${snap.size} review${snap.size === 1 ? "" : "s"}`;
+      } catch (err) {
+        console.log(err);
+        reviewsList.innerHTML = `<p class="activity-empty">Couldn't load reviews right now.</p>`;
+      }
+    }
+    loadReviews();
+
+    function openReviewModal() {
+      selectedStars = 0;
+      paintStarPicker(0);
+      document.getElementById("review-comment").value = "";
+      document.getElementById("review-status").textContent = "";
+      document.getElementById("review-ratingError").classList.remove("sk-show");
+      document.getElementById("review-commentError").classList.remove("sk-show");
+      reviewOverlay.classList.remove("sr-hidden");
+    }
+
+    document.getElementById("reviewsWriteBtn").addEventListener("click", () => {
+      window.sahiRequireLogin(openReviewModal);
+    });
+    document.getElementById("review-close").addEventListener("click", () => {
+      reviewOverlay.classList.add("sr-hidden");
+    });
+    reviewOverlay.addEventListener("click", (e) => {
+      if (e.target === reviewOverlay) reviewOverlay.classList.add("sr-hidden");
+    });
+
+    document.getElementById("review-submit-btn").addEventListener("click", async () => {
+      const comment = document.getElementById("review-comment").value.trim();
+      const statusEl = document.getElementById("review-status");
+      const ratingOk = selectedStars > 0;
+      const commentOk = comment.length >= 10;
+
+      document.getElementById("review-ratingError").classList.toggle("sk-show", !ratingOk);
+      document.getElementById("review-commentError").classList.toggle("sk-show", !commentOk);
+      if (!ratingOk || !commentOk) return;
+
+      const user = SahiAuth.getUser();
+      if (!user) {
+        statusEl.textContent = "Please log in again.";
+        statusEl.className = "sr-status sr-status-error";
+        return;
+      }
+
+      const submitBtn = document.getElementById("review-submit-btn");
+      submitBtn.disabled = true;
+      statusEl.textContent = "Submitting...";
+      statusEl.className = "sr-status";
+
+      try {
+        await addDoc(collection(db, "reviews"), {
+          uid: user.uid,
+          name: user.displayName || (user.email ? user.email.split("@")[0] : "Customer"),
+          rating: selectedStars,
+          comment,
+          submittedAt: new Date().toISOString()
+        });
+        statusEl.textContent = "✅ Thanks for your review!";
+        statusEl.className = "sr-status sr-status-ok";
+        setTimeout(() => {
+          reviewOverlay.classList.add("sr-hidden");
+          loadReviews();
+        }, 1200);
+      } catch (err) {
+        console.log(err);
+        statusEl.textContent = "Something went wrong. Please try again.";
+        statusEl.className = "sr-status sr-status-error";
+      }
+      submitBtn.disabled = false;
+    });
 
     // ---- Booking review & confirm ----
     const bookingOverlay = document.getElementById("booking-overlay");
