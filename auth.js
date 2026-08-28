@@ -71,8 +71,10 @@ const SahiAuth = (() => {
           <label>Password</label>
           <input type="password" id="sa-login-password" name="password" placeholder="Password" autocomplete="current-password">
           <button type="submit" class="sr-submit" id="sa-login-btn">Log In</button>
-          <button type="button" class="sa-forgot-link" id="sa-forgot-btn">Forgot password?</button>
-          <p class="sa-username-hint">Your email address is your username — no separate username to remember.</p>
+          <div class="sa-forgot-row">
+            <button type="button" class="sa-forgot-link" id="sa-forgot-btn">Forgot password?</button>
+            <button type="button" class="sa-forgot-link" id="sa-forgot-username-btn">Forgot email?</button>
+          </div>
         </form>
 
         <form id="sa-signup-form" class="sr-hidden" autocomplete="on">
@@ -114,6 +116,7 @@ const SahiAuth = (() => {
       doSignup();
     });
     document.getElementById("sa-forgot-btn").addEventListener("click", doForgotPassword);
+    document.getElementById("sa-forgot-username-btn").addEventListener("click", doForgotUsername);
   }
 
   function switchTab(mode) {
@@ -231,6 +234,19 @@ const SahiAuth = (() => {
       statusEl.textContent = "If that email has an account, a reset link is on its way.";
       statusEl.className = "sr-status";
     }
+  }
+
+  function doForgotUsername() {
+    const statusEl = document.getElementById("sa-status");
+    const b = window.SAHI_BUSINESS || {};
+    const waMsg = encodeURIComponent("Hi, I've forgotten which email I used to sign up on Sahi Kaamwala. Can you help me find my account?");
+    const waLink = b.whatsappNumber ? `https://wa.me/${b.whatsappNumber}?text=${waMsg}` : null;
+
+    statusEl.innerHTML = `Your email address <em>is</em> your login — there's no separate username.
+      If you've forgotten which email you signed up with, our team can help you find it:
+      ${waLink ? `<a href="${waLink}" target="_blank" rel="noopener">message us on WhatsApp</a>` : ""}
+      ${b.supportEmail ? ` or email <a href="mailto:${b.supportEmail}">${b.supportEmail}</a>` : ""}.`;
+    statusEl.className = "sr-status";
   }
 
   function open(mode, onSuccess) {

@@ -209,9 +209,15 @@ body.sk-verified .sk-verify-hint {
 }
 .sr-status-ok { color: #2e7d32; }
 .sr-status-error { color: #c62828; }
+.sa-forgot-row{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  margin-top:10px;
+}
 .sa-forgot-link{
   display:block;
-  margin:10px auto 0;
+  margin:0;
   background:none;
   border:none;
   color:#1565c0;
