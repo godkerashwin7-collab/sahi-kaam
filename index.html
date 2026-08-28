@@ -17,8 +17,7 @@
   <header class="site-header">
     <div class="header-inner">
       <div class="brand">
-        <span class="brand-mark">SK</span>
-        <div class="brand-text">
+        <span class="brand-mark" id="brandMarkHeader">SK</span>
           <h1>Sahi Kaamwala</h1>
           <p class="brand-tagline">Trusted help, at your doorstep.</p>
         </div>
@@ -42,7 +41,7 @@
   <div id="nav-drawer-overlay" class="sr-overlay sr-hidden nav-drawer-overlay">
     <nav class="nav-drawer">
       <div class="nav-drawer-head">
-        <span class="brand-mark">SK</span>
+        <span class="brand-mark" id="brandMarkDrawer">SK</span>
         <button type="button" class="sr-close" id="navDrawerClose" aria-label="Close menu">&times;</button>
       </div>
       <div class="nav-drawer-links">
@@ -509,6 +508,15 @@
           <span class="pm-chevron">›</span>
         </button>
 
+        <button type="button" class="profile-menu-item" id="pm-customize">
+          <span class="pm-icon">🎨</span>
+          <span class="pm-text">
+            <strong>Customize Look</strong>
+            <span>Pick your logo color &amp; avatar</span>
+          </span>
+          <span class="pm-chevron">›</span>
+        </button>
+
         <a href="join.html" class="profile-menu-item">
           <span class="pm-icon">🧰</span>
           <span class="pm-text">
@@ -549,6 +557,24 @@
 
       <div class="profile-field profile-field-email"><span>Email</span><strong id="profile-email">—</strong></div>
       <button type="button" class="sr-submit profile-logout-btn" id="profile-logout-btn">Log Out</button>
+    </div>
+  </div>
+
+  <!-- Customize Look: logo color + avatar picker -->
+  <div id="customize-overlay" class="sr-overlay sr-hidden">
+    <div class="sr-modal">
+      <button type="button" class="sr-close" id="customize-close">&times;</button>
+      <h2 style="margin:0 0 4px;">Customize Look</h2>
+      <p style="margin:0 0 16px; font-size:13px; color:#666;">Make Sahi Kaamwala feel like yours — pick a logo color and an avatar. Only you see these change on your own device/account.</p>
+
+      <h3 class="customize-subhead">Logo Color</h3>
+      <div class="customize-swatch-row" id="customizeSwatchRow"></div>
+
+      <h3 class="customize-subhead">Your Avatar</h3>
+      <div class="customize-avatar-grid" id="customizeAvatarGrid"></div>
+      <label class="customize-upload-btn" for="customizePhotoInput">📷 Upload a Photo Instead</label>
+      <input type="file" id="customizePhotoInput" accept="image/*" style="display:none;">
+      <p id="customizeStatus" class="sr-status"></p>
     </div>
   </div>
 
@@ -657,11 +683,13 @@
       return chars.toUpperCase();
     }
 
+    let currentAvatar = null;
+
     async function openProfilePanel(user) {
       const displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Guest");
       document.getElementById("profile-name-big").textContent = displayName;
       document.getElementById("profile-email").textContent = user.email || "—";
-      document.getElementById("profile-avatar-big").textContent = initials(user.displayName || user.email);
+      renderAvatarInto(document.getElementById("profile-avatar-big"), currentAvatar, initials(user.displayName || user.email));
 
       const verifiedBadge = document.getElementById("profile-verified-badge");
       verifiedBadge.style.display = user.emailVerified ? "inline-flex" : "none";
@@ -702,6 +730,137 @@
       const card = document.querySelector(".location-card");
       if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
     });
+
+    // ---- Customize Look: logo color + avatar (emoji or photo) ----
+    const LOGO_COLORS = ["#FF6A3D", "#1565C0", "#2E7D32", "#8E24AA", "#D81B60", "#00897B", "#F9A825"];
+    const AVATAR_EMOJIS = ["👤", "🙂", "😎", "🧑", "👩", "👨", "🧕", "👷", "🧑‍🔧", "🏗️", "🔧", "🎨", "🌟", "🐯", "🦁", "🐼"];
+
+    function renderAvatarInto(el, avatar, fallbackText) {
+      if (avatar && avatar.type === "photo" && avatar.value) {
+        el.innerHTML = `<img src="${avatar.value}" alt="Your avatar">`;
+      } else if (avatar && avatar.type === "emoji" && avatar.value) {
+        el.textContent = avatar.value;
+      } else {
+        el.textContent = fallbackText;
+      }
+    }
+
+    function applyLogoColor(hex) {
+      document.documentElement.style.setProperty("--brand-logo-color", hex);
+      localStorage.setItem("sahi_logo_color", hex);
+      document.querySelectorAll(".customize-swatch").forEach(sw => {
+        sw.classList.toggle("customize-swatch-active", sw.dataset.color === hex);
+      });
+    }
+
+    function applyAvatar(avatar, fallbackText) {
+      currentAvatar = avatar;
+      localStorage.setItem("sahi_avatar", JSON.stringify(avatar));
+      renderAvatarInto(profileAvatarIcon, avatar, fallbackText);
+      const bigEl = document.getElementById("profile-avatar-big");
+      if (bigEl) renderAvatarInto(bigEl, avatar, fallbackText);
+      document.querySelectorAll(".customize-avatar-option").forEach(opt => {
+        opt.classList.toggle("customize-avatar-option-active", avatar && avatar.type === "emoji" && opt.dataset.emoji === avatar.value);
+      });
+    }
+
+    function loadLocalCustomization(fallbackText) {
+      const savedColor = localStorage.getItem("sahi_logo_color");
+      if (savedColor) applyLogoColor(savedColor);
+      const savedAvatarRaw = localStorage.getItem("sahi_avatar");
+      if (savedAvatarRaw) {
+        try { applyAvatar(JSON.parse(savedAvatarRaw), fallbackText); } catch (e) { /* ignore bad data */ }
+      }
+    }
+
+    // Build the swatch row + emoji grid once
+    const swatchRow = document.getElementById("customizeSwatchRow");
+    LOGO_COLORS.forEach(hex => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "customize-swatch";
+      b.style.background = hex;
+      b.dataset.color = hex;
+      b.setAttribute("aria-label", "Logo color " + hex);
+      b.addEventListener("click", async () => {
+        applyLogoColor(hex);
+        if (SahiAuth.isLoggedIn()) {
+          try { await setDoc(doc(db, "users", SahiAuth.getUser().uid), { logoColor: hex }, { merge: true }); } catch (e) {}
+        }
+      });
+      swatchRow.appendChild(b);
+    });
+
+    const avatarGrid = document.getElementById("customizeAvatarGrid");
+    AVATAR_EMOJIS.forEach(emoji => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "customize-avatar-option";
+      b.textContent = emoji;
+      b.dataset.emoji = emoji;
+      b.addEventListener("click", async () => {
+        const user = SahiAuth.getUser();
+        const fallback = user ? initials(user.displayName || user.email) : "👤";
+        const avatar = { type: "emoji", value: emoji };
+        applyAvatar(avatar, fallback);
+        if (user) {
+          try { await setDoc(doc(db, "users", user.uid), { avatar }, { merge: true }); } catch (e) {}
+        }
+      });
+      avatarGrid.appendChild(b);
+    });
+
+    document.getElementById("customizePhotoInput").addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const statusEl = document.getElementById("customizeStatus");
+      statusEl.textContent = "Processing photo...";
+      statusEl.className = "sr-status";
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = async () => {
+          // Resize to a small square so it stays light to store/load.
+          const size = 128;
+          const canvas = document.createElement("canvas");
+          canvas.width = size; canvas.height = size;
+          const ctx = canvas.getContext("2d");
+          const scale = Math.max(size / img.width, size / img.height);
+          const w = img.width * scale, h = img.height * scale;
+          ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+
+          const user = SahiAuth.getUser();
+          const fallback = user ? initials(user.displayName || user.email) : "👤";
+          const avatar = { type: "photo", value: dataUrl };
+          applyAvatar(avatar, fallback);
+          statusEl.textContent = "Photo updated!";
+          statusEl.className = "sr-status sr-status-ok";
+          if (user) {
+            try { await setDoc(doc(db, "users", user.uid), { avatar }, { merge: true }); } catch (err) {}
+          }
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    const customizeOverlay = document.getElementById("customize-overlay");
+    document.getElementById("pm-customize").addEventListener("click", () => {
+      profileOverlay.classList.add("sr-hidden");
+      customizeOverlay.classList.remove("sr-hidden");
+    });
+    document.getElementById("customize-close").addEventListener("click", () => {
+      customizeOverlay.classList.add("sr-hidden");
+    });
+    customizeOverlay.addEventListener("click", (e) => {
+      if (e.target === customizeOverlay) customizeOverlay.classList.add("sr-hidden");
+    });
+
+    // Restore any saved logo color / avatar as soon as the page loads,
+    // even before login, so returning visitors see their own look right away.
+    loadLocalCustomization("👤");
     document.getElementById("pm-share").addEventListener("click", () => {
       const shareMsg = "Check out Sahi Kaamwala for trusted, ID-verified home repair professionals: " + window.location.href;
       const waNumber = ""; // blank recipient = opens WhatsApp's own contact picker
@@ -920,8 +1079,18 @@
           profileBtn.classList.add("profile-avatar-active");
           profileBtn.setAttribute("aria-label", "My Account");
           profileBtn.onclick = () => openProfilePanel(user);
+
+          // Pull this account's saved logo color / avatar from Firestore so
+          // it follows them across devices, not just this browser.
+          getDoc(doc(db, "users", user.uid)).then(snap => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            if (data.logoColor) applyLogoColor(data.logoColor);
+            if (data.avatar) applyAvatar(data.avatar, initial);
+          }).catch(() => { /* fall back silently to whatever's local */ });
         } else {
           profileAvatarIcon.textContent = "👤";
+          currentAvatar = null;
           profileBtn.classList.remove("profile-avatar-active");
           profileBtn.setAttribute("aria-label", "Log In");
           profileBtn.onclick = () => SahiAuth.open("login");

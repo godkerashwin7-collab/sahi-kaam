@@ -63,7 +63,7 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
 }
 .brand{display:flex; align-items:center; gap:12px; min-width:0; flex-shrink:1;}
 .brand-mark{
-  background: var(--safety);
+  background: var(--brand-logo-color, var(--safety));
   color:#14213D;
   font-weight:800;
   font-size:14px;
@@ -473,6 +473,14 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   font-size:20px;
   font-weight:700;
   box-shadow: 0 4px 12px rgba(255,106,61,0.35);
+  overflow:hidden;
+}
+.profile-avatar-big img,
+.profile-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:50%;
 }
 .profile-menu{
   display:flex;
@@ -539,6 +547,65 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
 }
 .profile-field-email{
   margin-top:4px;
+}
+/* ---- Customize Look (logo color + avatar picker) ---- */
+.customize-subhead{
+  font-size:13px;
+  font-weight:700;
+  color: var(--navy);
+  margin:18px 0 8px;
+}
+.customize-swatch-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.customize-swatch{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:2px solid transparent;
+  cursor:pointer;
+  padding:0;
+  flex:0 0 auto;
+}
+.customize-swatch-active{
+  border-color: var(--navy);
+  box-shadow:0 0 0 2px #fff inset;
+}
+.customize-avatar-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.customize-avatar-option{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:2px solid #eee;
+  background:#FAFAFA;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  flex:0 0 auto;
+}
+.customize-avatar-option-active{
+  border-color: var(--safety);
+  background:#FFF3EC;
+}
+.customize-upload-btn{
+  display:inline-block;
+  margin-top:14px;
+  padding:10px 16px;
+  background: var(--navy);
+  color:#fff;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  text-align:center;
 }
 .profile-field{
   display:flex;
