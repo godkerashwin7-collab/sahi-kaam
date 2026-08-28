@@ -171,9 +171,8 @@ const CATALOG_EN = [
 let CATALOG = CATALOG_EN;
 
 window.sahiSetCatalogLanguage = function(lang) {
-  CATALOG = (lang === "mr" && window.CATALOG_MR) ? window.CATALOG_MR
-          : (lang === "hi" && window.CATALOG_HI) ? window.CATALOG_HI
-          : CATALOG_EN;
+  const map = { mr: window.CATALOG_MR, hi: window.CATALOG_HI, te: window.CATALOG_TE, kn: window.CATALOG_KN };
+  CATALOG = map[lang] || CATALOG_EN;
   render();
   renderQuickIcons();
   renderPricingTable();
@@ -362,6 +361,15 @@ const SHOWCASE_TITLES_HI = {
   "on-the-job": "काम के दौरान",
   "handled-with-care": "सावधानी से किया गया काम"
 };
+const SHOWCASE_TITLES_TE = {
+  "on-the-job": "పని లో",
+  "handled-with-care": "జాగ్రత్తగా చేసిన పని"
+};
+const SHOWCASE_TITLES_KN = {
+  "on-the-job": "ಕೆಲಸದಲ್ಲಿ",
+  "handled-with-care": "ಎಚ್ಚರಿಕೆಯಿಂದ ನಿರ್ವಹಿಸಿದ ಕೆಲಸ"
+};
+const SHOWCASE_TITLES_BY_LANG = { mr: SHOWCASE_TITLES_MR, hi: SHOWCASE_TITLES_HI, te: SHOWCASE_TITLES_TE, kn: SHOWCASE_TITLES_KN };
 
 function currentLang() {
   return (window.SahiI18n && window.SahiI18n.getLanguage()) || "en";
@@ -373,7 +381,7 @@ function openGallery(key) {
   const title = document.getElementById("galleryTitle");
   if (!overlay || !strip) return;
   const lang = currentLang();
-  const titles = lang === "mr" ? SHOWCASE_TITLES_MR : lang === "hi" ? SHOWCASE_TITLES_HI : SHOWCASE_TITLES;
+  const titles = SHOWCASE_TITLES_BY_LANG[lang] || SHOWCASE_TITLES;
 
   const media = SHOWCASE_MEDIA[key] || [];
   title.textContent = titles[key] || "Photos & Videos";
@@ -454,9 +462,36 @@ const GROUP_LABELS_HI = {
   }
 };
 
+const GROUP_LABELS_TE = {
+  trade: {
+    eyebrow: "ఇల్లు & మరమ్మత్తు",
+    title: "ఇంటి కోసం నైపుణ్యం గల కళాకారులు",
+    desc: "వడ్రంగి, వైరింగ్, పెయింటింగ్, ప్లంబింగ్ మరియు క్లీనింగ్ — పని ప్రకారం బుక్ చేయండి."
+  },
+  care: {
+    eyebrow: "సమాజం & సంరక్షణ",
+    title: "కేవలం మరమ్మత్తులు కాదు, ప్రజలకు మద్దతు",
+    desc: "మహిళలకు సహాయం, వైద్య అవసరాలు మరియు వృద్ధుల సంరక్షణ — ఏ ఇంటి సందర్శన అంత శ్రద్ధగానే."
+  }
+};
+
+const GROUP_LABELS_KN = {
+  trade: {
+    eyebrow: "ಮನೆ & ದುರಸ್ತಿ",
+    title: "ಮನೆಗಾಗಿ ನುರಿತ ಕುಶಲಕರ್ಮಿಗಳು",
+    desc: "ಬಡಗಿತನ, ವೈರಿಂಗ್, ಪೇಂಟಿಂಗ್, ಪ್ಲಂಬಿಂಗ್ ಮತ್ತು ಸ್ವಚ್ಛತೆ — ಕೆಲಸದ ಪ್ರಕಾರ ಬುಕ್ ಮಾಡಿ."
+  },
+  care: {
+    eyebrow: "ಸಮುದಾಯ & ಆರೈಕೆ",
+    title: "ಕೇವಲ ದುರಸ್ತಿಗಳಲ್ಲ, ಜನರಿಗೆ ಬೆಂಬಲ",
+    desc: "ಮಹಿಳೆಯರಿಗೆ ಸಹಾಯ, ವೈದ್ಯಕೀಯ ಅಗತ್ಯಗಳು ಮತ್ತು ಹಿರಿಯರ ಆರೈಕೆ — ಯಾವುದೇ ಗೃಹ ಭೇಟಿಯಷ್ಟೇ ಕಾಳಜಿಯಿಂದ."
+  }
+};
+
+const GROUP_LABELS_BY_LANG = { mr: GROUP_LABELS_MR, hi: GROUP_LABELS_HI, te: GROUP_LABELS_TE, kn: GROUP_LABELS_KN };
+
 function currentGroupLabels() {
-  const lang = currentLang();
-  return lang === "mr" ? GROUP_LABELS_MR : lang === "hi" ? GROUP_LABELS_HI : GROUP_LABELS_EN;
+  return GROUP_LABELS_BY_LANG[currentLang()] || GROUP_LABELS_EN;
 }
 
 function render() {
@@ -638,8 +673,12 @@ const SERVICE_HUBS = [
   { name: "Sion", lat: 19.0448, lng: 72.8631 },
   { name: "Ghatkopar", lat: 19.0863, lng: 72.9081 }
 ];
-const SERVICE_HUB_NAMES_MR = { Santacruz: "सांताक्रूझ", Dadar: "दादर", Chembur: "चेंबूर", Sion: "सायन", Ghatkopar: "घाटकोपर" };
-const SERVICE_HUB_NAMES_HI = { Santacruz: "सांताक्रूज़", Dadar: "दादर", Chembur: "चेंबूर", Sion: "सायन", Ghatkopar: "घाटकोपर" };
+const SERVICE_HUB_NAMES = {
+  mr: { Santacruz: "सांताक्रूझ", Dadar: "दादर", Chembur: "चेंबूर", Sion: "सायन", Ghatkopar: "घाटकोपर" },
+  hi: { Santacruz: "सांताक्रूज़", Dadar: "दादर", Chembur: "चेंबूर", Sion: "सायन", Ghatkopar: "घाटकोपर" },
+  te: { Santacruz: "శాంతాక్రజ్", Dadar: "దాదర్", Chembur: "చెంబూర్", Sion: "సాయన్", Ghatkopar: "ఘాట్‌కోపర్" },
+  kn: { Santacruz: "ಸಾಂತಾಕ್ರೂಜ್", Dadar: "ದಾದರ್", Chembur: "ಚೆಂಬೂರ್", Sion: "ಸಯಾನ್", Ghatkopar: "ಘಾಟ್ಕೋಪರ್" }
+};
 const SERVICE_RADIUS_KM = 20;
 
 function haversineKm(lat1, lng1, lat2, lng2) {
@@ -652,25 +691,65 @@ function haversineKm(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+const PIN_MESSAGES = {
+  en: {
+    invalid: "Enter a valid 6-digit PIN code.",
+    checking: "Checking...",
+    notFound: "Couldn't find that PIN code — double-check and try again.",
+    yes: (n, km) => `✅ Yes! We serve this area (near ${n}, about ${km} km away).`,
+    no: (n, km) => `Not quite yet — this is about ${km} km from our nearest area (${n}). We're expanding weekly, check back soon!`,
+    error: "Couldn't check right now — try again in a moment."
+  },
+  mr: {
+    invalid: "योग्य ६ अंकी PIN कोड टाका.",
+    checking: "तपासत आहोत...",
+    notFound: "हा PIN कोड सापडला नाही — पुन्हा तपासा आणि प्रयत्न करा.",
+    yes: (n, km) => `✅ होय! आम्ही या भागात सेवा देतो (${n} जवळ, सुमारे ${km} किमी दूर).`,
+    no: (n, km) => `अजून नाही — हे आमच्या सर्वात जवळच्या भागापासून (${n}) सुमारे ${km} किमी दूर आहे. आम्ही दर आठवड्याला विस्तार करत आहोत, लवकरच पुन्हा तपासा!`,
+    error: "आत्ता तपासता आले नाही — थोड्या वेळाने प्रयत्न करा."
+  },
+  hi: {
+    invalid: "सही 6 अंकों का PIN कोड डालें.",
+    checking: "जांच हो रही है...",
+    notFound: "यह PIN कोड नहीं मिला — दोबारा जांचें और फिर कोशिश करें.",
+    yes: (n, km) => `✅ हां! हम इस इलाके में सेवा देते हैं (${n} के पास, लगभग ${km} km दूर).`,
+    no: (n, km) => `अभी नहीं — यह हमारे नज़दीकी इलाके (${n}) से लगभग ${km} km दूर है. हम हर हफ़्ते बढ़ रहे हैं, जल्द दोबारा देखें!`,
+    error: "आत्ता तपासता आले नाही — कुछ देर बाद कोशिश करें."
+  },
+  te: {
+    invalid: "సరైన 6-అంకెల PIN కోడ్ నమోదు చేయండి.",
+    checking: "తనిఖీ చేస్తోంది...",
+    notFound: "ఆ PIN కోడ్ కనుగొనబడలేదు — మళ్ళీ తనిఖీ చేసి ప్రయత్నించండి.",
+    yes: (n, km) => `✅ అవును! మేము ఈ ప్రాంతంలో సేవలు అందిస్తున్నాము (${n} సమీపంలో, సుమారు ${km} km దూరంలో).`,
+    no: (n, km) => `ఇంకా లేదు — ఇది మా సమీప ప్రాంతం (${n}) నుండి సుమారు ${km} km దూరంలో ఉంది. మేము ప్రతి వారం విస్తరిస్తున్నాము, త్వరలో మళ్ళీ చూడండి!`,
+    error: "ప్రస్తుతం తనిఖీ చేయలేకపోయాము — కొద్దిసేపటి తర్వాత ప్రయత్నించండి."
+  },
+  kn: {
+    invalid: "ಮಾನ್ಯ 6-ಅಂಕಿಯ PIN ಕೋಡ್ ನಮೂದಿಸಿ.",
+    checking: "ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...",
+    notFound: "ಆ PIN ಕೋಡ್ ಕಂಡುಬಂದಿಲ್ಲ — ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಪ್ರಯತ್ನಿಸಿ.",
+    yes: (n, km) => `✅ ಹೌದು! ನಾವು ಈ ಪ್ರದೇಶದಲ್ಲಿ ಸೇವೆ ಸಲ್ಲಿಸುತ್ತೇವೆ (${n} ಬಳಿ, ಸುಮಾರು ${km} km ದೂರದಲ್ಲಿ).`,
+    no: (n, km) => `ಇನ್ನೂ ಇಲ್ಲ — ಇದು ನಮ್ಮ ಹತ್ತಿರದ ಪ್ರದೇಶದಿಂದ (${n}) ಸುಮಾರು ${km} km ದೂರದಲ್ಲಿದೆ. ನಾವು ಪ್ರತಿ ವಾರ ವಿಸ್ತರಿಸುತ್ತಿದ್ದೇವೆ, ಶೀಘ್ರದಲ್ಲೇ ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ!`,
+    error: "ಇದೀಗ ಪರಿಶೀಲಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಪ್ರಯತ್ನಿಸಿ."
+  }
+};
+
 async function checkPinAvailability(pin) {
   const lang = currentLang();
+  const msg = PIN_MESSAGES[lang] || PIN_MESSAGES.en;
   const resultEl = document.getElementById("pinCheckResult");
   resultEl.className = "pin-check-result";
   if (!/^\d{6}$/.test(pin)) {
-    resultEl.textContent = lang === "mr" ? "योग्य ६ अंकी PIN कोड टाका."
-      : lang === "hi" ? "सही 6 अंकों का PIN कोड डालें."
-      : "Enter a valid 6-digit PIN code.";
+    resultEl.textContent = msg.invalid;
     resultEl.classList.add("pin-no");
     return;
   }
-  resultEl.textContent = lang === "mr" ? "तपासत आहोत..." : lang === "hi" ? "जांच हो रही है..." : "Checking...";
+  resultEl.textContent = msg.checking;
   try {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&country=India&postalcode=${pin}`);
     const data = await res.json();
     if (!data.length) {
-      resultEl.textContent = lang === "mr" ? "हा PIN कोड सापडला नाही — पुन्हा तपासा आणि प्रयत्न करा."
-        : lang === "hi" ? "यह PIN कोड नहीं मिला — दोबारा जांचें और फिर कोशिश करें."
-        : "Couldn't find that PIN code — double-check and try again.";
+      resultEl.textContent = msg.notFound;
       resultEl.classList.add("pin-no");
       return;
     }
@@ -680,28 +759,17 @@ async function checkPinAvailability(pin) {
       const km = haversineKm(parseFloat(lat), parseFloat(lon), hub.lat, hub.lng);
       if (km < nearestKm) { nearestKm = km; nearest = hub.name; }
     });
-    const nearestLocalized = lang === "mr" ? (SERVICE_HUB_NAMES_MR[nearest] || nearest)
-      : lang === "hi" ? (SERVICE_HUB_NAMES_HI[nearest] || nearest)
-      : nearest;
+    const hubNames = SERVICE_HUB_NAMES[lang];
+    const nearestLocalized = (hubNames && hubNames[nearest]) || nearest;
     if (nearestKm <= SERVICE_RADIUS_KM) {
-      resultEl.textContent = lang === "mr"
-        ? `✅ होय! आम्ही या भागात सेवा देतो (${nearestLocalized} जवळ, सुमारे ${Math.round(nearestKm)} किमी दूर).`
-        : lang === "hi"
-        ? `✅ हां! हम इस इलाके में सेवा देते हैं (${nearestLocalized} के पास, लगभग ${Math.round(nearestKm)} km दूर).`
-        : `✅ Yes! We serve this area (near ${nearestLocalized}, about ${Math.round(nearestKm)} km away).`;
+      resultEl.textContent = msg.yes(nearestLocalized, Math.round(nearestKm));
       resultEl.classList.add("pin-ok");
     } else {
-      resultEl.textContent = lang === "mr"
-        ? `अजून नाही — हे आमच्या सर्वात जवळच्या भागापासून (${nearestLocalized}) सुमारे ${Math.round(nearestKm)} किमी दूर आहे. आम्ही दर आठवड्याला विस्तार करत आहोत, लवकरच पुन्हा तपासा!`
-        : lang === "hi"
-        ? `अभी नहीं — यह हमारे नज़दीकी इलाके (${nearestLocalized}) से लगभग ${Math.round(nearestKm)} km दूर है. हम हर हफ़्ते बढ़ रहे हैं, जल्द दोबारा देखें!`
-        : `Not quite yet — this is about ${Math.round(nearestKm)} km from our nearest area (${nearestLocalized}). We're expanding weekly, check back soon!`;
+      resultEl.textContent = msg.no(nearestLocalized, Math.round(nearestKm));
       resultEl.classList.add("pin-no");
     }
   } catch (err) {
-    resultEl.textContent = lang === "mr" ? "आत्ता तपासता आले नाही — थोड्या वेळाने प्रयत्न करा."
-      : lang === "hi" ? "आत्ता तपासता आले नाही — कुछ देर बाद कोशिश करें."
-      : "Couldn't check right now — try again in a moment.";
+    resultEl.textContent = msg.error;
     resultEl.classList.add("pin-no");
   }
 }
@@ -726,9 +794,13 @@ function showCategoryLinks() {
   panel.innerHTML = `
     <h3>${(() => {
       const lang = currentLang();
-      if (lang === "mr") return "तयार आहे — कारागीर पाहण्यासाठी श्रेणी निवडा:";
-      if (lang === "hi") return "तैयार है — कारीगर देखने के लिए श्रेणी चुनें:";
-      return "You're all set — pick a category to browse workers:";
+      const headings = {
+        mr: "तयार आहे — कारागीर पाहण्यासाठी श्रेणी निवडा:",
+        hi: "तैयार है — कारीगर देखने के लिए श्रेणी चुनें:",
+        te: "సిద్ధంగా ఉంది — నిపుణులను చూడటానికి కేటగిరీని ఎంచుకోండి:",
+        kn: "ಸಿದ್ಧವಾಗಿದೆ — ಕುಶಲಕರ್ಮಿಗಳನ್ನು ವೀಕ್ಷಿಸಲು ವರ್ಗವನ್ನು ಆಯ್ಕೆಮಾಡಿ:"
+      };
+      return headings[lang] || "You're all set — pick a category to browse workers:";
     })()}</h3>
     <div class="continue-links">${linksHtml}</div>
   `;
