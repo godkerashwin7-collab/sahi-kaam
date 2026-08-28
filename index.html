@@ -373,26 +373,40 @@
         <p class="team-subheading">Short posts on home maintenance, our latest work, and what's new on the platform.</p>
 
         <div class="blog-grid">
-          <a href="#" class="blog-card">
+          <button type="button" class="blog-card" id="tipsCardTrigger">
             <span class="blog-card-icon">🔧</span>
             <span class="blog-card-tag">Maintenance Tips</span>
-            <strong class="blog-card-title">REPLACE_ME_BLOG_POST_1_TITLE</strong>
-            <p class="blog-card-excerpt">REPLACE_ME_BLOG_POST_1_EXCERPT — a couple of lines summarizing the post.</p>
-          </a>
-          <a href="#" class="blog-card">
+            <strong class="blog-card-title">Help us grow — share a tip</strong>
+            <p class="blog-card-excerpt">We're a growing community, and every idea helps. Tell us one thing we could do better or a tip you think other customers would find useful.</p>
+          </button>
+          <a href="showcase.html" class="blog-card">
             <span class="blog-card-icon">🏠</span>
             <span class="blog-card-tag">Before &amp; After</span>
-            <strong class="blog-card-title">REPLACE_ME_BLOG_POST_2_TITLE</strong>
-            <p class="blog-card-excerpt">REPLACE_ME_BLOG_POST_2_EXCERPT — a couple of lines summarizing the post.</p>
+            <strong class="blog-card-title">Share your own before &amp; after</strong>
+            <p class="blog-card-excerpt">See real transformations from our community — and upload your own photos and story once a job's done.</p>
           </a>
           <a href="#" class="blog-card">
             <span class="blog-card-icon">📣</span>
             <span class="blog-card-tag">Platform Update</span>
-            <strong class="blog-card-title">REPLACE_ME_BLOG_POST_3_TITLE</strong>
-            <p class="blog-card-excerpt">REPLACE_ME_BLOG_POST_3_EXCERPT — a couple of lines summarizing the post.</p>
+            <strong class="blog-card-title">We're a growing community, not just a platform</strong>
+            <p class="blog-card-excerpt">We're a growing community that loves serving the people of Mumbai, and we'll always work to meet what you need with real quality. Anyone can join and work with us — and earn dignity and respect as a professional, not just be called "a worker."</p>
           </a>
         </div>
-        <p class="team-note">These are placeholder posts. Swap in real write-ups (or link to a blog.html page per post) whenever you're ready to publish.</p>
+        <p class="team-note">Tap "Maintenance Tips" to send us a suggestion, or "Before &amp; After" to see and share real community photos.</p>
+      </div>
+
+      <!-- Customer suggestion / tips modal -->
+      <div id="tips-overlay" class="sr-overlay sr-hidden">
+        <div class="sr-modal">
+          <button type="button" class="sr-close" id="tips-close">&times;</button>
+          <h2>Share a Tip</h2>
+          <p style="font-size:13px; color:#666; margin-top:-6px;">We're a growing community — your idea genuinely helps us improve.</p>
+          <label>Your Tip</label>
+          <textarea id="tips-text" placeholder="e.g. It would help if..." rows="4"></textarea>
+          <p class="sk-error-text" id="tips-textError">Write at least 10 characters.</p>
+          <button type="button" class="sr-submit cta-bold" id="tips-submit-btn">Send Tip</button>
+          <p id="tips-status" class="sr-status"></p>
+        </div>
       </div>
 
       <!-- Ratings & reviews -->
@@ -1352,6 +1366,57 @@
           reviewOverlay.classList.add("sr-hidden");
           loadReviews();
         }, 1200);
+      } catch (err) {
+        console.log(err);
+        statusEl.textContent = "Something went wrong. Please try again.";
+        statusEl.className = "sr-status sr-status-error";
+      }
+      submitBtn.disabled = false;
+    });
+
+    // ---- Customer suggestion / tips ----
+    const tipsOverlay = document.getElementById("tips-overlay");
+    document.getElementById("tipsCardTrigger").addEventListener("click", () => {
+      document.getElementById("tips-text").value = "";
+      document.getElementById("tips-status").textContent = "";
+      document.getElementById("tips-textError").classList.remove("sk-show");
+      window.sahiRequireLogin(() => tipsOverlay.classList.remove("sr-hidden"));
+    });
+    document.getElementById("tips-close").addEventListener("click", () => {
+      tipsOverlay.classList.add("sr-hidden");
+    });
+    tipsOverlay.addEventListener("click", (e) => {
+      if (e.target === tipsOverlay) tipsOverlay.classList.add("sr-hidden");
+    });
+    document.getElementById("tips-submit-btn").addEventListener("click", async () => {
+      const tip = document.getElementById("tips-text").value.trim();
+      const statusEl = document.getElementById("tips-status");
+      const tipOk = tip.length >= 10;
+      document.getElementById("tips-textError").classList.toggle("sk-show", !tipOk);
+      if (!tipOk) return;
+
+      const user = SahiAuth.getUser();
+      if (!user) {
+        statusEl.textContent = "Please log in again.";
+        statusEl.className = "sr-status sr-status-error";
+        return;
+      }
+
+      const submitBtn = document.getElementById("tips-submit-btn");
+      submitBtn.disabled = true;
+      statusEl.textContent = "Sending...";
+      statusEl.className = "sr-status";
+
+      try {
+        await addDoc(collection(db, "community_feedback"), {
+          uid: user.uid,
+          name: user.displayName || (user.email ? user.email.split("@")[0] : "Customer"),
+          tip,
+          submittedAt: new Date().toISOString()
+        });
+        statusEl.textContent = "✅ Thank you — we read every tip!";
+        statusEl.className = "sr-status sr-status-ok";
+        setTimeout(() => tipsOverlay.classList.add("sr-hidden"), 1200);
       } catch (err) {
         console.log(err);
         statusEl.textContent = "Something went wrong. Please try again.";

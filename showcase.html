@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Before & After — Sahi Kaamwala</title>
+<script src="business-info.js"></script>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#14213D">
+<link rel="stylesheet" href="verify.css">
+
+<style>
+  body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; margin:0; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
+  h1 { color: #14213D; margin-bottom:2px; }
+  .sk-sub { color: #555; margin-top: 0; }
+  a.back-link { display:inline-block; margin-bottom:14px; color:#1565c0; font-size:14px; text-decoration:none; }
+  button.sk-submit {
+    width: 100%; padding: 14px; font-size: 17px; background-color: #14213D;
+    color: white; border: none; border-radius: 8px; margin-top: 14px; font-weight:700;
+  }
+  #shareBtn { margin-bottom: 18px; }
+  #status { margin-top: 15px; font-weight: bold; }
+  label { font-weight: bold; margin-top: 14px; display: block; font-size:14px; }
+  textarea {
+    width: 100%; padding: 12px; font-size: 15px; margin: 8px 0 2px;
+    box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px;
+    font-family: inherit; resize: vertical; min-height: 70px;
+  }
+  .photo-upload-row{ display:flex; gap:12px; margin-top:8px; }
+  .photo-upload-box{
+    flex:1; text-align:center; background:#fff; border:2px dashed #ccc;
+    border-radius:10px; padding:14px 8px; cursor:pointer; font-size:13px; color:#555;
+  }
+  .photo-upload-box img{ width:100%; border-radius:6px; margin-top:6px; display:none; }
+  #submitForm{ display:none; background:#fff; border-radius:14px; padding:16px; margin-bottom:24px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+
+  .showcase-card{
+    background:#fff; border-radius:14px; padding:14px; margin-bottom:16px;
+    box-shadow:0 1px 4px rgba(0,0,0,0.08);
+  }
+  .showcase-photos{ display:flex; gap:6px; }
+  .showcase-photos > div{ flex:1; text-align:center; }
+  .showcase-photos img{ width:100%; border-radius:8px; display:block; }
+  .showcase-photos span{ font-size:11px; color:#888; font-weight:700; text-transform:uppercase; }
+  .showcase-caption{ font-size:14px; color:#333; margin:10px 0 4px; line-height:1.5; }
+  .showcase-meta{ font-size:12px; color:#999; }
+  .gallery-empty{ color:#888; text-align:center; padding:30px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="back-link">← Back to Sahi Kaamwala</a>
+  <h1>Before &amp; After</h1>
+  <p class="sk-sub">Real transformations shared by our community. Had work done? Show it off.</p>
+
+  <button type="button" class="sk-submit" id="shareBtn">+ Share Your Before &amp; After</button>
+
+  <div id="submitForm">
+    <label>Before Photo</label>
+    <div class="photo-upload-box" id="beforeBox">
+      Tap to choose a photo
+      <img id="beforePreview">
+    </div>
+    <input type="file" id="beforeInput" accept="image/*" style="display:none;">
+
+    <label>After Photo</label>
+    <div class="photo-upload-box" id="afterBox">
+      Tap to choose a photo
+      <img id="afterPreview">
+    </div>
+    <input type="file" id="afterInput" accept="image/*" style="display:none;">
+
+    <label>Tell us about it</label>
+    <textarea id="caption" placeholder="e.g. Our kitchen tap was leaking for months — fixed in one visit!"></textarea>
+
+    <button type="button" class="sk-submit" id="submitBtn">Post to Community</button>
+    <p id="status"></p>
+  </div>
+
+  <div id="gallery">
+    <p class="gallery-empty">Loading...</p>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, updateProfile, signOut, sendPasswordResetEmail
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import {
+    getFirestore, collection, addDoc, query, orderBy, limit, getDocs
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
+    authDomain: "sahi-kaam-b32fa.firebaseapp.com",
+    projectId: "sahi-kaam-b32fa",
+    storageBucket: "sahi-kaam-b32fa.firebasestorage.app",
+    messagingSenderId: "187530591485",
+    appId: "1:187530591485:web:5f5973815c2b6ff5175294"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  let currentUser = null;
+
+  SahiAuth.init({
+    auth,
+    fns: { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, sendPasswordResetEmail },
+    onChange: (user) => { currentUser = user; }
+  });
+
+  // ---- Photo picking + resizing (kept small so posts stay light to load) ----
+  function pickAndPreview(inputId, boxId, previewId) {
+    return new Promise((resolve) => {
+      const input = document.getElementById(inputId);
+      input.onchange = () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const maxW = 640;
+            const scale = Math.min(1, maxW / img.width);
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+            const preview = document.getElementById(previewId);
+            preview.src = dataUrl;
+            preview.style.display = "block";
+            resolve(dataUrl);
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    });
+  }
+
+  let beforeDataUrl = null;
+  let afterDataUrl = null;
+  document.getElementById("beforeBox").addEventListener("click", async () => {
+    beforeDataUrl = await pickAndPreview("beforeInput", "beforeBox", "beforePreview");
+  });
+  document.getElementById("afterBox").addEventListener("click", async () => {
+    afterDataUrl = await pickAndPreview("afterInput", "afterBox", "afterPreview");
+  });
+
+  document.getElementById("shareBtn").addEventListener("click", () => {
+    if (!currentUser) {
+      SahiAuth.open("login", () => {
+        document.getElementById("submitForm").style.display = "block";
+        document.getElementById("submitForm").scrollIntoView({ behavior: "smooth" });
+      });
+      return;
+    }
+    const form = document.getElementById("submitForm");
+    form.style.display = form.style.display === "block" ? "none" : "block";
+    if (form.style.display === "block") form.scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("submitBtn").addEventListener("click", async () => {
+    const statusEl = document.getElementById("status");
+    const caption = document.getElementById("caption").value.trim();
+
+    if (!currentUser) {
+      statusEl.textContent = "Please log in first.";
+      statusEl.style.color = "red";
+      return;
+    }
+    if (!beforeDataUrl || !afterDataUrl) {
+      statusEl.textContent = "Please add both a before and an after photo.";
+      statusEl.style.color = "red";
+      return;
+    }
+    if (caption.length < 10) {
+      statusEl.textContent = "Tell us a bit more (at least 10 characters).";
+      statusEl.style.color = "red";
+      return;
+    }
+
+    statusEl.textContent = "Posting...";
+    statusEl.style.color = "#1565c0";
+    try {
+      await addDoc(collection(db, "community_showcase"), {
+        uid: currentUser.uid,
+        name: currentUser.displayName || (currentUser.email ? currentUser.email.split("@")[0] : "Customer"),
+        caption,
+        beforeImage: beforeDataUrl,
+        afterImage: afterDataUrl,
+        createdAt: new Date().toISOString()
+      });
+      statusEl.textContent = "✅ Posted! Thanks for sharing with the community.";
+      statusEl.style.color = "green";
+      document.getElementById("caption").value = "";
+      beforeDataUrl = null; afterDataUrl = null;
+      document.getElementById("beforePreview").style.display = "none";
+      document.getElementById("afterPreview").style.display = "none";
+      loadGallery();
+    } catch (err) {
+      statusEl.textContent = "Something went wrong. Please try again.";
+      statusEl.style.color = "red";
+      console.error(err);
+    }
+  });
+
+  function timeAgo(iso) {
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const days = Math.floor(diffMs / 86400000);
+    if (days < 1) return "today";
+    if (days === 1) return "1 day ago";
+    if (days < 30) return `${days} days ago`;
+    return new Date(iso).toLocaleDateString();
+  }
+
+  async function loadGallery() {
+    const galleryEl = document.getElementById("gallery");
+    try {
+      const q = query(collection(db, "community_showcase"), orderBy("createdAt", "desc"), limit(30));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        galleryEl.innerHTML = `<p class="gallery-empty">No posts yet — be the first to share!</p>`;
+        return;
+      }
+      let html = "";
+      snap.forEach(docSnap => {
+        const p = docSnap.data();
+        html += `
+          <div class="showcase-card">
+            <div class="showcase-photos">
+              <div><span>Before</span><img src="${p.beforeImage}" loading="lazy"></div>
+              <div><span>After</span><img src="${p.afterImage}" loading="lazy"></div>
+            </div>
+            <p class="showcase-caption">${(p.caption || "").replace(/</g, "&lt;")}</p>
+            <p class="showcase-meta">${(p.name || "Customer")} · ${timeAgo(p.createdAt)}</p>
+          </div>
+        `;
+      });
+      galleryEl.innerHTML = html;
+    } catch (err) {
+      galleryEl.innerHTML = `<p class="gallery-empty">Couldn't load posts right now.</p>`;
+      console.error(err);
+    }
+  }
+
+  loadGallery();
+</script>
+</body>
+</html>
