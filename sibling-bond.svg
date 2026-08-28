@@ -1,6 +1,6 @@
-<svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of a brother and sister holding hands, in memory of a beloved sister">
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of a brother and sister holding hands, in memory of a beloved sister">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#FDF0F5"/>
       <stop offset="100%" stop-color="#F3E8FA"/>
     </linearGradient>
@@ -14,39 +14,40 @@
     </linearGradient>
   </defs>
 
-  <rect width="400" height="260" rx="18" fill="url(#bg)"/>
+  <rect width="480" height="200" rx="16" fill="url(#bg)"/>
 
   <!-- soft ground shadow -->
-  <ellipse cx="200" cy="228" rx="120" ry="10" fill="#00000010"/>
+  <ellipse cx="240" cy="178" rx="150" ry="8" fill="#00000010"/>
+
+  <!-- ribbon, off to the left, small -->
+  <g transform="translate(70,60) scale(0.8)">
+    <path d="M0 0 C -9 12, -12 26, -3 36 C 0 29, 0 22, 0 17 C 0 22, 0 29, 3 36 C 12 26, 9 12, 0 0 Z"
+          fill="#EA7BA0" stroke="#D65C87" stroke-width="1.1"/>
+  </g>
 
   <!-- taller sibling silhouette -->
   <g>
-    <circle cx="160" cy="110" r="24" fill="url(#figA)"/>
-    <path d="M120 225
-             C118 165, 130 140, 160 136
-             C190 140, 202 165, 200 225 Z" fill="url(#figA)"/>
+    <circle cx="215" cy="88" r="21" fill="url(#figA)"/>
+    <path d="M180 182
+             C178 132, 189 110, 215 106
+             C241 110, 252 132, 250 182 Z" fill="url(#figA)"/>
   </g>
 
   <!-- smaller sibling silhouette -->
   <g>
-    <circle cx="235" cy="126" r="19" fill="url(#figB)"/>
-    <path d="M205 225
-             C204 178, 213 158, 235 155
-             C257 158, 266 178, 265 225 Z" fill="url(#figB)"/>
+    <circle cx="278" cy="100" r="17" fill="url(#figB)"/>
+    <path d="M252 182
+             C251 144, 259 128, 278 125
+             C297 128, 305 144, 304 182 Z" fill="url(#figB)"/>
   </g>
 
   <!-- joined hands -->
-  <circle cx="200" cy="196" r="7" fill="#F7E7EE"/>
+  <circle cx="248" cy="158" r="6" fill="#F7E7EE"/>
 
-  <!-- pink ribbon, floating above, cancer awareness -->
-  <g transform="translate(196,52) scale(0.9)">
-    <path d="M0 0 C -10 14, -14 30, -4 42 C 0 34, 0 26, 0 20 C 0 26, 0 34, 4 42 C 14 30, 10 14, 0 0 Z"
-          fill="#EA7BA0" stroke="#D65C87" stroke-width="1.2"/>
-  </g>
-
-  <!-- gentle sparkle accents -->
-  <circle cx="90" cy="70" r="2.5" fill="#EA7BA0" opacity="0.55"/>
-  <circle cx="320" cy="90" r="2" fill="#8FA6C9" opacity="0.55"/>
-  <circle cx="70" cy="150" r="1.8" fill="#C98BA8" opacity="0.5"/>
-  <circle cx="330" cy="160" r="2.2" fill="#EA7BA0" opacity="0.45"/>
+  <!-- gentle sparkle accents, spread wide for the horizontal format -->
+  <circle cx="40" cy="40" r="2.3" fill="#EA7BA0" opacity="0.5"/>
+  <circle cx="410" cy="55" r="2" fill="#8FA6C9" opacity="0.5"/>
+  <circle cx="380" cy="130" r="1.8" fill="#C98BA8" opacity="0.45"/>
+  <circle cx="130" cy="145" r="2" fill="#EA7BA0" opacity="0.4"/>
+  <circle cx="440" cy="110" r="1.6" fill="#8FA6C9" opacity="0.4"/>
 </svg>
