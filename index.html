@@ -53,6 +53,23 @@
   <!-- Quick category icons — populated from CATALOG in script.js -->
   <div class="quick-icons" id="quickIcons"></div>
 
+  <!-- Always-visible location picker — scrollable map of Mumbai -->
+  <section class="location-card">
+    <div class="location-card-head">
+      <span class="location-card-icon">📍</span>
+      <div class="location-card-headtext">
+        <strong>Your location</strong>
+        <p id="homeAddressDisplay">Search, drag the pin, or scroll the map to set where you need service</p>
+      </div>
+    </div>
+    <div class="addr-search-wrap">
+      <input type="text" id="home-addr-search" class="search-bar" placeholder="🔍 Search your address or area in Mumbai" autocomplete="off">
+      <div id="home-addr-suggestions" class="addr-suggestions sr-hidden"></div>
+    </div>
+    <button type="button" id="home-addr-locate-btn" class="addr-locate-btn">📍 Use my current location</button>
+    <div id="home-addr-map" class="addr-map home-map"></div>
+  </section>
+
   <section class="hero">
     <div class="hero-media">
       <img src="hero-kitchen.jpg" alt="Verified plumber, electrician and cleaning professionals working in a Mumbai home" loading="eager">
@@ -493,6 +510,49 @@
       document.getElementById(errId).classList.toggle("sk-show", !ok);
     }
 
+    // ---- Location pickers ----
+    // Home page: always-visible map, sets the customer's general location.
+    const homeLocationPicker = window.SahiAddressMap.create({
+      mapId: "home-addr-map",
+      searchInputId: "home-addr-search",
+      suggestionsId: "home-addr-suggestions",
+      locateBtnId: "home-addr-locate-btn",
+      onChange: (result) => {
+        window.__sahiHomeLocation = result;
+        const displayEl = document.getElementById("homeAddressDisplay");
+        if (displayEl) displayEl.textContent = result.address;
+        try {
+          localStorage.setItem("sahi_last_location", JSON.stringify(result));
+        } catch (e) { /* storage unavailable — ignore */ }
+      }
+    });
+    homeLocationPicker.init();
+
+    // Restore the last-picked location on return visits
+    try {
+      const saved = localStorage.getItem("sahi_last_location");
+      if (saved) {
+        const loc = JSON.parse(saved);
+        if (loc && loc.address && loc.lat && loc.lng) {
+          window.__sahiHomeLocation = loc;
+          homeLocationPicker.setFromExternal(loc.address, loc.lat, loc.lng);
+          const displayEl = document.getElementById("homeAddressDisplay");
+          if (displayEl) displayEl.textContent = loc.address;
+        }
+      }
+    } catch (e) { /* ignore malformed/unavailable storage */ }
+
+    // Booking form: separate map instance, feeds booking-address/lat/lng
+    const bookingLocationPicker = window.SahiAddressMap.create({
+      mapId: "addr-map",
+      searchInputId: "addr-search",
+      suggestionsId: "addr-suggestions",
+      locateBtnId: "addr-locate-btn",
+      addressFieldId: "booking-address",
+      latFieldId: "booking-lat",
+      lngFieldId: "booking-lng"
+    });
+
     // Called by script.js's Continue button once the user is logged in
     let selectedPaymentMethod = null;
 
@@ -535,7 +595,15 @@
 
       // Init/refresh the address map now that the overlay is visible
       // (Leaflet needs visible dimensions to size itself correctly).
-      setTimeout(() => window.SahiAddressMap && window.SahiAddressMap.init(), 50);
+      setTimeout(() => {
+        bookingLocationPicker.init();
+        // Carry over whatever location was already picked on the homepage,
+        // so the customer doesn't have to search again.
+        if (window.__sahiHomeLocation) {
+          const loc = window.__sahiHomeLocation;
+          bookingLocationPicker.setFromExternal(loc.address, loc.lat, loc.lng);
+        }
+      }, 50);
 
       // Stash for the confirm handler
       window.__sahiPendingSelected = selected;
