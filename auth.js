@@ -61,43 +61,44 @@ const SahiAuth = (() => {
         <button type="button" class="sr-close" id="sa-close">&times;</button>
 
         <div class="sa-tabs">
-          <button type="button" class="sa-tab sa-tab-active" id="sa-tab-login">Log In</button>
-          <button type="button" class="sa-tab" id="sa-tab-signup">Sign Up</button>
+          <button type="button" class="sa-tab sa-tab-active" id="sa-tab-login" data-i18n="loginTab">Log In</button>
+          <button type="button" class="sa-tab" id="sa-tab-signup" data-i18n="signupTab">Sign Up</button>
         </div>
 
         <form id="sa-login-form" autocomplete="on">
-          <label>Email</label>
+          <label data-i18n="emailLabel">Email</label>
           <input type="email" id="sa-login-email" name="email" placeholder="you@email.com" autocomplete="username">
-          <label>Password</label>
-          <input type="password" id="sa-login-password" name="password" placeholder="Password" autocomplete="current-password">
-          <button type="submit" class="sr-submit" id="sa-login-btn">Log In</button>
+          <label data-i18n="passwordLabel">Password</label>
+          <input type="password" id="sa-login-password" name="password" placeholder="Password" autocomplete="current-password" data-i18n-placeholder="passwordLabel">
+          <button type="submit" class="sr-submit" id="sa-login-btn" data-i18n="loginTab">Log In</button>
           <div class="sa-forgot-row">
-            <button type="button" class="sa-forgot-link" id="sa-forgot-btn">Forgot password?</button>
-            <button type="button" class="sa-forgot-link" id="sa-forgot-username-btn">Forgot email?</button>
+            <button type="button" class="sa-forgot-link" id="sa-forgot-btn" data-i18n="forgotPassword">Forgot password?</button>
+            <button type="button" class="sa-forgot-link" id="sa-forgot-username-btn" data-i18n="forgotEmail">Forgot email?</button>
           </div>
         </form>
 
         <form id="sa-signup-form" class="sr-hidden" autocomplete="on">
-          <label>Full Name</label>
+          <label data-i18n="fullNameLabel">Full Name</label>
           <input type="text" id="sa-signup-name" name="name" placeholder="Your name" autocomplete="name">
-          <p class="sk-error-text" id="sa-nameError">Enter your name (letters only, at least 2 characters).</p>
+          <p class="sk-error-text" id="sa-nameError" data-i18n="nameError">Enter your name (letters only, at least 2 characters).</p>
 
-          <label>Email</label>
+          <label data-i18n="emailLabel">Email</label>
           <input type="email" id="sa-signup-email" name="email" placeholder="you@email.com" autocomplete="username">
-          <p class="sk-error-text" id="sa-emailError">Enter a valid email address.</p>
-          <label>Password</label>
+          <p class="sk-error-text" id="sa-emailError" data-i18n="emailError">Enter a valid email address.</p>
+          <label data-i18n="passwordLabel">Password</label>
           <input type="password" id="sa-signup-password" name="new-password" placeholder="At least 6 characters" autocomplete="new-password">
-          <label>Confirm Password</label>
+          <label data-i18n="confirmPasswordLabel">Confirm Password</label>
           <input type="password" id="sa-signup-confirm" name="confirm-password" placeholder="Re-enter password" autocomplete="new-password">
-          <p class="sk-error-text" id="sa-passError">Passwords must match and be at least 6 characters.</p>
+          <p class="sk-error-text" id="sa-passError" data-i18n="passError">Passwords must match and be at least 6 characters.</p>
 
-          <button type="submit" class="sr-submit" id="sa-signup-btn">Create Account</button>
+          <button type="submit" class="sr-submit" id="sa-signup-btn" data-i18n="createAccount">Create Account</button>
         </form>
 
         <p id="sa-status" class="sr-status"></p>
       </div>
     `;
     document.body.appendChild(wrap);
+    if (window.SahiI18n) window.SahiI18n.setLanguage(window.SahiI18n.getLanguage());
 
     document.getElementById("sa-close").addEventListener("click", close);
     wrap.addEventListener("click", (e) => { if (e.target === wrap) close(); });

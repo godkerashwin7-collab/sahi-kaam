@@ -3,7 +3,7 @@
 // `active: false` hides a category from the homepage grid without deleting
 // its content — flip it to true once you actually have vetted workers
 // and (for the "care" group) proper protocols in place for that category.
-const CATALOG = [
+const CATALOG_EN = [
   {
     id: "carpenter",
     group: "trade",
@@ -165,6 +165,17 @@ const CATALOG = [
     ]
   }
 ];
+
+// Active catalog — switches between CATALOG_EN and window.CATALOG_MR
+// (from translations.js) when the language toggle is used.
+let CATALOG = CATALOG_EN;
+
+window.sahiSetCatalogLanguage = function(lang) {
+  CATALOG = (lang === "mr" && window.CATALOG_MR) ? window.CATALOG_MR : CATALOG_EN;
+  render();
+  renderQuickIcons();
+  renderPricingTable();
+};
 
 // ---- State ----
 const STORAGE_KEY = "helloMumbai_selectedServices";
@@ -341,15 +352,20 @@ const SHOWCASE_TITLES = {
   "on-the-job": "On the job",
   "handled-with-care": "Handled with care"
 };
+const SHOWCASE_TITLES_MR = {
+  "on-the-job": "कामावर",
+  "handled-with-care": "काळजीपूर्वक हाताळलेले"
+};
 
 function openGallery(key) {
   const overlay = document.getElementById("gallery-overlay");
   const strip = document.getElementById("galleryStrip");
   const title = document.getElementById("galleryTitle");
   if (!overlay || !strip) return;
+  const isMr = window.SahiI18n && window.SahiI18n.getLanguage() === "mr";
 
   const media = SHOWCASE_MEDIA[key] || [];
-  title.textContent = SHOWCASE_TITLES[key] || "Photos & Videos";
+  title.textContent = (isMr ? SHOWCASE_TITLES_MR[key] : SHOWCASE_TITLES[key]) || "Photos & Videos";
   strip.innerHTML = media.map(item => `
     <div class="gallery-item">
       ${item.type === "video"
@@ -388,7 +404,7 @@ function renderQuickIcons() {
 }
 
 // ---- Render ----
-const GROUP_LABELS = {
+const GROUP_LABELS_EN = {
   trade: {
     eyebrow: "Home & Repair",
     title: "Skilled trades for the house",
@@ -401,10 +417,28 @@ const GROUP_LABELS = {
   }
 };
 
+const GROUP_LABELS_MR = {
+  trade: {
+    eyebrow: "घर आणि दुरुस्ती",
+    title: "घरासाठी कुशल कारागीर",
+    desc: "सुतारकाम, वायरिंग, पेंटिंग, प्लंबिंग आणि स्वच्छता — कामानुसार बुक करा."
+  },
+  care: {
+    eyebrow: "समुदाय आणि काळजी",
+    title: "फक्त दुरुस्तीच नाही, लोकांसाठी आधार",
+    desc: "महिलांसाठी मदत, वैद्यकीय गरजा आणि ज्येष्ठांची काळजी — घरगुती भेटीइतकीच काळजी घेऊन."
+  }
+};
+
+function currentGroupLabels() {
+  return (window.SahiI18n && window.SahiI18n.getLanguage() === "mr") ? GROUP_LABELS_MR : GROUP_LABELS_EN;
+}
+
 function render() {
   const grid = document.getElementById("categoryGrid");
   grid.innerHTML = "";
 
+  const GROUP_LABELS = currentGroupLabels();
   const query = searchQuery.toLowerCase();
   const visibleCats = CATALOG.filter(cat => categoryMatchesSearch(cat, searchQuery));
 
@@ -592,19 +626,20 @@ function haversineKm(lat1, lng1, lat2, lng2) {
 }
 
 async function checkPinAvailability(pin) {
+  const isMr = window.SahiI18n && window.SahiI18n.getLanguage() === "mr";
   const resultEl = document.getElementById("pinCheckResult");
   resultEl.className = "pin-check-result";
   if (!/^\d{6}$/.test(pin)) {
-    resultEl.textContent = "Enter a valid 6-digit PIN code.";
+    resultEl.textContent = isMr ? "योग्य ६ अंकी PIN कोड टाका." : "Enter a valid 6-digit PIN code.";
     resultEl.classList.add("pin-no");
     return;
   }
-  resultEl.textContent = "Checking...";
+  resultEl.textContent = isMr ? "तपासत आहोत..." : "Checking...";
   try {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&country=India&postalcode=${pin}`);
     const data = await res.json();
     if (!data.length) {
-      resultEl.textContent = "Couldn't find that PIN code — double-check and try again.";
+      resultEl.textContent = isMr ? "हा PIN कोड सापडला नाही — पुन्हा तपासा आणि प्रयत्न करा." : "Couldn't find that PIN code — double-check and try again.";
       resultEl.classList.add("pin-no");
       return;
     }
@@ -615,14 +650,18 @@ async function checkPinAvailability(pin) {
       if (km < nearestKm) { nearestKm = km; nearest = hub.name; }
     });
     if (nearestKm <= SERVICE_RADIUS_KM) {
-      resultEl.textContent = `✅ Yes! We serve this area (near ${nearest}, about ${Math.round(nearestKm)} km away).`;
+      resultEl.textContent = isMr
+        ? `✅ होय! आम्ही या भागात सेवा देतो (${nearest} जवळ, सुमारे ${Math.round(nearestKm)} किमी दूर).`
+        : `✅ Yes! We serve this area (near ${nearest}, about ${Math.round(nearestKm)} km away).`;
       resultEl.classList.add("pin-ok");
     } else {
-      resultEl.textContent = `Not quite yet — this is about ${Math.round(nearestKm)} km from our nearest area (${nearest}). We're expanding weekly, check back soon!`;
+      resultEl.textContent = isMr
+        ? `अजून नाही — हे आमच्या सर्वात जवळच्या भागापासून (${nearest}) सुमारे ${Math.round(nearestKm)} किमी दूर आहे. आम्ही दर आठवड्याला विस्तार करत आहोत, लवकरच पुन्हा तपासा!`
+        : `Not quite yet — this is about ${Math.round(nearestKm)} km from our nearest area (${nearest}). We're expanding weekly, check back soon!`;
       resultEl.classList.add("pin-no");
     }
   } catch (err) {
-    resultEl.textContent = "Couldn't check right now — try again in a moment.";
+    resultEl.textContent = isMr ? "आत्ता तपासता आले नाही — थोड्या वेळाने प्रयत्न करा." : "Couldn't check right now — try again in a moment.";
     resultEl.classList.add("pin-no");
   }
 }
@@ -645,7 +684,7 @@ function showCategoryLinks() {
   });
 
   panel.innerHTML = `
-    <h3>You're all set — pick a category to browse workers:</h3>
+    <h3>${window.SahiI18n && window.SahiI18n.getLanguage() === "mr" ? "तयार आहे — कारागीर पाहण्यासाठी श्रेणी निवडा:" : "You're all set — pick a category to browse workers:"}</h3>
     <div class="continue-links">${linksHtml}</div>
   `;
   panel.scrollIntoView({ behavior: "smooth", block: "center" });

@@ -43,7 +43,7 @@ window.SAHI_BUSINESS = {
 };
 
 // ---- Applies the values above to every page automatically ----
-document.addEventListener("DOMContentLoaded", () => {
+function sahiApplyBusinessInfo() {
   const b = window.SAHI_BUSINESS;
 
   document.querySelectorAll("[data-sk-phone-link]").forEach(el => {
@@ -94,4 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!areas.length) return; // leave the fallback markup already in the HTML
     el.innerHTML = areas.map(a => `<a href="#categoryGrid">${a}</a>`).join("");
   });
-});
+}
+window.sahiApplyBusinessInfo = sahiApplyBusinessInfo;
+document.addEventListener("DOMContentLoaded", sahiApplyBusinessInfo);

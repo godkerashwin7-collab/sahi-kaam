@@ -21,14 +21,14 @@
         <span class="brand-mark" id="brandMarkHeader">SK</span>
         <div class="brand-text">
           <h1>Sahi Kaamwala</h1>
-          <p class="brand-tagline">Trusted help, at your doorstep.</p>
+          <p class="brand-tagline" data-i18n="brandTagline">Trusted help, at your doorstep.</p>
         </div>
       </div>
       <div class="header-right">
         <button type="button" id="hamburgerBtn" class="hamburger-btn" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
-        <a href="join.html" class="header-pro-badge" id="headerProBadge">🛠️ Become a Professional</a>
+        <a href="join.html" class="header-pro-badge" id="headerProBadge" data-i18n="proBadge">🛠️ Become a Professional</a>
         <button type="button" class="ticket-counter" id="ticketCounter">
           <span id="selectedCount">0</span> selected
         </button>
@@ -64,10 +64,11 @@
   </div>
 
   <div class="help-bar">
-    <span>Need help choosing a service?</span>
+    <span data-i18n="helpBarText">Need help choosing a service?</span>
     <div class="help-bar-links">
-      <a href="tel:" data-sk-phone-link>📞 Call us</a>
-      <a href="https://wa.me/" data-sk-whatsapp-link data-sk-whatsapp-msg="Hi, I need help with ___. My location is ___. Preferred time: ___" target="_blank" rel="noopener">🟢 WhatsApp</a>
+      <button type="button" id="langToggleBtn" class="lang-toggle-btn">🌐 <span id="langToggleLabel">मराठी</span></button>
+      <a href="tel:" data-sk-phone-link data-i18n="callUs">📞 Call us</a>
+      <a href="https://wa.me/" data-sk-whatsapp-link data-sk-whatsapp-msg="Hi, I need help with ___. My location is ___. Preferred time: ___" target="_blank" rel="noopener" data-i18n="whatsApp">🟢 WhatsApp</a>
     </div>
   </div>
 
@@ -107,7 +108,7 @@
   </div>
 
   <div class="search-bar-wrap search-bar-top">
-    <input type="text" id="serviceSearch" class="search-bar" placeholder="🔍 Search services — e.g. tap repair, wiring, deep cleaning">
+    <input type="text" id="serviceSearch" class="search-bar" placeholder="🔍 Search services — e.g. tap repair, wiring, deep cleaning" data-i18n-placeholder="searchPlaceholder">
   </div>
 
   <!-- Quick category icons — populated from CATALOG in script.js -->
@@ -118,15 +119,15 @@
     <div class="location-card-head">
       <span class="location-card-icon">📍</span>
       <div class="location-card-headtext">
-        <strong>Your location</strong>
+        <strong data-i18n="yourLocation">Your location</strong>
         <p id="homeAddressDisplay">Search, drag the pin, or scroll the map to set where you need service</p>
       </div>
     </div>
     <div class="addr-search-wrap">
-      <input type="text" id="home-addr-search" class="search-bar" placeholder="🔍 Search your address or area in Mumbai" autocomplete="off">
+      <input type="text" id="home-addr-search" class="search-bar" placeholder="🔍 Search your address or area in Mumbai" autocomplete="off" data-i18n-placeholder="addressSearchPlaceholder">
       <div id="home-addr-suggestions" class="addr-suggestions sr-hidden"></div>
     </div>
-    <button type="button" id="home-addr-locate-btn" class="addr-locate-btn">📍 Use my current location</button>
+    <button type="button" id="home-addr-locate-btn" class="addr-locate-btn" data-i18n="useCurrentLocation">📍 Use my current location</button>
     <div id="home-addr-map" class="addr-map home-map"></div>
   </section>
 
@@ -136,16 +137,16 @@
       <div class="hero-scrim"></div>
     </div>
     <div class="hero-content">
-      <span class="hero-eyebrow">Since your first call, sorted.</span>
-      <h2 class="hero-title">Every home, every helper —<br><em>one tap away.</em></h2>
-      <p class="hero-sub">From a leaking tap at 8pm to a wobbly cupboard hinge — Sahi Kaamwala connects you with ID-verified home-service professionals across <span data-sk-service-areas>Mumbai</span>.</p>
-      <a href="#categoryGrid" class="hero-cta">Book a Service ↓</a>
-      <a href="#categoryGrid" class="hero-cta hero-cta-secondary">Submit a Request — Anytime →</a>
+      <span class="hero-eyebrow" data-i18n="heroEyebrow">Since your first call, sorted.</span>
+      <h2 class="hero-title"><span data-i18n="heroTitlePrefix">Every home, every helper — </span><br><em data-i18n="heroTitleEm">one tap away.</em></h2>
+      <p class="hero-sub" data-i18n="heroSub">From a leaking tap at 8pm to a wobbly cupboard hinge — Sahi Kaamwala connects you with ID-verified home-service professionals across <span data-sk-service-areas>Mumbai</span>.</p>
+      <a href="#categoryGrid" class="hero-cta" data-i18n="bookService">Book a Service ↓</a>
+      <a href="#categoryGrid" class="hero-cta hero-cta-secondary" data-i18n="submitRequest">Submit a Request — Anytime →</a>
       <div class="hero-stats">
         <div><strong>5</strong><span>categories</span></div>
         <div><strong>50+</strong><span>listed services</span></div>
       </div>
-      <p class="hero-fineprint">You can submit a request any time of day — actual visit timing depends on professional availability in your area (<span data-sk-service-areas>Mumbai</span> only, for now).</p>
+      <p class="hero-fineprint" data-i18n="heroFineprint">You can submit a request any time of day — actual visit timing depends on professional availability in your area (<span data-sk-service-areas>Mumbai</span> only, for now).</p>
     </div>
   </section>
 
@@ -155,17 +156,17 @@
 
   <section class="trust-mini" aria-label="Why trust Sahi Kaamwala">
     <div class="trust-mini-inner">
-      <span class="trust-mini-item"><span class="trust-mini-icon">✅</span>Phone verified</span>
-      <span class="trust-mini-item"><span class="trust-mini-icon">🪪</span>ID checked</span>
-      <span class="trust-mini-item"><span class="trust-mini-icon">🆓</span>Free to join — no signup fee</span>
-      <a href="#trust" class="trust-mini-more">Why trust us →</a>
+      <span class="trust-mini-item"><span class="trust-mini-icon">✅</span><span data-i18n="trustPhone">Phone verified</span></span>
+      <span class="trust-mini-item"><span class="trust-mini-icon">🪪</span><span data-i18n="trustId">ID checked</span></span>
+      <span class="trust-mini-item"><span class="trust-mini-icon">🆓</span><span data-i18n="trustFree">Free to join — no signup fee</span></span>
+      <a href="#trust" class="trust-mini-more" data-i18n="trustMore">Why trust us →</a>
     </div>
   </section>
 
   <main>
     <section class="intro">
       <button type="button" class="intro-trigger" id="howItWorksTrigger">
-        <span class="intro-trigger-icon">ℹ️</span> How it works
+        <span class="intro-trigger-icon">ℹ️</span> <span data-i18n="howItWorks">How it works</span>
       </button>
     </section>
 
@@ -185,23 +186,23 @@
 
     <!-- Pricing transparency -->
     <section class="pricing-section" id="pricing">
-      <span class="intro-eyebrow">Transparent pricing</span>
-      <h3 class="team-heading">No surprise bills</h3>
-      <p class="team-subheading">Starting prices below — the professional confirms the exact price with you before any work begins.</p>
+      <span class="intro-eyebrow" data-i18n="pricingEyebrow">Transparent pricing</span>
+      <h3 class="team-heading" data-i18n="pricingHeading">No surprise bills</h3>
+      <p class="team-subheading" data-i18n="pricingSub">Starting prices below — the professional confirms the exact price with you before any work begins.</p>
       <div class="pricing-table" id="pricingTable"><!-- filled by script.js --></div>
-      <p class="pricing-note">Prices shown are starting estimates for the category and may vary by the exact job, materials, and site conditions — always confirmed with you upfront.</p>
+      <p class="pricing-note" data-i18n="pricingNote">Prices shown are starting estimates for the category and may vary by the exact job, materials, and site conditions — always confirmed with you upfront.</p>
     </section>
 
     <!-- PIN code / area availability checker -->
     <section class="pin-check-section" id="pin-check">
-      <span class="intro-eyebrow">Service availability</span>
-      <h3 class="team-heading">Is Sahi Kaamwala available in your area?</h3>
+      <span class="intro-eyebrow" data-i18n="pinEyebrow">Service availability</span>
+      <h3 class="team-heading" data-i18n="pinHeading">Is Sahi Kaamwala available in your area?</h3>
       <div class="pin-check-box">
-        <input type="text" id="pinCheckInput" inputmode="numeric" maxlength="6" placeholder="Enter your 6-digit PIN code, e.g. 400054">
-        <button type="button" id="pinCheckBtn" class="sr-submit" style="margin-top:0; width:auto; padding:12px 20px;">Check Availability</button>
+        <input type="text" id="pinCheckInput" inputmode="numeric" maxlength="6" placeholder="Enter your 6-digit PIN code, e.g. 400054" data-i18n-placeholder="pinPlaceholder">
+        <button type="button" id="pinCheckBtn" class="sr-submit" style="margin-top:0; width:auto; padding:12px 20px;" data-i18n="pinCheckBtn">Check Availability</button>
       </div>
       <p id="pinCheckResult" class="pin-check-result"></p>
-      <p class="pricing-note">We currently serve <span data-sk-service-areas>Mumbai</span>.</p>
+      <p class="pricing-note" data-i18n="pinServeNote">We currently serve <span data-sk-service-areas>Mumbai</span>.</p>
     </section>
 
     <section class="showcase">
@@ -330,9 +331,9 @@
       </div>
 
       <div class="team-section" id="team">
-        <span class="intro-eyebrow">Meet the team</span>
-        <h3 class="team-heading">The people behind every visit</h3>
-        <p class="team-subheading">Real people you can call by name — not a faceless app.</p>
+        <span class="intro-eyebrow" data-i18n="teamEyebrow">Meet the team</span>
+        <h3 class="team-heading" data-i18n="teamHeading">The people behind every visit</h3>
+        <p class="team-subheading" data-i18n="teamSub">Real people you can call by name — not a faceless app.</p>
 
         <div class="team-grid">
           <div class="team-card">
@@ -359,9 +360,9 @@
 
       <!-- Individual professional profiles -->
       <div class="pros-section" id="professionals">
-        <span class="intro-eyebrow">Meet your professionals</span>
-        <h3 class="team-heading">Know who's coming to your door</h3>
-        <p class="team-subheading">Real names, real experience — every professional is ID verified before their first job.</p>
+        <span class="intro-eyebrow" data-i18n="prosEyebrow">Meet your professionals</span>
+        <h3 class="team-heading" data-i18n="prosHeading">Know who's coming to your door</h3>
+        <p class="team-subheading" data-i18n="prosSub">Real names, real experience — every professional is ID verified before their first job.</p>
 
         <div class="pros-grid">
           <div class="pro-card">
@@ -443,8 +444,8 @@
 
       <!-- Ratings & reviews -->
       <div class="reviews-section" id="reviews">
-        <span class="intro-eyebrow">Customer reviews</span>
-        <h3 class="team-heading">What people are saying</h3>
+        <span class="intro-eyebrow" data-i18n="reviewsEyebrow">Customer reviews</span>
+        <h3 class="team-heading" data-i18n="reviewsHeading">What people are saying</h3>
 
         <div class="reviews-summary">
           <div class="reviews-avg-number" id="reviewsAvgNumber">—</div>
@@ -454,7 +455,7 @@
           </div>
         </div>
 
-        <button type="button" class="cta-bold reviews-write-btn" id="reviewsWriteBtn">⭐ Write a Review</button>
+        <button type="button" class="cta-bold reviews-write-btn" id="reviewsWriteBtn" data-i18n="writeReview">⭐ Write a Review</button>
 
         <div class="reviews-list" id="reviewsList">
           <p class="activity-empty">Loading reviews...</p>
@@ -463,8 +464,8 @@
 
       <!-- FAQ -->
       <div class="faq-section" id="faq">
-        <span class="intro-eyebrow">Common questions</span>
-        <h3 class="team-heading">Frequently asked questions</h3>
+        <span class="intro-eyebrow" data-i18n="faqEyebrow">Common questions</span>
+        <h3 class="team-heading" data-i18n="faqHeading">Frequently asked questions</h3>
 
         <div class="faq-list">
           <details class="faq-item">
@@ -540,7 +541,7 @@
   <footer class="site-footer">
     <div class="footer-grid">
       <div class="footer-col">
-        <h4>Company</h4>
+        <h4 data-i18n="footerCompany">Company</h4>
         <a href="#trust">About Us</a>
         <a href="#team">Our Team</a>
         <a href="#blog">Blog</a>
@@ -549,7 +550,7 @@
         <a href="#" onclick="document.getElementById('sc-fab').click(); return false;">Contact</a>
       </div>
       <div class="footer-col">
-        <h4>Services</h4>
+        <h4 data-i18n="footerServices">Services</h4>
         <a href="carpenter.html">Carpenter</a>
         <a href="electrician.html">Electrician</a>
         <a href="painter.html">Painter</a>
@@ -558,13 +559,13 @@
         <a href="#categoryGrid">All Services</a>
       </div>
       <div class="footer-col">
-        <h4>Locations</h4>
+        <h4 data-i18n="footerLocations">Locations</h4>
         <div class="footer-locations-list" data-sk-areas-list>
           <a href="#categoryGrid" data-sk-service-areas>Mumbai</a>
         </div>
       </div>
       <div class="footer-col">
-        <h4>Contact</h4>
+        <h4 data-i18n="footerContact">Contact</h4>
         <a href="tel:" data-sk-phone-link><span class="footer-contact-icon">📞</span> <span data-sk-phone-text>Call a location</span></a>
         <a href="mailto:" data-sk-email-link><span class="footer-contact-icon">✉️</span> <span data-sk-email-text>Email us</span></a>
         <span class="footer-contact-hours"><span class="footer-contact-icon">🕐</span> <span data-sk-support-hours>9:00 AM – 8:00 PM, all days</span></span>
@@ -572,18 +573,18 @@
       </div>
     </div>
 
-    <div class="footer-shoutout">
+    <div class="footer-shoutout" data-i18n="policeShoutout">
       🙏 With gratitude to the Mumbai Police for their tireless work keeping our city and its people safe, every single day.
     </div>
 
     <div class="footer-bottom-bar">
       <p class="footer-copyright">
-        © <span data-sk-current-year>2026</span> <span data-sk-legal-name>REPLACE_ME_LEGAL_ENTITY_NAME</span>. All rights reserved.
+        © <span data-sk-current-year>2026</span> <span data-sk-legal-name>REPLACE_ME_LEGAL_ENTITY_NAME</span>. <span data-i18n="allRightsReserved">All rights reserved.</span>
       </p>
       <div class="footer-bottom-links">
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
-        <a href="refund-policy.html">Refund Policy</a>
+        <a href="privacy.html" data-i18n="privacyPolicy">Privacy Policy</a>
+        <a href="terms.html" data-i18n="termsOfService">Terms of Service</a>
+        <a href="refund-policy.html" data-i18n="refundPolicy">Refund Policy</a>
       </div>
     </div>
   </footer>
@@ -787,6 +788,7 @@
   <script src="auth.js"></script>
   <script src="payment.js"></script>
   <script src="chatbot.js"></script>
+  <script src="translations.js"></script>
   <script src="script.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="address-map.js"></script>
@@ -1210,6 +1212,15 @@
     document.getElementById("bnHome").addEventListener("click", () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
+
+    // ---- Language toggle (English / Marathi) ----
+    if (window.SahiI18n) {
+      window.SahiI18n.init();
+      const langBtn = document.getElementById("langToggleBtn");
+      if (langBtn) {
+        langBtn.addEventListener("click", () => window.SahiI18n.toggle());
+      }
+    }
     document.getElementById("bnServices").addEventListener("click", () => {
       const grid = document.getElementById("categoryGrid");
       if (grid) grid.scrollIntoView({ behavior: "smooth", block: "start" });
