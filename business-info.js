@@ -17,11 +17,11 @@ window.SAHI_BUSINESS = {
   brandName: "Sahi Kaamwala",
 
   // Contact
-  phoneDisplay: "REPLACE_ME_PHONE",                // e.g. "+91 98XXXXXXXX"  (shown to customers)
-  phoneLink: "REPLACE_ME_PHONE_DIGITS",            // e.g. "+9198XXXXXXXX"   (used in tel: links, no spaces)
-  whatsappNumber: "REPLACE_ME_WHATSAPP_DIGITS",    // e.g. "9198XXXXXXXX"    (used in wa.me links, no + or spaces)
-  supportEmail: "REPLACE_ME_SUPPORT_EMAIL",        // e.g. "support@sahikaamwala.in"
-  privacyEmail: "REPLACE_ME_PRIVACY_EMAIL",        // e.g. "privacy@sahikaamwala.in" (can be same as supportEmail)
+  phoneDisplay: "+91 98678 82638",                 // e.g. "+91 98XXXXXXXX"  (shown to customers)
+  phoneLink: "+919867882638",                       // e.g. "+9198XXXXXXXX"   (used in tel: links, no spaces)
+  whatsappNumber: "919867882638",                   // e.g. "9198XXXXXXXX"    (used in wa.me links, no + or spaces)
+  supportEmail: "sahikaam12@gmail.com",             // e.g. "support@sahikaamwala.in"
+  privacyEmail: "sahikaam12@gmail.com",             // e.g. "privacy@sahikaamwala.in" (can be same as supportEmail)
 
   // Location
   city: "Mumbai",
