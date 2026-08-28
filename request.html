@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Request Service — Sahi Kaamwala</title>
 <script src="business-info.js"></script>
+<link rel="stylesheet" href="verify.css">
 <style>
   body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
   h1 { color: #1e88e5; }
@@ -12,19 +13,37 @@
     width: 100%; padding: 12px; font-size: 16px; margin: 8px 0;
     box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px;
   }
-  button {
+  button.sk-submit {
     width: 100%; padding: 14px; font-size: 18px; background-color: #1e88e5;
     color: white; border: none; border-radius: 8px; margin-top: 10px;
     font-weight: 800; font-style: italic;
     box-shadow: 0 4px 14px rgba(30,136,229,0.4);
   }
   #status { margin-top: 15px; font-weight: bold; }
+  #whatsappCta {
+    display: none;
+    margin-top: 12px;
+    text-align: center;
+    background: #25D366;
+    color: #fff;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  #signedInAs {
+    font-size: 13px;
+    color: #2e7d32;
+    font-weight: 600;
+    margin: 4px 0 0;
+  }
 </style>
 </head>
 <body>
 
 <h1>Request Help</h1>
 <p>Tell us what you need and we'll connect you with someone.</p>
+<p id="signedInAs"></p>
 
 <input type="text" id="name" placeholder="Your Name">
 <select id="skill">
@@ -38,11 +57,17 @@
 </select>
 <input type="text" id="area" placeholder="Your Area (e.g. Bandra)">
 <input type="tel" id="phone" placeholder="Your Phone Number">
-<button onclick="submitRequest()">Send Request</button>
+<button type="button" class="sk-submit" onclick="submitRequest()">Send Request</button>
 <p id="status"></p>
+<a href="#" id="whatsappCta" target="_blank" rel="noopener">📲 Tap to notify us on WhatsApp</a>
 
+<script src="auth.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, updateProfile, signOut, sendPasswordResetEmail
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -55,9 +80,36 @@
   };
 
   const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
   const db = getFirestore(app);
+  let currentUser = null;
 
+  SahiAuth.init({
+    auth,
+    fns: { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, sendPasswordResetEmail },
+    onChange: (user) => {
+      currentUser = user;
+      const el = document.getElementById("signedInAs");
+      if (user) {
+        el.textContent = `Signed in as ${user.email}`;
+        if (!document.getElementById("name").value && user.displayName) {
+          document.getElementById("name").value = user.displayName;
+        }
+      } else {
+        el.textContent = "";
+      }
+    }
+  });
+
+  // A real request needs a real, logged-in customer behind it — this is
+  // what stops anonymous/fake submissions instead of just trusting whatever
+  // name and number someone types in.
   window.submitRequest = async function() {
+    if (!currentUser) {
+      SahiAuth.open("login", () => window.submitRequest());
+      return;
+    }
+
     const name = document.getElementById("name").value.trim();
     const skill = document.getElementById("skill").value;
     const area = document.getElementById("area").value.trim();
@@ -79,10 +131,27 @@
     try {
       await addDoc(collection(db, "customer_requests"), {
         name, skill, area, phone,
+        uid: currentUser.uid,
+        accountEmail: currentUser.email,
         submittedAt: new Date().toISOString()
       });
-      statusEl.innerText = "Request sent! We'll contact you soon.";
+      statusEl.innerText = "✅ Request saved! We'll contact you soon.";
       statusEl.style.color = "green";
+
+      // Show a real, tappable WhatsApp link instead of trying to open one
+      // automatically — mobile browsers routinely block window.open() calls
+      // that happen after an `await` (like this database save), since by
+      // then it's no longer considered a direct result of the tap. That
+      // silent failure was exactly why requests seemed to "go nowhere."
+      const waNumber = (window.SAHI_BUSINESS && window.SAHI_BUSINESS.whatsappNumber) || "";
+      const waCta = document.getElementById("whatsappCta");
+      if (waNumber && waNumber.indexOf("REPLACE_ME") === -1) {
+        const msg = `🔔 New service request on Sahi Kaamwala\nName: ${name}\nNeeds: ${skill}\nArea: ${area}\nPhone: ${phone}`;
+        waCta.href = "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(msg);
+        waCta.style.display = "block";
+      } else {
+        console.warn("SAHI_BUSINESS.whatsappNumber is not set — fill it in business-info.js.");
+      }
     } catch (error) {
       statusEl.innerText = "Something went wrong. Try again.";
       statusEl.style.color = "red";

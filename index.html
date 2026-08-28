@@ -1438,13 +1438,28 @@
 
         const dayKey = WORKER_DAY_KEYS[new Date(dateStr + "T00:00:00").getDay()];
         const windowsByTrade = {};
-        trades.forEach(t => windowsByTrade[t] = []);
+        const tradeHasAnyWorker = {};
+        trades.forEach(t => { windowsByTrade[t] = []; tradeHasAnyWorker[t] = false; });
         snap.forEach(docSnap => {
           const w = docSnap.data();
+          if (!windowsByTrade.hasOwnProperty(w.trade)) return;
+          tradeHasAnyWorker[w.trade] = true;
           const day = w.availability && w.availability[dayKey];
-          if (day && day.available && day.start && day.end && windowsByTrade[w.trade]) {
+          if (day && day.available && day.start && day.end) {
             windowsByTrade[w.trade].push([toMinutes(day.start), toMinutes(day.end)]);
           }
+        });
+
+        // A trade with zero professionals registered at all yet (this
+        // feature is brand new) falls back to our general business hours
+        // instead of blocking booking outright — otherwise the very first
+        // customers would see "no availability" on everything, every day,
+        // until workers start setting their schedules. Once even one
+        // worker registers for a trade, that trade switches to real
+        // schedule-based availability.
+        const FALLBACK_WINDOW = [[toMinutes("09:00"), toMinutes("20:00")]];
+        trades.forEach(t => {
+          if (!tradeHasAnyWorker[t]) windowsByTrade[t] = FALLBACK_WINDOW;
         });
 
         const missingTrade = trades.find(t => windowsByTrade[t].length === 0);
@@ -1659,11 +1674,18 @@
       try {
         const lat = document.getElementById("booking-lat").value;
         const lng = document.getElementById("booking-lng").value;
+        const tradesNeeded = Object.keys(window.__sahiPendingSelected || {}).filter(
+          catId => window.__sahiPendingSelected[catId] && window.__sahiPendingSelected[catId].length
+        );
         const bookingData = Object.assign({
           uid: user.uid,
           customerName: user.displayName || "",
           customerEmail: user.email || "",
           services: window.__sahiPendingSelected,
+          tradesNeeded,
+          assignedWorkerUid: null,
+          assignedWorkerName: null,
+          declinedBy: [],
           address: document.getElementById("booking-address").value.trim(),
           addressLat: lat ? parseFloat(lat) : null,
           addressLng: lng ? parseFloat(lng) : null,

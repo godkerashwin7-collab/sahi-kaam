@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /bookings/{bookingId} {
+      // Anyone with the exact link can read one booking (tracking links,
+      // job-board cards) without needing to be logged in.
+      allow get: if true;
+
+      // Listing (querying many bookings at once) is only for:
+      // - a logged-in customer, filtered to their own bookings (Activity panel)
+      // - a logged-in, registered worker (Available Jobs board)
+      allow list: if request.auth != null && (
+                     resource.data.uid == request.auth.uid ||
+                     exists(/databases/$(database)/documents/worker_schedules/$(request.auth.uid))
+                   );
+
+      allow create: if true;
+
+      // Registered workers can update a booking (accept/decline/tracking status).
+      // Note: this doesn't lock down which specific fields they can change —
+      // a more advanced rule could restrict that further if it becomes a problem.
+      allow update: if request.auth != null &&
+                      exists(/databases/$(database)/documents/worker_schedules/$(request.auth.uid));
+    }
+
+    match /worker_schedules/{workerId} {
+      // Workers manage their own schedule. Existence-checks from other
+      // rules (above) work regardless of this read restriction.
+      allow read, write: if request.auth != null && request.auth.uid == workerId;
+    }
+
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+    }
+
+    match /worker_applications/{docId} {
+      allow read: if false;
+      allow create: if true;
+    }
+  }
+}

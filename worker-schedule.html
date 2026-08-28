@@ -64,6 +64,43 @@
   }
   #status { margin-top: 15px; font-weight: bold; }
   #signedInAs{ font-size:13px; color:#2e7d32; font-weight:600; margin:2px 0 14px; }
+  .job-card{
+    background:#fff;
+    border-radius:12px;
+    padding:16px;
+    margin:12px 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .job-card-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:14px;
+    margin:4px 0;
+  }
+  .job-card-row strong{ color:#14213D; }
+  .job-card-services{
+    font-size:13px;
+    color:#555;
+    margin:8px 0;
+    line-height:1.5;
+  }
+  .job-card-actions{
+    display:flex;
+    gap:10px;
+    margin-top:12px;
+  }
+  .job-accept-btn, .job-decline-btn{
+    flex:1;
+    padding:11px;
+    border-radius:8px;
+    border:none;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .job-accept-btn{ background:#2e7d32; color:#fff; }
+  .job-decline-btn{ background:#eee; color:#555; }
+  .jobs-empty{ color:#888; font-size:14px; padding:10px 0; }
 </style>
 </head>
 <body>
@@ -100,6 +137,12 @@
 
 <p id="status"></p>
 
+<div id="jobsSection" style="display:none; margin-top:28px;">
+  <h1 style="font-size:22px;">Available Jobs</h1>
+  <p class="sk-sub">New requests matching your trade. Take a look before you accept — no explanation needed if it's not for you.</p>
+  <div id="jobsList"></div>
+</div>
+
 <script src="auth.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -107,7 +150,10 @@
     getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
     signInWithEmailAndPassword, updateProfile, signOut, sendPasswordResetEmail
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, collection, query, where,
+    getDocs, updateDoc, arrayUnion, runTransaction
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
@@ -189,6 +235,7 @@
               if (day.start) document.getElementById(`start-${d.key}`).value = day.start;
               if (day.end) document.getElementById(`end-${d.key}`).value = day.end;
             });
+            if (w.trade) loadAvailableJobs(w.trade);
           }
         } catch (err) {
           console.warn("Could not load existing schedule:", err);
@@ -248,12 +295,142 @@
       }, { merge: true });
       statusEl.textContent = "✅ Schedule saved! Customers can now book you during these hours.";
       statusEl.style.color = "green";
+      loadAvailableJobs(trade);
     } catch (err) {
       statusEl.textContent = "Something went wrong saving your schedule. Please try again.";
       statusEl.style.color = "red";
       console.error(err);
     }
   });
+
+  // ---- Available Jobs board ----
+  // Shows open bookings matching this worker's trade, with a full
+  // accept/decline choice before anything is committed to them.
+  const DECLINED_KEY_PREFIX = "sahi_declined_jobs_"; // per-worker localStorage fallback
+
+  function getLocallyDeclined(uid) {
+    try {
+      return JSON.parse(localStorage.getItem(DECLINED_KEY_PREFIX + uid) || "[]");
+    } catch (e) { return []; }
+  }
+  function addLocallyDeclined(uid, bookingId) {
+    const list = getLocallyDeclined(uid);
+    if (!list.includes(bookingId)) list.push(bookingId);
+    try { localStorage.setItem(DECLINED_KEY_PREFIX + uid, JSON.stringify(list)); } catch (e) {}
+  }
+
+  async function loadAvailableJobs(trade) {
+    if (!currentUser || !trade) return;
+    const section = document.getElementById("jobsSection");
+    const listEl = document.getElementById("jobsList");
+    section.style.display = "block";
+    listEl.innerHTML = `<p class="jobs-empty">Loading jobs...</p>`;
+
+    try {
+      const q = query(
+        collection(db, "bookings"),
+        where("tradesNeeded", "array-contains", trade),
+        where("assignedWorkerUid", "==", null)
+      );
+      const snap = await getDocs(q);
+      const declinedLocally = getLocallyDeclined(currentUser.uid);
+
+      const jobs = [];
+      snap.forEach(docSnap => {
+        const b = docSnap.data();
+        const declinedByMe = (b.declinedBy || []).includes(currentUser.uid) || declinedLocally.includes(docSnap.id);
+        if (!declinedByMe) jobs.push({ id: docSnap.id, ...b });
+      });
+
+      if (!jobs.length) {
+        listEl.innerHTML = `<p class="jobs-empty">No open jobs for your trade right now — check back soon.</p>`;
+        return;
+      }
+
+      // Most recent first
+      jobs.sort((a, b) => (b.submittedAt || "").localeCompare(a.submittedAt || ""));
+
+      listEl.innerHTML = jobs.map(job => {
+        const servicesForTrade = (job.services && job.services[trade]) || [];
+        const otherTrades = (job.tradesNeeded || []).filter(t => t !== trade);
+        return `
+          <div class="job-card" data-job-id="${job.id}">
+            <div class="job-card-row"><span>📅 Date</span><strong>${job.preferredDate || "—"}</strong></div>
+            <div class="job-card-row"><span>🕒 Time</span><strong>${job.preferredTime || "—"}</strong></div>
+            <div class="job-card-row"><span>📍 Address</span><strong>${job.address || "—"}</strong></div>
+            <div class="job-card-services">
+              <strong>Your part of the job:</strong> ${servicesForTrade.join(", ") || "—"}
+              ${otherTrades.length ? `<br><em>Visit also includes: ${otherTrades.join(", ")} (different professional)</em>` : ""}
+            </div>
+            <div class="job-card-actions">
+              <button type="button" class="job-accept-btn" data-action="accept" data-job-id="${job.id}">✅ Accept This Job</button>
+              <button type="button" class="job-decline-btn" data-action="decline" data-job-id="${job.id}">✖ Not For Me</button>
+            </div>
+            <p class="job-status-msg" id="job-status-${job.id}" style="font-size:12px; margin-top:8px;"></p>
+          </div>
+        `;
+      }).join("");
+
+      listEl.querySelectorAll("[data-action]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const jobId = btn.getAttribute("data-job-id");
+          if (btn.getAttribute("data-action") === "accept") acceptJob(jobId, trade);
+          else declineJob(jobId, trade);
+        });
+      });
+    } catch (err) {
+      listEl.innerHTML = `<p class="jobs-empty">Couldn't load jobs right now — try refreshing.</p>`;
+      console.error(err);
+    }
+  }
+
+  async function acceptJob(jobId, trade) {
+    const msgEl = document.getElementById(`job-status-${jobId}`);
+    msgEl.textContent = "Accepting...";
+    msgEl.style.color = "#1565c0";
+    try {
+      await runTransaction(db, async (transaction) => {
+        const ref = doc(db, "bookings", jobId);
+        const snap = await transaction.get(ref);
+        if (!snap.exists() || snap.data().assignedWorkerUid) {
+          throw new Error("TAKEN");
+        }
+        transaction.update(ref, {
+          assignedWorkerUid: currentUser.uid,
+          assignedWorkerName: document.getElementById("wsName").value.trim() || currentUser.email,
+          assignedAt: new Date().toISOString()
+        });
+      });
+      msgEl.textContent = "✅ Job accepted! Contact the customer to confirm.";
+      msgEl.style.color = "green";
+      setTimeout(() => loadAvailableJobs(trade), 1200);
+    } catch (err) {
+      if (err.message === "TAKEN") {
+        msgEl.textContent = "Someone else already accepted this job.";
+      } else {
+        msgEl.textContent = "Something went wrong — try again.";
+        console.error(err);
+      }
+      msgEl.style.color = "red";
+      setTimeout(() => loadAvailableJobs(trade), 1500);
+    }
+  }
+
+  async function declineJob(jobId, trade) {
+    try {
+      await updateDoc(doc(db, "bookings", jobId), {
+        declinedBy: arrayUnion(currentUser.uid)
+      });
+    } catch (err) {
+      // Even if the write fails (e.g. rules not yet updated on the
+      // person's Firebase project), still hide it locally so the
+      // worker isn't stuck looking at a job they already said no to.
+      console.warn("Could not save decline remotely:", err);
+    }
+    addLocallyDeclined(currentUser.uid, jobId);
+    const card = document.querySelector(`.job-card[data-job-id="${jobId}"]`);
+    if (card) card.remove();
+  }
 </script>
 </body>
 </html>
