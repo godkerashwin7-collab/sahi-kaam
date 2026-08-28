@@ -719,6 +719,11 @@
       <input type="hidden" id="booking-lng">
       <p class="sk-error-text" id="booking-addressError">Enter your full address (at least 10 characters).</p>
 
+      <label>Your Phone Number</label>
+      <p class="addr-hint">So we can reach you about this booking, and send you a WhatsApp confirmation.</p>
+      <input type="tel" id="booking-phone" placeholder="e.g. 9876543210" inputmode="numeric" maxlength="10">
+      <p class="sk-error-text" id="booking-phoneError">Enter a valid 10-digit Indian mobile number.</p>
+
       <label>Preferred Date</label>
       <input type="date" id="booking-date">
       <p class="sk-error-text" id="booking-dateError">Pick a valid date (today or later).</p>
@@ -739,6 +744,7 @@
       <button type="button" class="sr-submit cta-bold" id="booking-confirm-btn">Confirm Booking</button>
       <p id="booking-status" class="sr-status"></p>
       <a href="#" id="booking-whatsapp-cta" class="whatsapp-cta sr-hidden" target="_blank" rel="noopener">📲 Tap to notify us on WhatsApp</a>
+      <a href="#" id="customer-whatsapp-cta" class="whatsapp-cta whatsapp-cta-customer sr-hidden" target="_blank" rel="noopener">📲 Save my booking confirmation to WhatsApp</a>
     </div>
   </div>
 
@@ -1653,6 +1659,7 @@
       document.getElementById("booking-address").value = "";
       document.getElementById("booking-lat").value = "";
       document.getElementById("booking-lng").value = "";
+      document.getElementById("booking-phone").value = "";
       const addrSearchEl = document.getElementById("addr-search");
       if (addrSearchEl) addrSearchEl.value = "";
       bookingDateInput.value = "";
@@ -1664,6 +1671,7 @@
       window.__sahiCurrentSelected = selected;
       document.getElementById("booking-status").textContent = "";
       document.getElementById("booking-whatsapp-cta").classList.add("sr-hidden");
+      document.getElementById("customer-whatsapp-cta").classList.add("sr-hidden");
 
       selectedPaymentMethod = null;
       document.getElementById("pm-online").classList.remove("pm-btn-active");
@@ -1752,6 +1760,7 @@
           assignedWorkerName: null,
           declinedBy: [],
           address: document.getElementById("booking-address").value.trim(),
+          phone: document.getElementById("booking-phone").value.trim(),
           addressLat: lat ? parseFloat(lat) : null,
           addressLng: lng ? parseFloat(lng) : null,
           preferredDate: document.getElementById("booking-date").value,
@@ -1778,6 +1787,7 @@
         const waUrl = buildWhatsAppUrl(
           `🔔 New booking on Sahi Kaamwala\n` +
           `Name: ${bookingData.customerName || "N/A"}\n` +
+          `Phone: ${bookingData.phone}\n` +
           `Address: ${bookingData.address}${mapLink}\n` +
           `Date/Time: ${bookingData.preferredDate} ${bookingData.preferredTime}\n` +
           `Services:\n${serviceLines}\n` +
@@ -1791,6 +1801,24 @@
           waCta.classList.remove("sr-hidden");
         } else {
           waCta.classList.add("sr-hidden");
+        }
+
+        // A second, separate link — this one opens the CUSTOMER's own
+        // WhatsApp (their number, typed just above) with a copy of their
+        // booking as a personal confirmation/reminder they can keep.
+        const customerWaCta = document.getElementById("customer-whatsapp-cta");
+        if (bookingData.phone) {
+          const customerMsg =
+            `✅ Your Sahi Kaamwala booking is confirmed!\n` +
+            `Address: ${bookingData.address}\n` +
+            `Date/Time: ${bookingData.preferredDate} ${bookingData.preferredTime}\n` +
+            `Services:\n${serviceLines}\n` +
+            `Estimated total: ₹${bookingData.estimatedTotal}\n` +
+            `Payment: ${extra.paymentMethod || "N/A"}`;
+          customerWaCta.href = "https://wa.me/91" + bookingData.phone + "?text=" + encodeURIComponent(customerMsg);
+          customerWaCta.classList.remove("sr-hidden");
+        } else {
+          customerWaCta.classList.add("sr-hidden");
         }
 
         // Don't auto-close the modal — leave it open so the person can
@@ -1809,20 +1837,23 @@
 
     document.getElementById("booking-confirm-btn").addEventListener("click", async () => {
       const address = document.getElementById("booking-address").value.trim();
+      const phone = document.getElementById("booking-phone").value.trim();
       const date = document.getElementById("booking-date").value;
       const time = document.getElementById("booking-time").value;
       const statusEl = document.getElementById("booking-status");
 
       const addressOk = isValidAddress(address);
+      const phoneOk = /^[6-9]\d{9}$/.test(phone);
       const dateOk = isValidBookingDate(date);
       const timeOk = !!time;
       const methodOk = !!selectedPaymentMethod;
       toggleBookingErr("booking-address", "booking-addressError", addressOk);
+      toggleBookingErr("booking-phone", "booking-phoneError", phoneOk);
       toggleBookingErr("booking-date", "booking-dateError", dateOk);
       toggleBookingErr("booking-time", "booking-timeError", timeOk);
       document.getElementById("booking-methodError").classList.toggle("sk-show", !methodOk);
 
-      if (!addressOk || !dateOk || !timeOk || !methodOk) {
+      if (!addressOk || !phoneOk || !dateOk || !timeOk || !methodOk) {
         statusEl.textContent = "Please fix the highlighted fields.";
         statusEl.className = "sr-status sr-status-error";
         return;

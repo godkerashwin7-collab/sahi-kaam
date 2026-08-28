@@ -245,6 +245,9 @@ body.sk-verified .sk-verify-hint {
   text-decoration:none;
   margin-top:12px;
 }
+.whatsapp-cta-customer{
+  background:#128C7E;
+}
 .whatsapp-cta:active{
   background:#1EBE5A;
 }
