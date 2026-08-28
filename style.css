@@ -290,6 +290,19 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   display:flex;
   gap:14px;
 }
+.lang-prompt-bar{
+  background: var(--paper);
+  border-bottom:1px solid var(--line);
+  padding:6px 18px;
+  text-align:center;
+  font-size:10.5px;
+  color: var(--muted);
+  cursor:pointer;
+  line-height:1.5;
+}
+.lang-prompt-bar span{
+  font-weight:600;
+}
 .help-bar-links a{
   color: var(--safety-dark);
   font-weight:700;
@@ -315,22 +328,13 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
 .cause-card{
   display:flex;
   align-items:center;
-  gap:12px;
-  max-width:280px;
+  max-width:300px;
   flex:0 0 auto;
-  background: linear-gradient(135deg, #05170F, #0B2E1C);
-  border:1px solid #39FFC440;
+  background: linear-gradient(135deg, #2B0A1F, #4A1030);
+  border:1px solid #FFB6D580;
   border-radius:16px;
-  padding:10px 14px;
-  box-shadow: 0 0 18px rgba(57,255,196,0.35), 0 0 30px rgba(255,153,51,0.10);
-}
-.cause-banner-illustration{
-  display:block;
-  width:56px;
-  height:56px;
-  flex:0 0 auto;
-  border-radius:10px;
-  object-fit:cover;
+  padding:14px 16px;
+  box-shadow: 0 0 18px rgba(255,143,177,0.35), 0 0 30px rgba(255,178,56,0.10);
 }
 .cause-card-text{
   flex:1;
@@ -341,24 +345,24 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   font-family: var(--font-body);
   font-style:normal;
   font-weight:600;
-  font-size:11px;
-  line-height:1.4;
-  color:#39FFC4;
-  text-shadow: 0 0 8px rgba(57,255,196,0.65);
+  font-size:12.5px;
+  line-height:1.55;
+  color:#FFD9E8;
+  text-shadow: 0 0 8px rgba(255,143,177,0.6);
 }
 .cause-donate-btn{
   display:inline-block;
-  margin-top:8px;
-  background: #2A1600;
-  color:#FFB238;
-  border:1px solid #FFB23880;
-  padding:6px 14px;
+  margin-top:10px;
+  background: #3D1B0A;
+  color:#FFC97A;
+  border:1px solid #FFC97A80;
+  padding:7px 16px;
   border-radius:20px;
-  font-size:11px;
+  font-size:11.5px;
   font-weight:800;
   cursor:pointer;
-  text-shadow: 0 0 6px rgba(255,178,56,0.6);
-  box-shadow: 0 0 10px rgba(255,178,56,0.25);
+  text-shadow: 0 0 6px rgba(255,201,122,0.6);
+  box-shadow: 0 0 10px rgba(255,201,122,0.25);
 }
 @media (max-width:560px){
   .cause-banner{

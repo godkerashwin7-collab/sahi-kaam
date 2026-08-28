@@ -71,13 +71,15 @@
       <a href="https://wa.me/" data-sk-whatsapp-link data-sk-whatsapp-msg="Hi, I need help with ___. My location is ___. Preferred time: ___" target="_blank" rel="noopener" data-i18n="whatsApp">🟢 WhatsApp</a>
     </div>
   </div>
+  <div class="lang-prompt-bar">
+    🌐 <span>Change language</span> · <span lang="hi">भाषा बदलें</span> · <span lang="mr">भाषा बदला</span> · <span lang="te">భాష మార్చండి</span> · <span lang="kn">ಭಾಷೆ ಬದಲಿಸಿ</span>
+  </div>
 
   <div class="cause-banner">
     <div class="search-bar-wrap search-bar-top">
       <input type="text" id="serviceSearch" class="search-bar" placeholder="🔍 Search services — e.g. tap repair, wiring, deep cleaning" data-i18n-placeholder="searchPlaceholder">
     </div>
     <div class="cause-card">
-      <img src="sibling-bond.svg" alt="Illustration of a brother and sister holding hands" class="cause-banner-illustration" loading="lazy">
       <div class="cause-card-text">
         <em>🎗️ In memory of my sister — a share of every booking supports cancer patients and their care.</em>
         <button type="button" class="cause-donate-btn" id="causeDonateBtn">❤️ Donate Directly</button>
@@ -1218,6 +1220,10 @@
       const langBtn = document.getElementById("langToggleBtn");
       if (langBtn) {
         langBtn.addEventListener("click", () => window.SahiI18n.toggle());
+      }
+      const langPromptBar = document.querySelector(".lang-prompt-bar");
+      if (langPromptBar) {
+        langPromptBar.addEventListener("click", () => window.SahiI18n.toggle());
       }
     }
     document.getElementById("bnServices").addEventListener("click", () => {
