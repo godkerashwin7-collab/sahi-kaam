@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share Your Location — Sahi Kaamwala</title>
+<script src="business-info.js"></script>
+<style>
+  body {
+    font-family: 'Manrope', Arial, sans-serif;
+    background: #F7F4EC;
+    padding: 20px;
+    margin: 0;
+    color: #1A1A1A;
+  }
+  h1 { font-size: 20px; color: #14213D; margin: 0 0 4px; }
+  .sub { color: #6B6B6B; font-size: 13.5px; margin: 0 0 20px; }
+  .job-card {
+    background: #fff;
+    border: 1px solid #E4E0D4;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+  .job-card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #E0551F;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .job-card .value { font-size: 14.5px; color: #14213D; font-weight: 600; }
+  /* Deliberately no customer name/phone/email here — only what the
+     professional needs to do the job: address and timing. */
+  .share-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 800;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .share-btn-start { background: #2e7d32; color: #fff; }
+  .share-btn-stop { background: #c62828; color: #fff; }
+  .status-line {
+    font-size: 13px;
+    text-align: center;
+    color: #6B6B6B;
+    margin: 10px 0 0;
+  }
+  .status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #ccc;
+    margin-right: 6px;
+  }
+  .status-dot.live { background: #2e7d32; }
+  .error-box {
+    background: #FFEBEE;
+    color: #C62828;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    margin-top: 14px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Share Your Location</h1>
+<p class="sub">Turn this on so the customer can see you're on the way. Turn it off once the job is done.</p>
+
+<div class="job-card" id="jobCard">
+  <span class="label">Job Address</span>
+  <div class="value" id="jobAddress">Loading job details...</div>
+</div>
+
+<button type="button" class="share-btn share-btn-start" id="startBtn">📍 Start Sharing My Location</button>
+<button type="button" class="share-btn share-btn-stop" id="stopBtn" style="display:none;">⏹ Stop Sharing (Job Done)</button>
+
+<p class="status-line" id="statusLine"><span class="status-dot" id="statusDot"></span><span id="statusText">Not sharing</span></p>
+<div class="error-box" id="errorBox"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxO3xbZTYPHXjMxCtdalD-efBG0hPe9b4",
+    authDomain: "sahi-kaam-b32fa.firebaseapp.com",
+    projectId: "sahi-kaam-b32fa",
+    storageBucket: "sahi-kaam-b32fa.firebasestorage.app",
+    messagingSenderId: "187530591485",
+    appId: "1:187530591485:web:5f5973815c2b6ff5175294"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const params = new URLSearchParams(window.location.search);
+  const bookingId = params.get("id");
+
+  const jobAddressEl = document.getElementById("jobAddress");
+  const startBtn = document.getElementById("startBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const statusDot = document.getElementById("statusDot");
+  const statusText = document.getElementById("statusText");
+  const errorBox = document.getElementById("errorBox");
+
+  let watchId = null;
+
+  if (!bookingId) {
+    jobAddressEl.textContent = "No job link provided. Ask for the tracking link sent for this booking.";
+    startBtn.disabled = true;
+  } else {
+    loadJob();
+  }
+
+  async function loadJob() {
+    try {
+      const bookingRef = doc(db, "bookings", bookingId);
+      const snap = await getDoc(bookingRef);
+      if (!snap.exists()) {
+        jobAddressEl.textContent = "This job link is no longer valid.";
+        startBtn.disabled = true;
+        return;
+      }
+      // Only address + timing — intentionally no customer name, phone, or
+      // email on this page. The professional only needs to know where and
+      // when, not who; contact stays through the platform.
+      const b = snap.data();
+      jobAddressEl.textContent = b.address || "Address not available";
+      if (b.preferredDate) {
+        const timeLine = document.createElement("div");
+        timeLine.style.marginTop = "6px";
+        timeLine.style.fontSize = "12.5px";
+        timeLine.style.color = "#6B6B6B";
+        timeLine.textContent = `Preferred: ${b.preferredDate} ${b.preferredTime || ""}`;
+        jobAddressEl.after(timeLine);
+      }
+    } catch (err) {
+      console.log(err);
+      jobAddressEl.textContent = "Couldn't load job details.";
+    }
+  }
+
+  async function pushLocation(lat, lng) {
+    try {
+      await updateDoc(doc(db, "bookings", bookingId), {
+        workerLocation: { lat, lng, updatedAt: new Date().toISOString() },
+        status: "in_progress"
+      });
+    } catch (err) {
+      console.log(err);
+      showError("Couldn't update your location. Check your connection.");
+    }
+  }
+
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.style.display = "block";
+  }
+
+  startBtn.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      showError("Location isn't available on this browser/device.");
+      return;
+    }
+    errorBox.style.display = "none";
+    watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        pushLocation(pos.coords.latitude, pos.coords.longitude);
+        statusDot.classList.add("live");
+        statusText.textContent = "Live — sharing your location";
+      },
+      (err) => {
+        console.log(err);
+        showError("Location access denied or unavailable. Please allow location access to share your position.");
+      },
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
+    );
+    startBtn.style.display = "none";
+    stopBtn.style.display = "block";
+  });
+
+  stopBtn.addEventListener("click", async () => {
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+    statusDot.classList.remove("live");
+    statusText.textContent = "Not sharing";
+    startBtn.style.display = "block";
+    stopBtn.style.display = "none";
+
+    try {
+      await updateDoc(doc(db, "bookings", bookingId), { status: "completed" });
+    } catch (err) {
+      console.log(err);
+    }
+  });
+</script>
+</body>
+</html>

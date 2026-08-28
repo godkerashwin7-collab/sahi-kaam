@@ -404,6 +404,20 @@
     </div>
   </div>
 
+  <!-- Live worker tracking — customer view -->
+  <div id="tracking-overlay" class="sr-overlay sr-hidden">
+    <div class="sr-modal">
+      <button type="button" class="sr-close" id="tracking-close">&times;</button>
+      <h2>Track Your Professional</h2>
+      <p id="trackingStatusText" class="tracking-status-text">Waiting for the professional to start sharing their location...</p>
+      <div id="tracking-eta-banner" class="tracking-eta-banner sr-hidden">
+        <span id="trackingEtaMinutes">—</span> away · <span id="trackingEtaDistance">—</span>
+      </div>
+      <div id="tracking-map" class="addr-map tracking-map"></div>
+      <p class="tracking-note">Location updates automatically while the professional has sharing turned on.</p>
+    </div>
+  </div>
+
   <!-- Bottom navigation bar -->
   <nav class="bottom-nav" aria-label="Main navigation">
     <button type="button" class="bn-item" id="bnHome">
@@ -552,8 +566,8 @@
       signInWithEmailAndPassword, updateProfile, signOut
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import {
-      getFirestore, doc, setDoc, getDoc, addDoc, collection,
-      query, where, orderBy, limit, getDocs
+      getFirestore, doc, setDoc, getDoc, updateDoc, addDoc, collection,
+      query, where, orderBy, limit, getDocs, onSnapshot
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -704,13 +718,128 @@
               </div>
               <p class="activity-item-meta">${dateLabel}${b.address ? " · " + b.address : ""}</p>
               <p class="activity-item-total">₹${b.estimatedTotal || 0} estimated</p>
+              <button type="button" class="activity-track-btn" data-booking-id="${docSnap.id}">📍 Track Worker</button>
             </div>`;
         });
         activityList.innerHTML = html;
+        activityList.querySelectorAll(".activity-track-btn").forEach(btn => {
+          btn.addEventListener("click", () => openTrackingView(btn.getAttribute("data-booking-id")));
+        });
       } catch (err) {
         console.log(err);
         activityList.innerHTML = `<p class="activity-empty">Couldn't load your activity right now. Please try again.</p>`;
       }
+    }
+
+    // ---- Live worker tracking (customer view) ----
+    const trackingOverlay = document.getElementById("tracking-overlay");
+    let trackingMap = null;
+    let trackingWorkerMarker = null;
+    let trackingCustomerMarker = null;
+    let trackingUnsubscribe = null;
+
+    document.getElementById("tracking-close").addEventListener("click", () => {
+      trackingOverlay.classList.add("sr-hidden");
+      if (trackingUnsubscribe) { trackingUnsubscribe(); trackingUnsubscribe = null; }
+    });
+    trackingOverlay.addEventListener("click", (e) => {
+      if (e.target === trackingOverlay) {
+        trackingOverlay.classList.add("sr-hidden");
+        if (trackingUnsubscribe) { trackingUnsubscribe(); trackingUnsubscribe = null; }
+      }
+    });
+
+    async function fetchEta(fromLat, fromLng, toLat, toLng) {
+      // Free, keyless routing via OSRM's public demo server — fine for light
+      // use. For production volume, self-host OSRM or switch to a paid
+      // routing API with an SLA.
+      try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=false`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.routes && data.routes[0]) {
+          return { seconds: data.routes[0].duration, meters: data.routes[0].distance };
+        }
+      } catch (err) {
+        console.warn("ETA lookup failed:", err);
+      }
+      return null;
+    }
+
+    function formatEta(seconds, meters) {
+      const mins = Math.max(1, Math.round(seconds / 60));
+      const km = (meters / 1000).toFixed(1);
+      return { minsText: mins < 60 ? `${mins} min` : `${Math.round(mins / 60)} hr ${mins % 60} min`, kmText: `${km} km` };
+    }
+
+    function openTrackingView(bookingId) {
+      trackingOverlay.classList.remove("sr-hidden");
+      document.getElementById("trackingStatusText").textContent = "Waiting for the professional to start sharing their location...";
+      document.getElementById("tracking-eta-banner").classList.add("sr-hidden");
+
+      setTimeout(() => {
+        if (!trackingMap) {
+          trackingMap = L.map("tracking-map").setView([19.0760, 72.8777], 12);
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors"
+          }).addTo(trackingMap);
+        } else {
+          trackingMap.invalidateSize();
+        }
+
+        if (trackingUnsubscribe) trackingUnsubscribe();
+        const bookingRef = doc(db, "bookings", bookingId);
+        trackingUnsubscribe = onSnapshot(bookingRef, async (snap) => {
+          if (!snap.exists()) return;
+          const b = snap.data();
+          const bounds = [];
+
+          if (b.addressLat && b.addressLng) {
+            const custPos = [b.addressLat, b.addressLng];
+            if (trackingCustomerMarker) {
+              trackingCustomerMarker.setLatLng(custPos);
+            } else {
+              trackingCustomerMarker = L.marker(custPos, {
+                icon: L.divIcon({ className: "", html: "🏠", iconSize: [26, 26] })
+              }).addTo(trackingMap).bindPopup("Your address");
+            }
+            bounds.push(custPos);
+          }
+
+          if (b.workerLocation && b.workerLocation.lat && b.workerLocation.lng) {
+            const workerPos = [b.workerLocation.lat, b.workerLocation.lng];
+            document.getElementById("trackingStatusText").textContent = "🟢 Live — the professional is on the move.";
+            if (trackingWorkerMarker) {
+              trackingWorkerMarker.setLatLng(workerPos);
+            } else {
+              trackingWorkerMarker = L.marker(workerPos, {
+                icon: L.divIcon({ className: "", html: "🧰", iconSize: [26, 26] })
+              }).addTo(trackingMap).bindPopup("Professional's location");
+            }
+            bounds.push(workerPos);
+
+            if (b.addressLat && b.addressLng) {
+              const eta = await fetchEta(b.workerLocation.lat, b.workerLocation.lng, b.addressLat, b.addressLng);
+              const banner = document.getElementById("tracking-eta-banner");
+              if (eta) {
+                const f = formatEta(eta.seconds, eta.meters);
+                document.getElementById("trackingEtaMinutes").textContent = f.minsText;
+                document.getElementById("trackingEtaDistance").textContent = f.kmText;
+                banner.classList.remove("sr-hidden");
+              } else {
+                banner.classList.add("sr-hidden");
+              }
+            }
+          }
+
+          if (bounds.length === 2) {
+            trackingMap.fitBounds(bounds, { padding: [30, 30] });
+          } else if (bounds.length === 1) {
+            trackingMap.setView(bounds[0], 15);
+          }
+        });
+      }, 50);
     }
 
     // ---- Bottom navigation bar ----
@@ -1088,7 +1217,7 @@
           status: "submitted",
           submittedAt: new Date().toISOString()
         }, extra);
-        await addDoc(collection(db, "bookings"), bookingData);
+        const docRef = await addDoc(collection(db, "bookings"), bookingData);
         statusEl.textContent = successMsg;
         statusEl.className = "sr-status sr-status-ok";
 
@@ -1098,15 +1227,20 @@
         const mapLink = (bookingData.addressLat && bookingData.addressLng)
           ? `\nMap: https://maps.google.com/?q=${bookingData.addressLat},${bookingData.addressLng}`
           : "";
+        // A private tracking link for whichever professional is assigned to this
+        // job — opening it lets them share live location for this booking only.
+        // No login required; the link itself (Firestore's random doc ID) is the
+        // access token, so don't forward it to anyone but the assigned worker.
+        const trackingLink = new URL("track.html", window.location.href).href + "?id=" + docRef.id;
         notifyBusinessOnWhatsApp(
           `🔔 New booking on Sahi Kaamwala\n` +
           `Name: ${bookingData.customerName || "N/A"}\n` +
-          `Email: ${bookingData.customerEmail || "N/A"}\n` +
           `Address: ${bookingData.address}${mapLink}\n` +
           `Date/Time: ${bookingData.preferredDate} ${bookingData.preferredTime}\n` +
           `Services:\n${serviceLines}\n` +
           `Estimated total: ₹${bookingData.estimatedTotal}\n` +
-          `Payment: ${extra.paymentMethod || "N/A"}`
+          `Payment: ${extra.paymentMethod || "N/A"}\n\n` +
+          `📍 Send this link to the assigned professional so the customer can track them:\n${trackingLink}`
         );
 
         setTimeout(() => {

@@ -1700,6 +1700,48 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   color: var(--navy);
   margin:0;
 }
+.activity-track-btn{
+  display:block;
+  width:100%;
+  margin-top:10px;
+  padding:9px;
+  background:#EAF2FF;
+  color:#1565c0;
+  border:1px solid #C7DBFA;
+  border-radius:8px;
+  font-size:12.5px;
+  font-weight:700;
+  font-family:inherit;
+  cursor:pointer;
+}
+
+/* ---- Live worker tracking (customer view) ---- */
+.tracking-status-text{
+  font-size:13.5px;
+  color: var(--navy);
+  font-weight:600;
+  margin:8px 0 10px;
+}
+.tracking-eta-banner{
+  background: linear-gradient(135deg, #FF6A3D, #FF9A56);
+  color:#fff;
+  font-size:14.5px;
+  font-weight:700;
+  text-align:center;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:12px;
+}
+.tracking-map{
+  height:280px;
+  margin-top:0;
+}
+.tracking-note{
+  font-size:11.5px;
+  color:var(--muted);
+  text-align:center;
+  margin:10px 0 0;
+}
 
 @media (min-width:600px){
   .category-icon{width:48px; height:48px; font-size:24px;}
