@@ -263,6 +263,23 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   -webkit-text-fill-color: transparent;
 }
 
+/* ---- Motivation banner (below hero) ---- */
+.motivation-banner{
+  background: linear-gradient(135deg, #14213D, #1E3055);
+  border-top:1px solid rgba(255,106,61,0.4);
+  border-bottom:1px solid rgba(255,106,61,0.4);
+  padding:12px 18px;
+  text-align:center;
+}
+.motivation-banner em{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight:600;
+  font-size:14px;
+  line-height:1.5;
+  color:#FF9A56;
+}
+
 /* ---- Search bar ---- */
 .search-bar-wrap{
   max-width:720px;
@@ -1179,7 +1196,7 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   max-width:720px;
   margin:20px auto 0;
   padding:0 18px;
-  text-align:right;
+  text-align:left;
 }
 .intro-trigger{
   display:inline-flex;
