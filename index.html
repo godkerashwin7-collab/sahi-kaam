@@ -204,6 +204,34 @@
           Support hours: <span data-sk-support-hours>9:00 AM – 8:00 PM, all days</span>.
         </p>
       </div>
+
+      <div class="team-section" id="team">
+        <span class="intro-eyebrow">Meet the team</span>
+        <h3 class="team-heading">The people behind every visit</h3>
+        <p class="team-subheading">Real people you can call by name — not a faceless app.</p>
+
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-avatar">👷</div>
+            <strong class="team-name" data-sk-team-1-name>REPLACE_ME_TEAM_MEMBER_1_NAME</strong>
+            <span class="team-role" data-sk-team-1-role>Founder — 25+ Years in PWD</span>
+            <p class="team-bio" data-sk-team-1-bio>Leads every project with two and a half decades of hands-on construction experience across Mumbai.</p>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">🔧</div>
+            <strong class="team-name" data-sk-team-2-name>REPLACE_ME_TEAM_MEMBER_2_NAME</strong>
+            <span class="team-role" data-sk-team-2-role>Operations Lead</span>
+            <p class="team-bio" data-sk-team-2-bio>Vets and coordinates every professional on the platform, from ID checks to job scheduling.</p>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">📞</div>
+            <strong class="team-name" data-sk-team-3-name>REPLACE_ME_TEAM_MEMBER_3_NAME</strong>
+            <span class="team-role" data-sk-team-3-role>Customer Support</span>
+            <p class="team-bio" data-sk-team-3-bio>The voice on the other end of your call or WhatsApp — here to sort out anything that comes up.</p>
+          </div>
+        </div>
+        <p class="team-note">Replace the placeholder names, roles, and bios above (in <code>index.html</code>) with your real team once ready — customers trust faces and names more than a logo.</p>
+      </div>
     </section>
   </main>
 
@@ -221,6 +249,7 @@
       <div class="footer-col">
         <h4>Company</h4>
         <a href="#trust">About Us</a>
+        <a href="#team">Our Team</a>
         <a href="join.html">Become a Professional</a>
         <a href="#" onclick="document.getElementById('sc-fab').click(); return false;">Contact</a>
       </div>
@@ -234,26 +263,30 @@
         <a href="#categoryGrid">All Services</a>
       </div>
       <div class="footer-col">
-        <h4>Customer</h4>
-        <a href="#" onclick="document.getElementById('profileBtn').click(); return false;">My Account</a>
-        <a href="#" onclick="document.getElementById('sc-fab').click(); return false;">Help Center</a>
-        <a href="refund-policy.html">Cancellation &amp; Refund Policy</a>
+        <h4>Locations</h4>
+        <div class="footer-locations-list" data-sk-areas-list>
+          <a href="#categoryGrid" data-sk-service-areas>Mumbai</a>
+        </div>
       </div>
       <div class="footer-col">
-        <h4>Legal</h4>
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms &amp; Conditions</a>
-      </div>
-      <div class="footer-col">
-        <h4>Support</h4>
-        <a href="tel:" data-sk-phone-link>📞 Call us</a>
-        <a href="https://wa.me/" data-sk-whatsapp-link>💬 WhatsApp</a>
-        <a href="mailto:" data-sk-email-link data-sk-email-text>Email us</a>
+        <h4>Contact</h4>
+        <a href="tel:" data-sk-phone-link><span class="footer-contact-icon">📞</span> <span data-sk-phone-text>Call a location</span></a>
+        <a href="mailto:" data-sk-email-link><span class="footer-contact-icon">✉️</span> <span data-sk-email-text>Email us</span></a>
+        <span class="footer-contact-hours"><span class="footer-contact-icon">🕐</span> <span data-sk-support-hours>9:00 AM – 8:00 PM, all days</span></span>
+        <a href="https://wa.me/" data-sk-whatsapp-link><span class="footer-contact-icon">💬</span> WhatsApp</a>
       </div>
     </div>
-    <p class="footer-bottom">
-      <span data-sk-legal-name>REPLACE_ME_LEGAL_ENTITY_NAME</span> · Based in <span data-sk-service-areas>Mumbai</span> · Household chores &amp; repairs, sorted.
-    </p>
+
+    <div class="footer-bottom-bar">
+      <p class="footer-copyright">
+        © <span data-sk-current-year>2026</span> <span data-sk-legal-name>REPLACE_ME_LEGAL_ENTITY_NAME</span>. All rights reserved.
+      </p>
+      <div class="footer-bottom-links">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="refund-policy.html">Refund Policy</a>
+      </div>
+    </div>
   </footer>
 
   <!-- Activity — recent requests for the logged-in customer -->
@@ -285,11 +318,78 @@
 
   <!-- Profile panel (shown when the avatar is tapped while logged in) -->
   <div id="profile-overlay" class="sr-overlay sr-hidden">
-    <div class="sr-modal">
+    <div class="sr-modal profile-modal">
       <button type="button" class="sr-close" id="profile-close">&times;</button>
-      <h2>My Account</h2>
-      <div class="profile-field"><span>Name</span><strong id="profile-name">—</strong></div>
-      <div class="profile-field"><span>Email</span><strong id="profile-email">—</strong></div>
+
+      <div class="profile-header">
+        <div class="profile-header-text">
+          <h2 class="profile-name-big" id="profile-name-big">—</h2>
+          <div class="profile-badges">
+            <span class="profile-badge" id="profile-verified-badge" style="display:none;">✅ Email Verified</span>
+            <span class="profile-badge profile-badge-muted" id="profile-bookings-badge">🛠️ New customer</span>
+          </div>
+        </div>
+        <div class="profile-avatar-big" id="profile-avatar-big">👤</div>
+      </div>
+
+      <div class="profile-menu">
+        <button type="button" class="profile-menu-item" id="pm-activity">
+          <span class="pm-icon">🕘</span>
+          <span class="pm-text">
+            <strong>My Activity</strong>
+            <span>See your past service requests</span>
+          </span>
+          <span class="pm-chevron">›</span>
+        </button>
+
+        <button type="button" class="profile-menu-item" id="pm-location">
+          <span class="pm-icon">📍</span>
+          <span class="pm-text">
+            <strong>Saved Location</strong>
+            <span>Update your default address</span>
+          </span>
+          <span class="pm-chevron">›</span>
+        </button>
+
+        <a href="join.html" class="profile-menu-item">
+          <span class="pm-icon">🧰</span>
+          <span class="pm-text">
+            <strong>Become a Professional</strong>
+            <span>Earn by joining as a worker</span>
+          </span>
+          <span class="pm-tag-new">FREE</span>
+          <span class="pm-chevron">›</span>
+        </a>
+
+        <button type="button" class="profile-menu-item" id="pm-share">
+          <span class="pm-icon">🎁</span>
+          <span class="pm-text">
+            <strong>Tell a Friend</strong>
+            <span>Share Sahi Kaamwala on WhatsApp</span>
+          </span>
+          <span class="pm-chevron">›</span>
+        </button>
+
+        <button type="button" class="profile-menu-item" id="pm-help">
+          <span class="pm-icon">💬</span>
+          <span class="pm-text">
+            <strong>Help &amp; Support</strong>
+            <span>Chat with us anytime</span>
+          </span>
+          <span class="pm-chevron">›</span>
+        </button>
+
+        <a href="terms.html" class="profile-menu-item">
+          <span class="pm-icon">📄</span>
+          <span class="pm-text">
+            <strong>Legal</strong>
+            <span>Terms, privacy &amp; refund policy</span>
+          </span>
+          <span class="pm-chevron">›</span>
+        </a>
+      </div>
+
+      <div class="profile-field profile-field-email"><span>Email</span><strong id="profile-email">—</strong></div>
       <button type="button" class="sr-submit profile-logout-btn" id="profile-logout-btn">Log Out</button>
     </div>
   </div>
@@ -301,7 +401,9 @@
       <h2>Review Your Booking</h2>
       <div id="booking-services-list" class="booking-services-list"></div>
 
-      <label>Address</label>
+      <label>Service Address</label>
+      <p class="addr-hint">Search below, tap the map, drag the pin, or use your current location — whatever's fastest.</p>
+      <p id="booking-addr-carried" class="addr-carried-note sr-hidden">📍 Using the location you set on the homepage — search again below to change it.</p>
       <div class="addr-search-wrap">
         <input type="text" id="addr-search" placeholder="🔍 Search your address or area" autocomplete="off">
         <div id="addr-suggestions" class="addr-suggestions sr-hidden"></div>
@@ -367,9 +469,36 @@
     const profileAvatarIcon = document.getElementById("profileAvatarIcon");
     const profileOverlay = document.getElementById("profile-overlay");
 
-    function openProfilePanel(user) {
-      document.getElementById("profile-name").textContent = user.displayName || "—";
+    function initials(nameOrEmail) {
+      if (!nameOrEmail) return "👤";
+      const parts = nameOrEmail.trim().split(/\s+/);
+      const chars = parts.length > 1
+        ? parts[0][0] + parts[1][0]
+        : nameOrEmail.slice(0, 2);
+      return chars.toUpperCase();
+    }
+
+    async function openProfilePanel(user) {
+      const displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Guest");
+      document.getElementById("profile-name-big").textContent = displayName;
       document.getElementById("profile-email").textContent = user.email || "—";
+      document.getElementById("profile-avatar-big").textContent = initials(user.displayName || user.email);
+
+      const verifiedBadge = document.getElementById("profile-verified-badge");
+      verifiedBadge.style.display = user.emailVerified ? "inline-flex" : "none";
+
+      const bookingsBadge = document.getElementById("profile-bookings-badge");
+      bookingsBadge.textContent = "🛠️ Loading...";
+      try {
+        const q = query(collection(db, "bookings"), where("uid", "==", user.uid));
+        const snap = await getDocs(q);
+        bookingsBadge.textContent = snap.size > 0
+          ? `🛠️ ${snap.size} booking${snap.size === 1 ? "" : "s"} placed`
+          : "🛠️ New customer";
+      } catch (err) {
+        bookingsBadge.textContent = "🛠️ New customer";
+      }
+
       profileOverlay.classList.remove("sr-hidden");
     }
 
@@ -382,6 +511,27 @@
     document.getElementById("profile-logout-btn").addEventListener("click", () => {
       SahiAuth.logout();
       profileOverlay.classList.add("sr-hidden");
+    });
+
+    // ---- Profile menu items ----
+    document.getElementById("pm-activity").addEventListener("click", () => {
+      profileOverlay.classList.add("sr-hidden");
+      openActivityPanel();
+    });
+    document.getElementById("pm-location").addEventListener("click", () => {
+      profileOverlay.classList.add("sr-hidden");
+      const card = document.querySelector(".location-card");
+      if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    document.getElementById("pm-share").addEventListener("click", () => {
+      const shareMsg = "Check out Sahi Kaamwala for trusted, ID-verified home repair professionals: " + window.location.href;
+      const waNumber = ""; // blank recipient = opens WhatsApp's own contact picker
+      window.open("https://wa.me/?text=" + encodeURIComponent(shareMsg), "_blank", "noopener");
+    });
+    document.getElementById("pm-help").addEventListener("click", () => {
+      profileOverlay.classList.add("sr-hidden");
+      const chatBtn = document.getElementById("sc-fab");
+      if (chatBtn) chatBtn.click();
     });
 
     // ---- Activity panel — recent requests for the logged-in customer ----
@@ -595,6 +745,7 @@
 
       // Init/refresh the address map now that the overlay is visible
       // (Leaflet needs visible dimensions to size itself correctly).
+      const carriedNote = document.getElementById("booking-addr-carried");
       setTimeout(() => {
         bookingLocationPicker.init();
         // Carry over whatever location was already picked on the homepage,
@@ -602,6 +753,9 @@
         if (window.__sahiHomeLocation) {
           const loc = window.__sahiHomeLocation;
           bookingLocationPicker.setFromExternal(loc.address, loc.lat, loc.lng);
+          if (carriedNote) carriedNote.classList.remove("sr-hidden");
+        } else {
+          if (carriedNote) carriedNote.classList.add("sr-hidden");
         }
       }, 50);
 

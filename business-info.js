@@ -80,4 +80,18 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-sk-support-hours]").forEach(el => {
     el.textContent = b.supportHours;
   });
+  document.querySelectorAll("[data-sk-current-year]").forEach(el => {
+    el.textContent = new Date().getFullYear();
+  });
+
+  // Footer "Locations" list — splits the free-text serviceAreas string
+  // ("Andheri, Bandra, Powai, Thane — expanding weekly") into individual
+  // links. Trims any trailing note after a dash so it doesn't show up
+  // as a fake location.
+  document.querySelectorAll("[data-sk-areas-list]").forEach(el => {
+    const raw = (b.serviceAreas || "").split(/[—-]/)[0]; // drop "— expanding weekly" etc.
+    const areas = raw.split(",").map(a => a.trim()).filter(Boolean);
+    if (!areas.length) return; // leave the fallback markup already in the HTML
+    el.innerHTML = areas.map(a => `<a href="#categoryGrid">${a}</a>`).join("");
+  });
 });
