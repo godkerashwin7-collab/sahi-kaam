@@ -65,30 +65,32 @@ const SahiAuth = (() => {
           <button type="button" class="sa-tab" id="sa-tab-signup">Sign Up</button>
         </div>
 
-        <div id="sa-login-form">
+        <form id="sa-login-form" autocomplete="on">
           <label>Email</label>
-          <input type="email" id="sa-login-email" placeholder="you@email.com">
+          <input type="email" id="sa-login-email" name="email" placeholder="you@email.com" autocomplete="username">
           <label>Password</label>
-          <input type="password" id="sa-login-password" placeholder="Password">
-          <button type="button" class="sr-submit" id="sa-login-btn">Log In</button>
-        </div>
+          <input type="password" id="sa-login-password" name="password" placeholder="Password" autocomplete="current-password">
+          <button type="submit" class="sr-submit" id="sa-login-btn">Log In</button>
+          <button type="button" class="sa-forgot-link" id="sa-forgot-btn">Forgot password?</button>
+          <p class="sa-username-hint">Your email address is your username — no separate username to remember.</p>
+        </form>
 
-        <div id="sa-signup-form" class="sr-hidden">
+        <form id="sa-signup-form" class="sr-hidden" autocomplete="on">
           <label>Full Name</label>
-          <input type="text" id="sa-signup-name" placeholder="Your name">
+          <input type="text" id="sa-signup-name" name="name" placeholder="Your name" autocomplete="name">
           <p class="sk-error-text" id="sa-nameError">Enter your name (letters only, at least 2 characters).</p>
 
           <label>Email</label>
-          <input type="email" id="sa-signup-email" placeholder="you@email.com">
+          <input type="email" id="sa-signup-email" name="email" placeholder="you@email.com" autocomplete="username">
           <p class="sk-error-text" id="sa-emailError">Enter a valid email address.</p>
           <label>Password</label>
-          <input type="password" id="sa-signup-password" placeholder="At least 6 characters">
+          <input type="password" id="sa-signup-password" name="new-password" placeholder="At least 6 characters" autocomplete="new-password">
           <label>Confirm Password</label>
-          <input type="password" id="sa-signup-confirm" placeholder="Re-enter password">
+          <input type="password" id="sa-signup-confirm" name="confirm-password" placeholder="Re-enter password" autocomplete="new-password">
           <p class="sk-error-text" id="sa-passError">Passwords must match and be at least 6 characters.</p>
 
-          <button type="button" class="sr-submit" id="sa-signup-btn">Create Account</button>
-        </div>
+          <button type="submit" class="sr-submit" id="sa-signup-btn">Create Account</button>
+        </form>
 
         <p id="sa-status" class="sr-status"></p>
       </div>
@@ -101,8 +103,17 @@ const SahiAuth = (() => {
     document.getElementById("sa-tab-login").addEventListener("click", () => switchTab("login"));
     document.getElementById("sa-tab-signup").addEventListener("click", () => switchTab("signup"));
 
-    document.getElementById("sa-login-btn").addEventListener("click", doLogin);
-    document.getElementById("sa-signup-btn").addEventListener("click", doSignup);
+    // Real form submit (not just a button click) is what makes browsers
+    // reliably offer to save the username/password on mobile and desktop.
+    document.getElementById("sa-login-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      doLogin();
+    });
+    document.getElementById("sa-signup-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      doSignup();
+    });
+    document.getElementById("sa-forgot-btn").addEventListener("click", doForgotPassword);
   }
 
   function switchTab(mode) {
@@ -191,6 +202,35 @@ const SahiAuth = (() => {
       statusEl.className = "sr-status sr-status-error";
     }
     signupBtn.disabled = false;
+  }
+
+  async function doForgotPassword() {
+    const statusEl = document.getElementById("sa-status");
+    let email = document.getElementById("sa-login-email").value.trim();
+
+    if (!isValidEmail(email)) {
+      email = (window.prompt("Enter the email address you signed up with:") || "").trim();
+      if (!email) return;
+    }
+    if (!isValidEmail(email)) {
+      statusEl.textContent = "That doesn't look like a valid email address.";
+      statusEl.className = "sr-status sr-status-error";
+      return;
+    }
+
+    statusEl.textContent = "Sending reset link...";
+    statusEl.className = "sr-status";
+    try {
+      await fns.sendPasswordResetEmail(auth, email);
+      statusEl.textContent = "Check your inbox — we've sent a link to reset your password.";
+      statusEl.className = "sr-status";
+    } catch (err) {
+      // Don't reveal whether the email exists, for privacy — Firebase's
+      // own error already avoids this in most cases, but keep the
+      // messaging generic either way.
+      statusEl.textContent = "If that email has an account, a reset link is on its way.";
+      statusEl.className = "sr-status";
+    }
   }
 
   function open(mode, onSuccess) {

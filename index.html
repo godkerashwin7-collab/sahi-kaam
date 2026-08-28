@@ -20,10 +20,11 @@
         <span class="brand-mark">SK</span>
         <div class="brand-text">
           <h1>Sahi Kaamwala</h1>
-          <p>Trusted help, at your doorstep.</p>
+          <p class="brand-tagline">Trusted help, at your doorstep.</p>
         </div>
       </div>
       <div class="header-right">
+        <a href="join.html" class="header-pro-badge" id="headerProBadge">🛠️ Become a Pro</a>
         <button type="button" class="ticket-counter" id="ticketCounter">
           <span id="selectedCount">0</span> selected
         </button>
@@ -603,7 +604,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import {
       getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
-      signInWithEmailAndPassword, updateProfile, signOut
+      signInWithEmailAndPassword, updateProfile, signOut, sendPasswordResetEmail
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import {
       getFirestore, doc, setDoc, getDoc, updateDoc, addDoc, collection,
@@ -903,7 +904,7 @@
 
     SahiAuth.init({
       auth,
-      fns: { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut },
+      fns: { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, sendPasswordResetEmail },
       onSignupExtra: async ({ uid, name, email, registrationFeePaid, registrationPaymentId }) => {
         await setDoc(doc(db, "users", uid), {
           name, email,
