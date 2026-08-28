@@ -149,23 +149,35 @@
     </div>
 
     <section class="showcase">
-      <div class="showcase-card">
+      <button type="button" class="showcase-card" data-gallery="on-the-job" aria-label="View photos and videos: On the job">
         <img src="gallery-modern.jpg" alt="Plumber, electrician and housekeeping team working together in a modern Mumbai apartment" loading="lazy">
+        <span class="showcase-play-badge">▶ View photos &amp; videos</span>
         <div class="showcase-text">
           <span class="intro-eyebrow">On the job</span>
           <h3>One Booking. Multiple Problems. One Visit.</h3>
           <p>Our teams work in step — so your electrician, plumber and cleaner can finish the same visit together, not three separate ones.</p>
         </div>
-      </div>
-      <div class="showcase-card reverse">
+      </button>
+      <button type="button" class="showcase-card reverse" data-gallery="handled-with-care" aria-label="View photos and videos: Handled with care">
         <img src="gallery-heritage.jpg" alt="Home service professionals working carefully in a traditionally furnished Mumbai home" loading="lazy">
+        <span class="showcase-play-badge">▶ View photos &amp; videos</span>
         <div class="showcase-text">
           <span class="intro-eyebrow">Handled with care</span>
           <h3>Your home, treated like ours</h3>
           <p>Heirloom furniture, marble floors, or a rented 1BHK — every professional on Sahi Kaamwala works with the same respect for your space.</p>
         </div>
-      </div>
+      </button>
     </section>
+
+    <!-- Photo/video gallery — opened from the showcase cards above -->
+    <div id="gallery-overlay" class="sr-overlay sr-hidden">
+      <div class="gallery-modal">
+        <button type="button" class="sr-close gallery-close" id="galleryClose" aria-label="Close">&times;</button>
+        <h2 id="galleryTitle" class="gallery-title">Photos &amp; Videos</h2>
+        <div id="galleryStrip" class="gallery-strip"></div>
+        <p class="gallery-note">Swipe to see more. Replace these placeholder photos/videos in <code>script.js</code> (<code>SHOWCASE_MEDIA</code>) with real ones whenever you're ready.</p>
+      </div>
+    </div>
 
     <section class="trust-section" id="trust">
       <div class="trust-banner">
@@ -550,6 +562,7 @@
 
       <button type="button" class="sr-submit cta-bold" id="booking-confirm-btn">Confirm Booking</button>
       <p id="booking-status" class="sr-status"></p>
+      <a href="#" id="booking-whatsapp-cta" class="whatsapp-cta sr-hidden" target="_blank" rel="noopener">📲 Tap to notify us on WhatsApp</a>
     </div>
   </div>
 
@@ -1133,6 +1146,7 @@
       dateInput.min = new Date().toISOString().split("T")[0];
       document.getElementById("booking-time").value = "";
       document.getElementById("booking-status").textContent = "";
+      document.getElementById("booking-whatsapp-cta").classList.add("sr-hidden");
 
       selectedPaymentMethod = null;
       document.getElementById("pm-online").classList.remove("pm-btn-active");
@@ -1186,17 +1200,22 @@
       if (e.target === bookingOverlay) bookingOverlay.classList.add("sr-hidden");
     });
 
-    // Sends a WhatsApp message to the business number so a real person
-    // actually sees the request immediately, instead of it just sitting
-    // in the database until someone happens to check.
-    function notifyBusinessOnWhatsApp(message) {
+    // Builds a WhatsApp deep link for the business to receive a booking
+    // notification. IMPORTANT: this deliberately does NOT call window.open()
+    // itself — mobile browsers routinely block popups opened after an
+    // `await` (e.g. after saving to the database), because by then it's no
+    // longer considered a direct result of the user's tap. That silent
+    // failure is exactly what was happening — the booking saved fine, but
+    // the WhatsApp tab never opened and nobody noticed why. Instead, we
+    // show a real, visible link the person taps themselves — that's always
+    // a genuine user gesture, so it always works.
+    function buildWhatsAppUrl(message) {
       const waNumber = (window.SAHI_BUSINESS && window.SAHI_BUSINESS.whatsappNumber) || "";
       if (!waNumber || waNumber.indexOf("REPLACE_ME") !== -1) {
-        console.warn("SAHI_BUSINESS.whatsappNumber is not set — skipping owner notification. Fill it in business-info.js.");
-        return;
+        console.warn("SAHI_BUSINESS.whatsappNumber is not set — fill it in business-info.js.");
+        return null;
       }
-      const url = "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(message);
-      window.open(url, "_blank", "noopener");
+      return "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(message);
     }
 
     async function saveBooking(user, extra, statusEl, confirmBtn, successMsg) {
@@ -1218,7 +1237,7 @@
           submittedAt: new Date().toISOString()
         }, extra);
         const docRef = await addDoc(collection(db, "bookings"), bookingData);
-        statusEl.textContent = successMsg;
+        statusEl.textContent = "✅ " + successMsg + " Saved to your Activity — check there anytime.";
         statusEl.className = "sr-status sr-status-ok";
 
         const serviceLines = Object.entries(window.__sahiPendingSelected || {})
@@ -1232,7 +1251,7 @@
         // No login required; the link itself (Firestore's random doc ID) is the
         // access token, so don't forward it to anyone but the assigned worker.
         const trackingLink = new URL("track.html", window.location.href).href + "?id=" + docRef.id;
-        notifyBusinessOnWhatsApp(
+        const waUrl = buildWhatsAppUrl(
           `🔔 New booking on Sahi Kaamwala\n` +
           `Name: ${bookingData.customerName || "N/A"}\n` +
           `Address: ${bookingData.address}${mapLink}\n` +
@@ -1242,13 +1261,20 @@
           `Payment: ${extra.paymentMethod || "N/A"}\n\n` +
           `📍 Send this link to the assigned professional so the customer can track them:\n${trackingLink}`
         );
+        const waCta = document.getElementById("booking-whatsapp-cta");
+        if (waUrl) {
+          waCta.href = waUrl;
+          waCta.classList.remove("sr-hidden");
+        } else {
+          waCta.classList.add("sr-hidden");
+        }
 
-        setTimeout(() => {
-          bookingOverlay.classList.add("sr-hidden");
-          if (typeof window.showCategoryLinks === "function") {
-            window.showCategoryLinks();
-          }
-        }, 1800);
+        // Don't auto-close the modal — leave it open so the person can
+        // actually see the confirmation and tap the WhatsApp link if they
+        // want to. They can close it manually with the × when ready.
+        if (typeof window.showCategoryLinks === "function") {
+          window.showCategoryLinks();
+        }
       } catch (err) {
         statusEl.textContent = "Something went wrong saving your booking. Please try again.";
         statusEl.className = "sr-status sr-status-error";

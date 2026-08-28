@@ -293,7 +293,63 @@ onDomReady(() => {
       if (e.target === howItWorksOverlay) howItWorksOverlay.classList.add("sr-hidden");
     });
   }
+
+  // Showcase cards ("On the job" / "Handled with care") — open a
+  // photo/video gallery for that card.
+  document.querySelectorAll("[data-gallery]").forEach(card => {
+    card.addEventListener("click", () => openGallery(card.getAttribute("data-gallery")));
+  });
+  const galleryOverlay = document.getElementById("gallery-overlay");
+  const galleryClose = document.getElementById("galleryClose");
+  if (galleryOverlay && galleryClose) {
+    galleryClose.addEventListener("click", () => galleryOverlay.classList.add("sr-hidden"));
+    galleryOverlay.addEventListener("click", (e) => {
+      if (e.target === galleryOverlay) galleryOverlay.classList.add("sr-hidden");
+    });
+  }
 });
+
+// ---- Showcase gallery media ----
+// Edit this to add real photos/videos of completed jobs. Each entry is one
+// slide in the gallery for that card. type can be "image" or "video"
+// (video src should be an actual video file URL — mp4 works everywhere).
+const SHOWCASE_MEDIA = {
+  "on-the-job": [
+    { type: "image", src: "gallery-modern.jpg", caption: "REPLACE_ME_CAPTION_1 — e.g. Electrician & plumber working the same visit" },
+    { type: "image", src: "hero-kitchen.jpg", caption: "REPLACE_ME_CAPTION_2 — swap in a real before/after photo" },
+    { type: "image", src: "gallery-heritage.jpg", caption: "REPLACE_ME_CAPTION_3 — add a short video walkthrough here too" }
+  ],
+  "handled-with-care": [
+    { type: "image", src: "gallery-heritage.jpg", caption: "REPLACE_ME_CAPTION_1 — careful work in a heritage home" },
+    { type: "image", src: "gallery-modern.jpg", caption: "REPLACE_ME_CAPTION_2 — swap in a real photo from a completed job" },
+    { type: "image", src: "hero-kitchen.jpg", caption: "REPLACE_ME_CAPTION_3 — a customer testimonial video works great here" }
+  ]
+};
+
+const SHOWCASE_TITLES = {
+  "on-the-job": "On the job",
+  "handled-with-care": "Handled with care"
+};
+
+function openGallery(key) {
+  const overlay = document.getElementById("gallery-overlay");
+  const strip = document.getElementById("galleryStrip");
+  const title = document.getElementById("galleryTitle");
+  if (!overlay || !strip) return;
+
+  const media = SHOWCASE_MEDIA[key] || [];
+  title.textContent = SHOWCASE_TITLES[key] || "Photos & Videos";
+  strip.innerHTML = media.map(item => `
+    <div class="gallery-item">
+      ${item.type === "video"
+        ? `<video src="${item.src}" controls playsinline></video>`
+        : `<img src="${item.src}" alt="${item.caption || ""}" loading="lazy">`}
+      ${item.caption ? `<span class="gallery-item-caption">${item.caption}</span>` : ""}
+    </div>
+  `).join("");
+
+  overlay.classList.remove("sr-hidden");
+}
 
 // ---- Quick category icons (Uber-style "For you" row) ----
 function renderQuickIcons() {
