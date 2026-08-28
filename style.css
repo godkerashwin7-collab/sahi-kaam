@@ -76,7 +76,7 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
 .header-inner{
   max-width:720px;
   margin:0 auto;
-  padding:16px 18px;
+  padding:16px 12px 16px 8px;
   display:flex;
   align-items:center;
   justify-content:space-between;
