@@ -251,6 +251,17 @@ function onDomReady(fn) {
 }
 
 onDomReady(() => {
+  renderPricingTable();
+
+  const pinCheckBtn = document.getElementById("pinCheckBtn");
+  const pinCheckInput = document.getElementById("pinCheckInput");
+  if (pinCheckBtn && pinCheckInput) {
+    pinCheckBtn.addEventListener("click", () => checkPinAvailability(pinCheckInput.value.trim()));
+    pinCheckInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") checkPinAvailability(pinCheckInput.value.trim());
+    });
+  }
+
   const searchInput = document.getElementById("serviceSearch");
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
@@ -543,6 +554,77 @@ function getSelectedTotal(selectedObj) {
 
 // Expose pricing so index.html's module script can use it for payment + display
 window.SahiPricing = { getServicePrice, getSelectedTotal, CATEGORY_DEFAULT_PRICE };
+
+function renderPricingTable() {
+  const table = document.getElementById("pricingTable");
+  if (!table) return;
+  const rows = CATALOG.filter(cat => cat.active).map(cat => `
+    <div class="pricing-row">
+      <span class="pricing-row-service">${cat.icon || ""} ${cat.name}</span>
+      <span class="pricing-row-price">From ₹${CATEGORY_DEFAULT_PRICE[cat.id] || 199}</span>
+    </div>
+  `).join("");
+  table.innerHTML = rows;
+}
+
+// ---- PIN code / area availability checker ----
+// Approximate coordinates for the hub areas we currently serve. A PIN code
+// is treated as "available" if it falls within SERVICE_RADIUS_KM of any hub.
+// Edit SERVICE_HUBS / SERVICE_RADIUS_KM as your real coverage area changes.
+const SERVICE_HUBS = [
+  { name: "Santacruz", lat: 19.0800, lng: 72.8400 },
+  { name: "Dadar", lat: 19.0178, lng: 72.8478 },
+  { name: "Chembur", lat: 19.0522, lng: 72.9005 },
+  { name: "Sion", lat: 19.0448, lng: 72.8631 },
+  { name: "Ghatkopar", lat: 19.0863, lng: 72.9081 }
+];
+const SERVICE_RADIUS_KM = 20;
+
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function checkPinAvailability(pin) {
+  const resultEl = document.getElementById("pinCheckResult");
+  resultEl.className = "pin-check-result";
+  if (!/^\d{6}$/.test(pin)) {
+    resultEl.textContent = "Enter a valid 6-digit PIN code.";
+    resultEl.classList.add("pin-no");
+    return;
+  }
+  resultEl.textContent = "Checking...";
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&country=India&postalcode=${pin}`);
+    const data = await res.json();
+    if (!data.length) {
+      resultEl.textContent = "Couldn't find that PIN code — double-check and try again.";
+      resultEl.classList.add("pin-no");
+      return;
+    }
+    const { lat, lon } = data[0];
+    let nearest = null, nearestKm = Infinity;
+    SERVICE_HUBS.forEach(hub => {
+      const km = haversineKm(parseFloat(lat), parseFloat(lon), hub.lat, hub.lng);
+      if (km < nearestKm) { nearestKm = km; nearest = hub.name; }
+    });
+    if (nearestKm <= SERVICE_RADIUS_KM) {
+      resultEl.textContent = `✅ Yes! We serve this area (near ${nearest}, about ${Math.round(nearestKm)} km away).`;
+      resultEl.classList.add("pin-ok");
+    } else {
+      resultEl.textContent = `Not quite yet — this is about ${Math.round(nearestKm)} km from our nearest area (${nearest}). We're expanding weekly, check back soon!`;
+      resultEl.classList.add("pin-no");
+    }
+  } catch (err) {
+    resultEl.textContent = "Couldn't check right now — try again in a moment.";
+    resultEl.classList.add("pin-no");
+  }
+}
 
 function showCategoryLinks() {
   let panel = document.getElementById("continuePanel");

@@ -1114,6 +1114,188 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   margin:18px 0 0;
   line-height:1.5;
 }
+
+/* ---- Pricing table ---- */
+.pricing-section{
+  max-width:720px;
+  margin:0 auto;
+  padding:36px 18px 8px;
+}
+.pricing-table{
+  border:1px solid #eee;
+  border-radius:14px;
+  overflow:hidden;
+  margin-top:16px;
+}
+.pricing-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 16px;
+  border-bottom:1px solid #f2f2f2;
+  background:#fff;
+}
+.pricing-row:last-child{ border-bottom:none; }
+.pricing-row-service{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+  color: var(--navy);
+  font-size:14px;
+}
+.pricing-row-price{
+  font-weight:700;
+  color: var(--safety-dark);
+  font-size:14px;
+  white-space:nowrap;
+}
+.pricing-note{
+  font-size:11.5px;
+  color:var(--muted);
+  font-style:italic;
+  margin:14px 0 0;
+  line-height:1.5;
+}
+
+/* ---- PIN code availability checker ---- */
+.pin-check-section{
+  max-width:720px;
+  margin:0 auto;
+  padding:36px 18px 8px;
+}
+.pin-check-box{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+  flex-wrap:wrap;
+}
+.pin-check-box input{
+  flex:1;
+  min-width:180px;
+  padding:12px 14px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:15px;
+  box-sizing:border-box;
+}
+.pin-check-result{
+  margin:12px 0 0;
+  font-size:14px;
+  font-weight:600;
+  min-height:20px;
+}
+.pin-check-result.pin-ok{ color:#2e7d32; }
+.pin-check-result.pin-no{ color:#c62828; }
+
+/* ---- Individual professional profiles ---- */
+.pros-section{
+  margin-top:44px;
+}
+.pros-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-top:18px;
+}
+.pro-card{
+  background:#fff;
+  border:1px solid #eee;
+  border-radius:14px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.pro-avatar{
+  font-size:32px;
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:#FFF3EC;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:6px;
+}
+.pro-name{
+  font-size:15.5px;
+  color: var(--navy);
+}
+.pro-trade{
+  font-size:12.5px;
+  color:var(--muted);
+}
+.pro-rating{
+  font-size:13px;
+  color:#B8860B;
+  font-weight:600;
+  margin-top:2px;
+}
+.pro-badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+.pro-badge{
+  font-size:10.5px;
+  font-weight:700;
+  background:#E8F5E9;
+  color:#2e7d32;
+  padding:4px 8px;
+  border-radius:10px;
+}
+@media (min-width:560px){
+  .pros-grid{
+    grid-template-columns:1fr 1fr 1fr;
+  }
+}
+
+/* ---- FAQ ---- */
+.faq-section{
+  margin-top:44px;
+}
+.faq-list{
+  margin-top:16px;
+  border-top:1px solid #eee;
+}
+.faq-item{
+  border-bottom:1px solid #eee;
+  padding:14px 2px;
+}
+.faq-item summary{
+  font-weight:700;
+  font-size:14px;
+  color: var(--navy);
+  cursor:pointer;
+  list-style:none;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.faq-item summary::-webkit-details-marker{ display:none; }
+.faq-item summary::after{
+  content:"+";
+  font-size:20px;
+  color: var(--safety);
+  flex:0 0 auto;
+  margin-left:10px;
+}
+.faq-item[open] summary::after{
+  content:"−";
+}
+.faq-item p{
+  font-size:13px;
+  color:#555;
+  line-height:1.6;
+  margin:10px 0 0;
+}
+.faq-item a{
+  color: var(--safety-dark);
+  font-weight:600;
+}
 @media (min-width:560px){
   .team-grid{
     grid-template-columns:1fr 1fr 1fr;

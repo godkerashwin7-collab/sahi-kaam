@@ -13,7 +13,7 @@
 
 window.SAHI_BUSINESS = {
   // Legal / display name of the company
-  legalName: "REPLACE_ME_LEGAL_ENTITY_NAME",       // e.g. "Sahi Kaamwala Home Services Pvt. Ltd." or "Sahi Kaamwala Home Services" (if proprietorship)
+  legalName: "Sahi Kaamwala Home Services",       // e.g. "Sahi Kaamwala Home Services Pvt. Ltd." or "Sahi Kaamwala Home Services" (if proprietorship)
   brandName: "Sahi Kaamwala",
 
   // Contact
@@ -25,7 +25,7 @@ window.SAHI_BUSINESS = {
 
   // Location
   city: "Mumbai",
-  serviceAreas: "REPLACE_ME_AREAS",                // e.g. "Andheri, Bandra, Powai, Thane — expanding weekly"
+  serviceAreas: "Santacruz, Dadar, Chembur, Sion, Ghatkopar — and nearby areas within 10–20 km, expanding weekly",
   registeredAddress: "REPLACE_ME_ADDRESS",         // full registered/office address for legal pages
 
   // Compliance (fill once you have these — leave blank string "" until then, do NOT invent numbers)

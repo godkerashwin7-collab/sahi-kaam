@@ -149,6 +149,27 @@
       <!-- Categories are injected by script.js -->
     </div>
 
+    <!-- Pricing transparency -->
+    <section class="pricing-section" id="pricing">
+      <span class="intro-eyebrow">Transparent pricing</span>
+      <h3 class="team-heading">No surprise bills</h3>
+      <p class="team-subheading">Starting prices below — the professional confirms the exact price with you before any work begins.</p>
+      <div class="pricing-table" id="pricingTable"><!-- filled by script.js --></div>
+      <p class="pricing-note">Prices shown are starting estimates for the category and may vary by the exact job, materials, and site conditions — always confirmed with you upfront.</p>
+    </section>
+
+    <!-- PIN code / area availability checker -->
+    <section class="pin-check-section" id="pin-check">
+      <span class="intro-eyebrow">Service availability</span>
+      <h3 class="team-heading">Is Sahi Kaamwala available in your area?</h3>
+      <div class="pin-check-box">
+        <input type="text" id="pinCheckInput" inputmode="numeric" maxlength="6" placeholder="Enter your 6-digit PIN code, e.g. 400054">
+        <button type="button" id="pinCheckBtn" class="sr-submit" style="margin-top:0; width:auto; padding:12px 20px;">Check Availability</button>
+      </div>
+      <p id="pinCheckResult" class="pin-check-result"></p>
+      <p class="pricing-note">We currently serve <span data-sk-service-areas>Mumbai</span>.</p>
+    </section>
+
     <section class="showcase">
       <button type="button" class="showcase-card" data-gallery="on-the-job" aria-label="View photos and videos: On the job">
         <img src="gallery-modern.jpg" alt="Plumber, electrician and housekeeping team working together in a modern Mumbai apartment" loading="lazy">
@@ -302,6 +323,47 @@
         <p class="team-note">Photos coming soon for each team member — swap the 👷 🔧 📞 emoji avatars above for real photos whenever you're ready.</p>
       </div>
 
+      <!-- Individual professional profiles -->
+      <div class="pros-section" id="professionals">
+        <span class="intro-eyebrow">Meet your professionals</span>
+        <h3 class="team-heading">Know who's coming to your door</h3>
+        <p class="team-subheading">Real names, real experience — every professional is ID verified before their first job.</p>
+
+        <div class="pros-grid">
+          <div class="pro-card">
+            <div class="pro-avatar">👨‍🔧</div>
+            <strong class="pro-name">REPLACE_ME_PRO_1_NAME</strong>
+            <span class="pro-trade">Electrician · REPLACE_ME_YEARS yrs experience</span>
+            <span class="pro-rating">⭐ REPLACE_ME_RATING (REPLACE_ME_JOBS jobs)</span>
+            <div class="pro-badges">
+              <span class="pro-badge">✓ ID Verified</span>
+              <span class="pro-badge">✓ Background Checked</span>
+            </div>
+          </div>
+          <div class="pro-card">
+            <div class="pro-avatar">👷‍♂️</div>
+            <strong class="pro-name">REPLACE_ME_PRO_2_NAME</strong>
+            <span class="pro-trade">Carpenter · REPLACE_ME_YEARS yrs experience</span>
+            <span class="pro-rating">⭐ REPLACE_ME_RATING (REPLACE_ME_JOBS jobs)</span>
+            <div class="pro-badges">
+              <span class="pro-badge">✓ ID Verified</span>
+              <span class="pro-badge">✓ Background Checked</span>
+            </div>
+          </div>
+          <div class="pro-card">
+            <div class="pro-avatar">🧑‍🎨</div>
+            <strong class="pro-name">REPLACE_ME_PRO_3_NAME</strong>
+            <span class="pro-trade">Painter · REPLACE_ME_YEARS yrs experience</span>
+            <span class="pro-rating">⭐ REPLACE_ME_RATING (REPLACE_ME_JOBS jobs)</span>
+            <div class="pro-badges">
+              <span class="pro-badge">✓ ID Verified</span>
+              <span class="pro-badge">✓ Background Checked</span>
+            </div>
+          </div>
+        </div>
+        <p class="team-note">These are placeholder profiles. Replace names, experience, ratings and photos with your real professionals once you have a few on board — this builds far more trust than a generic listing.</p>
+      </div>
+
       <!-- Blog / posts -->
       <div class="blog-section" id="blog">
         <span class="intro-eyebrow">From the workshop</span>
@@ -348,6 +410,47 @@
 
         <div class="reviews-list" id="reviewsList">
           <p class="activity-empty">Loading reviews...</p>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="faq-section" id="faq">
+        <span class="intro-eyebrow">Common questions</span>
+        <h3 class="team-heading">Frequently asked questions</h3>
+
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>How are professionals verified?</summary>
+            <p>Every professional on Sahi Kaamwala goes through ID verification before their first job. We're working towards uniforms and formal licensing so you always know who's at your door.</p>
+          </details>
+          <details class="faq-item">
+            <summary>What happens if I don't like the service?</summary>
+            <p>Message us on WhatsApp or call us right after the job and we'll work with you to make it right. See our <a href="refund-policy.html">refund policy</a> for details.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can I cancel my booking?</summary>
+            <p>Yes — contact us via call or WhatsApp as early as possible before the scheduled time. See our <a href="terms.html">terms</a> for the full cancellation policy.</p>
+          </details>
+          <details class="faq-item">
+            <summary>When do I pay?</summary>
+            <p>You can pay online at booking or choose "Pay Cash After Service" — you only pay once the work is confirmed done.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Is there a visit or inspection charge?</summary>
+            <p>The prices shown are starting estimates for the category. The professional confirms the exact price with you before starting any work — no surprise bills.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can I book multiple services together?</summary>
+            <p>Yes — select as many services as you need across categories and submit them as one request. One visit can often cover more than one job.</p>
+          </details>
+          <details class="faq-item">
+            <summary>What if something gets damaged during the job?</summary>
+            <p>Let us know immediately via call or WhatsApp with photos. We'll look into it with the professional involved and work towards a fair resolution.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Do you offer emergency bookings?</summary>
+            <p>Right now, submit a request any time via "Submit a Request — Anytime" and we'll do our best to match you quickly based on professional availability in your area.</p>
+          </details>
         </div>
       </div>
     </section>
