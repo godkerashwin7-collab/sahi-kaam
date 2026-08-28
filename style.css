@@ -301,24 +301,33 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
 .cause-banner{
   padding:14px 16px;
   display:flex;
-  justify-content:flex-end;
+  align-items:center;
+  gap:14px;
+  max-width:720px;
+  margin:0 auto;
+}
+.cause-banner .search-bar-top{
+  flex:1;
+  min-width:0;
+  margin:0;
+  padding:0;
 }
 .cause-card{
   display:flex;
   align-items:center;
   gap:12px;
-  max-width:340px;
-  width:100%;
-  background: linear-gradient(135deg, #1A0B2E, #2D1150);
-  border:1px solid #FF2E9440;
+  max-width:280px;
+  flex:0 0 auto;
+  background: linear-gradient(135deg, #05170F, #0B2E1C);
+  border:1px solid #39FFC440;
   border-radius:16px;
   padding:10px 14px;
-  box-shadow: 0 0 18px rgba(255,46,148,0.35), 0 0 30px rgba(57,255,196,0.12);
+  box-shadow: 0 0 18px rgba(57,255,196,0.35), 0 0 30px rgba(255,153,51,0.10);
 }
 .cause-banner-illustration{
   display:block;
-  width:64px;
-  height:64px;
+  width:56px;
+  height:56px;
   flex:0 0 auto;
   border-radius:10px;
   object-fit:cover;
@@ -332,24 +341,33 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   font-family: var(--font-body);
   font-style:normal;
   font-weight:600;
-  font-size:11.5px;
+  font-size:11px;
   line-height:1.4;
-  color:#FF6FC1;
-  text-shadow: 0 0 8px rgba(255,46,148,0.65);
+  color:#39FFC4;
+  text-shadow: 0 0 8px rgba(57,255,196,0.65);
 }
 .cause-donate-btn{
   display:inline-block;
   margin-top:8px;
-  background: #12241B;
-  color:#39FFC4;
-  border:1px solid #39FFC480;
+  background: #2A1600;
+  color:#FFB238;
+  border:1px solid #FFB23880;
   padding:6px 14px;
   border-radius:20px;
-  font-size:11.5px;
+  font-size:11px;
   font-weight:800;
   cursor:pointer;
-  text-shadow: 0 0 6px rgba(57,255,196,0.6);
-  box-shadow: 0 0 10px rgba(57,255,196,0.25);
+  text-shadow: 0 0 6px rgba(255,178,56,0.6);
+  box-shadow: 0 0 10px rgba(255,178,56,0.25);
+}
+@media (max-width:560px){
+  .cause-banner{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .cause-card{
+    max-width:none;
+  }
 }
 .donate-amount-row{
   display:grid;
