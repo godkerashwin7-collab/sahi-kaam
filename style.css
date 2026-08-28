@@ -18,6 +18,26 @@
 }
 
 *{box-sizing:border-box;}
+
+.tricolor-stripe{
+  height:5px;
+  width:100%;
+  background: linear-gradient(90deg, var(--safety) 0 33.33%, #fff 33.33% 66.66%, var(--green) 66.66% 100%);
+}
+
+/* ---- Indian flag colors on every field, unmistakably ---- */
+input, textarea, select{
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, textarea:focus, select:focus{
+  border-color: var(--safety) !important;
+  box-shadow: 0 0 0 3px rgba(255,153,51,0.18), 0 0 0 5px rgba(19,136,8,0.12) !important;
+}
+input[type="checkbox"], input[type="radio"]{
+  accent-color: var(--green);
+}
+
 html{
   overflow-x:hidden;
   max-width:100%;
