@@ -58,5 +58,12 @@ service cloud.firestore {
       allow read: if false;
       allow create: if request.auth != null;
     }
+
+    match /donations/{donationId} {
+      // Donations don't require login (giving should be frictionless).
+      // Records are private — view them in the Firebase Console.
+      allow read: if false;
+      allow create: if true;
+    }
   }
 }

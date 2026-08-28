@@ -72,6 +72,32 @@
 
   <div class="cause-banner">
     <em>🎗️ In memory of my sister — a share of every booking goes toward supporting cancer patients and their care.</em>
+    <button type="button" class="cause-donate-btn" id="causeDonateBtn">❤️ Donate Directly</button>
+  </div>
+
+  <!-- Direct donation box -->
+  <div id="donate-overlay" class="sr-overlay sr-hidden">
+    <div class="sr-modal">
+      <button type="button" class="sr-close" id="donate-close">&times;</button>
+      <h2>🎗️ Support Cancer Patient Care</h2>
+      <p style="font-size:13px; color:#666; margin-top:-6px;">100% of what you give here goes directly toward supporting cancer patients and their care — in memory of my sister. Entirely optional, and separate from any booking.</p>
+
+      <label>Choose an amount</label>
+      <div class="donate-amount-row">
+        <button type="button" class="donate-amount-btn" data-amount="51">₹51</button>
+        <button type="button" class="donate-amount-btn" data-amount="101">₹101</button>
+        <button type="button" class="donate-amount-btn" data-amount="501">₹501</button>
+        <button type="button" class="donate-amount-btn" data-amount="1100">₹1,100</button>
+      </div>
+      <input type="number" id="donate-custom-amount" placeholder="Or enter a custom amount (₹)" min="1">
+      <p class="sk-error-text" id="donate-amountError">Enter an amount of at least ₹1.</p>
+
+      <label>Your Name (optional)</label>
+      <input type="text" id="donate-name" placeholder="Shown only on your own receipt">
+
+      <button type="button" class="sr-submit cta-bold" id="donate-submit-btn">❤️ Donate Now</button>
+      <p id="donate-status" class="sr-status"></p>
+    </div>
   </div>
 
   <div class="search-bar-wrap search-bar-top">
@@ -1429,6 +1455,94 @@
         statusEl.className = "sr-status sr-status-error";
       }
       submitBtn.disabled = false;
+    });
+
+    // ---- Direct donation (separate from bookings, no login required) ----
+    const donateOverlay = document.getElementById("donate-overlay");
+    const customAmountInput = document.getElementById("donate-custom-amount");
+    let selectedDonateAmount = null;
+
+    document.getElementById("causeDonateBtn").addEventListener("click", () => {
+      selectedDonateAmount = null;
+      customAmountInput.value = "";
+      document.getElementById("donate-name").value = "";
+      document.getElementById("donate-status").textContent = "";
+      document.getElementById("donate-amountError").classList.remove("sk-show");
+      document.querySelectorAll(".donate-amount-btn").forEach(b => b.classList.remove("donate-amount-btn-active"));
+      donateOverlay.classList.remove("sr-hidden");
+    });
+    document.getElementById("donate-close").addEventListener("click", () => {
+      donateOverlay.classList.add("sr-hidden");
+    });
+    donateOverlay.addEventListener("click", (e) => {
+      if (e.target === donateOverlay) donateOverlay.classList.add("sr-hidden");
+    });
+
+    document.querySelectorAll(".donate-amount-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedDonateAmount = parseInt(btn.dataset.amount, 10);
+        customAmountInput.value = "";
+        document.querySelectorAll(".donate-amount-btn").forEach(b => b.classList.remove("donate-amount-btn-active"));
+        btn.classList.add("donate-amount-btn-active");
+        document.getElementById("donate-amountError").classList.remove("sk-show");
+      });
+    });
+    customAmountInput.addEventListener("input", () => {
+      selectedDonateAmount = null;
+      document.querySelectorAll(".donate-amount-btn").forEach(b => b.classList.remove("donate-amount-btn-active"));
+      document.getElementById("donate-amountError").classList.remove("sk-show");
+    });
+
+    document.getElementById("donate-submit-btn").addEventListener("click", () => {
+      const customVal = parseInt(customAmountInput.value, 10);
+      const amount = selectedDonateAmount || (customVal > 0 ? customVal : 0);
+      const statusEl = document.getElementById("donate-status");
+      const name = document.getElementById("donate-name").value.trim();
+
+      if (!amount || amount < 1) {
+        document.getElementById("donate-amountError").classList.add("sk-show");
+        return;
+      }
+
+      const donateBtn = document.getElementById("donate-submit-btn");
+      donateBtn.disabled = true;
+      statusEl.textContent = "Opening secure payment...";
+      statusEl.className = "sr-status";
+
+      const donorUser = SahiAuth.getUser();
+      SahiPayment.charge({
+        amountRupees: amount,
+        description: "Donation — Cancer Patient Care (Sahi Kaamwala)",
+        prefillName: name || (donorUser && donorUser.displayName) || "",
+        prefillEmail: (donorUser && donorUser.email) || "",
+        onSuccess: async (paymentId) => {
+          statusEl.textContent = "Recording your donation...";
+          try {
+            await addDoc(collection(db, "donations"), {
+              uid: donorUser ? donorUser.uid : null,
+              name: name || (donorUser && donorUser.displayName) || "Anonymous",
+              amount,
+              paymentId,
+              donatedAt: new Date().toISOString()
+            });
+          } catch (err) {
+            console.warn("Donation payment succeeded but logging it failed:", err);
+          }
+          statusEl.textContent = "❤️ Thank you — your donation means a lot.";
+          statusEl.className = "sr-status sr-status-ok";
+          donateBtn.disabled = false;
+        },
+        onFailure: (message) => {
+          statusEl.textContent = "Payment failed: " + message;
+          statusEl.className = "sr-status sr-status-error";
+          donateBtn.disabled = false;
+        },
+        onCancel: () => {
+          statusEl.textContent = "Payment cancelled.";
+          statusEl.className = "sr-status sr-status-error";
+          donateBtn.disabled = false;
+        }
+      });
     });
 
     // ---- Booking review & confirm ----

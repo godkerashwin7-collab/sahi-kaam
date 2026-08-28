@@ -271,8 +271,8 @@ body.sk-verified .sk-verify-hint {
   border-bottom: 3px solid transparent;
 }
 .sa-tab-active {
-  color: #045FC4;
-  border-bottom: 3px solid #FFC72C;
+  color: #0B3D91;
+  border-bottom: 3px solid #FF9933;
 }
 
 /* ---- Emergency SOS block (always unlocked, no verification needed) ---- */
@@ -347,7 +347,7 @@ body.sk-verified .sk-verify-hint {
 .fee-slogan strong {
   display: block;
   margin-top: 4px;
-  color: #045FC4;
+  color: #0B3D91;
 }
 
 /* ---- Live help chat widget ---- */
@@ -358,7 +358,7 @@ body.sk-verified .sk-verify-hint {
   width: 54px;
   height: 54px;
   border-radius: 50%;
-  background: #045FC4;
+  background: #0B3D91;
   color: #fff;
   border: none;
   font-size: 24px;
@@ -384,7 +384,7 @@ body.sk-verified .sk-verify-hint {
   display: none;
 }
 .sc-header {
-  background: #045FC4;
+  background: #0B3D91;
   color: #fff;
   padding: 12px 14px;
   font-weight: bold;
@@ -418,11 +418,11 @@ body.sk-verified .sk-verify-hint {
 }
 .sc-bot {
   background: #F1F3F6;
-  color: #045FC4;
+  color: #0B3D91;
   align-self: flex-start;
 }
 .sc-user {
-  background: #045FC4;
+  background: #0B3D91;
   color: #fff;
   align-self: flex-end;
 }
@@ -439,7 +439,7 @@ body.sk-verified .sk-verify-hint {
   padding: 6px 10px;
   font-size: 12px;
   cursor: pointer;
-  color: #045FC4;
+  color: #0B3D91;
 }
 .sc-footer {
   display: flex;
@@ -455,7 +455,7 @@ body.sk-verified .sk-verify-hint {
   font-size: 13px;
 }
 .sc-footer button {
-  background: #045FC4;
+  background: #0B3D91;
   color: #fff;
   border: none;
   width: 36px;
@@ -614,7 +614,7 @@ body.sk-verified .sk-verify-hint {
   cursor:pointer;
 }
 .slot-btn-active{
-  background: var(--safety, #FFC72C);
-  border-color: var(--safety, #FFC72C);
+  background: var(--safety, #FF9933);
+  border-color: var(--safety, #FF9933);
   color:#fff;
 }
