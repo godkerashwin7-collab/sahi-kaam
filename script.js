@@ -171,7 +171,9 @@ const CATALOG_EN = [
 let CATALOG = CATALOG_EN;
 
 window.sahiSetCatalogLanguage = function(lang) {
-  CATALOG = (lang === "mr" && window.CATALOG_MR) ? window.CATALOG_MR : CATALOG_EN;
+  CATALOG = (lang === "mr" && window.CATALOG_MR) ? window.CATALOG_MR
+          : (lang === "hi" && window.CATALOG_HI) ? window.CATALOG_HI
+          : CATALOG_EN;
   render();
   renderQuickIcons();
   renderPricingTable();
@@ -356,16 +358,25 @@ const SHOWCASE_TITLES_MR = {
   "on-the-job": "कामावर",
   "handled-with-care": "काळजीपूर्वक हाताळलेले"
 };
+const SHOWCASE_TITLES_HI = {
+  "on-the-job": "काम के दौरान",
+  "handled-with-care": "सावधानी से किया गया काम"
+};
+
+function currentLang() {
+  return (window.SahiI18n && window.SahiI18n.getLanguage()) || "en";
+}
 
 function openGallery(key) {
   const overlay = document.getElementById("gallery-overlay");
   const strip = document.getElementById("galleryStrip");
   const title = document.getElementById("galleryTitle");
   if (!overlay || !strip) return;
-  const isMr = window.SahiI18n && window.SahiI18n.getLanguage() === "mr";
+  const lang = currentLang();
+  const titles = lang === "mr" ? SHOWCASE_TITLES_MR : lang === "hi" ? SHOWCASE_TITLES_HI : SHOWCASE_TITLES;
 
   const media = SHOWCASE_MEDIA[key] || [];
-  title.textContent = (isMr ? SHOWCASE_TITLES_MR[key] : SHOWCASE_TITLES[key]) || "Photos & Videos";
+  title.textContent = titles[key] || "Photos & Videos";
   strip.innerHTML = media.map(item => `
     <div class="gallery-item">
       ${item.type === "video"
@@ -430,8 +441,22 @@ const GROUP_LABELS_MR = {
   }
 };
 
+const GROUP_LABELS_HI = {
+  trade: {
+    eyebrow: "घर और मरम्मत",
+    title: "घर के लिए कुशल कारीगर",
+    desc: "बढ़ईगीरी, वायरिंग, पेंटिंग, प्लंबिंग और सफाई — काम के हिसाब से बुक करें."
+  },
+  care: {
+    eyebrow: "समुदाय और देखभाल",
+    title: "सिर्फ़ मरम्मत नहीं, लोगों के लिए सहारा",
+    desc: "महिलाओं के लिए मदद, चिकित्सा ज़रूरतें और बुज़ुर्गों की देखभाल — किसी भी घरेलू विज़िट जितनी ही सावधानी से."
+  }
+};
+
 function currentGroupLabels() {
-  return (window.SahiI18n && window.SahiI18n.getLanguage() === "mr") ? GROUP_LABELS_MR : GROUP_LABELS_EN;
+  const lang = currentLang();
+  return lang === "mr" ? GROUP_LABELS_MR : lang === "hi" ? GROUP_LABELS_HI : GROUP_LABELS_EN;
 }
 
 function render() {
@@ -613,6 +638,8 @@ const SERVICE_HUBS = [
   { name: "Sion", lat: 19.0448, lng: 72.8631 },
   { name: "Ghatkopar", lat: 19.0863, lng: 72.9081 }
 ];
+const SERVICE_HUB_NAMES_MR = { Santacruz: "सांताक्रूझ", Dadar: "दादर", Chembur: "चेंबूर", Sion: "सायन", Ghatkopar: "घाटकोपर" };
+const SERVICE_HUB_NAMES_HI = { Santacruz: "सांताक्रूज़", Dadar: "दादर", Chembur: "चेंबूर", Sion: "सायन", Ghatkopar: "घाटकोपर" };
 const SERVICE_RADIUS_KM = 20;
 
 function haversineKm(lat1, lng1, lat2, lng2) {
@@ -626,20 +653,24 @@ function haversineKm(lat1, lng1, lat2, lng2) {
 }
 
 async function checkPinAvailability(pin) {
-  const isMr = window.SahiI18n && window.SahiI18n.getLanguage() === "mr";
+  const lang = currentLang();
   const resultEl = document.getElementById("pinCheckResult");
   resultEl.className = "pin-check-result";
   if (!/^\d{6}$/.test(pin)) {
-    resultEl.textContent = isMr ? "योग्य ६ अंकी PIN कोड टाका." : "Enter a valid 6-digit PIN code.";
+    resultEl.textContent = lang === "mr" ? "योग्य ६ अंकी PIN कोड टाका."
+      : lang === "hi" ? "सही 6 अंकों का PIN कोड डालें."
+      : "Enter a valid 6-digit PIN code.";
     resultEl.classList.add("pin-no");
     return;
   }
-  resultEl.textContent = isMr ? "तपासत आहोत..." : "Checking...";
+  resultEl.textContent = lang === "mr" ? "तपासत आहोत..." : lang === "hi" ? "जांच हो रही है..." : "Checking...";
   try {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&country=India&postalcode=${pin}`);
     const data = await res.json();
     if (!data.length) {
-      resultEl.textContent = isMr ? "हा PIN कोड सापडला नाही — पुन्हा तपासा आणि प्रयत्न करा." : "Couldn't find that PIN code — double-check and try again.";
+      resultEl.textContent = lang === "mr" ? "हा PIN कोड सापडला नाही — पुन्हा तपासा आणि प्रयत्न करा."
+        : lang === "hi" ? "यह PIN कोड नहीं मिला — दोबारा जांचें और फिर कोशिश करें."
+        : "Couldn't find that PIN code — double-check and try again.";
       resultEl.classList.add("pin-no");
       return;
     }
@@ -649,19 +680,28 @@ async function checkPinAvailability(pin) {
       const km = haversineKm(parseFloat(lat), parseFloat(lon), hub.lat, hub.lng);
       if (km < nearestKm) { nearestKm = km; nearest = hub.name; }
     });
+    const nearestLocalized = lang === "mr" ? (SERVICE_HUB_NAMES_MR[nearest] || nearest)
+      : lang === "hi" ? (SERVICE_HUB_NAMES_HI[nearest] || nearest)
+      : nearest;
     if (nearestKm <= SERVICE_RADIUS_KM) {
-      resultEl.textContent = isMr
-        ? `✅ होय! आम्ही या भागात सेवा देतो (${nearest} जवळ, सुमारे ${Math.round(nearestKm)} किमी दूर).`
-        : `✅ Yes! We serve this area (near ${nearest}, about ${Math.round(nearestKm)} km away).`;
+      resultEl.textContent = lang === "mr"
+        ? `✅ होय! आम्ही या भागात सेवा देतो (${nearestLocalized} जवळ, सुमारे ${Math.round(nearestKm)} किमी दूर).`
+        : lang === "hi"
+        ? `✅ हां! हम इस इलाके में सेवा देते हैं (${nearestLocalized} के पास, लगभग ${Math.round(nearestKm)} km दूर).`
+        : `✅ Yes! We serve this area (near ${nearestLocalized}, about ${Math.round(nearestKm)} km away).`;
       resultEl.classList.add("pin-ok");
     } else {
-      resultEl.textContent = isMr
-        ? `अजून नाही — हे आमच्या सर्वात जवळच्या भागापासून (${nearest}) सुमारे ${Math.round(nearestKm)} किमी दूर आहे. आम्ही दर आठवड्याला विस्तार करत आहोत, लवकरच पुन्हा तपासा!`
-        : `Not quite yet — this is about ${Math.round(nearestKm)} km from our nearest area (${nearest}). We're expanding weekly, check back soon!`;
+      resultEl.textContent = lang === "mr"
+        ? `अजून नाही — हे आमच्या सर्वात जवळच्या भागापासून (${nearestLocalized}) सुमारे ${Math.round(nearestKm)} किमी दूर आहे. आम्ही दर आठवड्याला विस्तार करत आहोत, लवकरच पुन्हा तपासा!`
+        : lang === "hi"
+        ? `अभी नहीं — यह हमारे नज़दीकी इलाके (${nearestLocalized}) से लगभग ${Math.round(nearestKm)} km दूर है. हम हर हफ़्ते बढ़ रहे हैं, जल्द दोबारा देखें!`
+        : `Not quite yet — this is about ${Math.round(nearestKm)} km from our nearest area (${nearestLocalized}). We're expanding weekly, check back soon!`;
       resultEl.classList.add("pin-no");
     }
   } catch (err) {
-    resultEl.textContent = isMr ? "आत्ता तपासता आले नाही — थोड्या वेळाने प्रयत्न करा." : "Couldn't check right now — try again in a moment.";
+    resultEl.textContent = lang === "mr" ? "आत्ता तपासता आले नाही — थोड्या वेळाने प्रयत्न करा."
+      : lang === "hi" ? "आत्ता तपासता आले नाही — कुछ देर बाद कोशिश करें."
+      : "Couldn't check right now — try again in a moment.";
     resultEl.classList.add("pin-no");
   }
 }
@@ -684,7 +724,12 @@ function showCategoryLinks() {
   });
 
   panel.innerHTML = `
-    <h3>${window.SahiI18n && window.SahiI18n.getLanguage() === "mr" ? "तयार आहे — कारागीर पाहण्यासाठी श्रेणी निवडा:" : "You're all set — pick a category to browse workers:"}</h3>
+    <h3>${(() => {
+      const lang = currentLang();
+      if (lang === "mr") return "तयार आहे — कारागीर पाहण्यासाठी श्रेणी निवडा:";
+      if (lang === "hi") return "तैयार है — कारीगर देखने के लिए श्रेणी चुनें:";
+      return "You're all set — pick a category to browse workers:";
+    })()}</h3>
     <div class="continue-links">${linksHtml}</div>
   `;
   panel.scrollIntoView({ behavior: "smooth", block: "center" });
