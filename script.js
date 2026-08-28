@@ -434,13 +434,14 @@ function render() {
     const card = document.createElement("div");
     card.className = "category-card";
     card.id = `card-${cat.id}`;
+    card.setAttribute("data-cat", cat.id);
 
     const head = document.createElement("button");
     head.className = "category-head";
     head.type = "button";
     head.setAttribute("aria-expanded", "false");
     head.innerHTML = `
-      <span class="category-icon">${cat.icon}</span>
+      <span class="category-icon" data-cat="${cat.id}">${cat.icon}</span>
       <span class="category-title">
         <h2>${cat.name}</h2>
         <span>${cat.tagline}</span>

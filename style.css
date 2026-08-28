@@ -1591,10 +1591,27 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   box-shadow:var(--shadow);
   overflow:hidden;
   grid-column: span 1;
+  border-bottom:4px solid var(--line);
 }
 .category-card.open{
   grid-column: 1 / -1;
 }
+
+/* ---- Per-trade colors (icon badge = top, card border = bottom) ---- */
+.category-icon[data-cat="carpenter"], .quick-icon-item[data-cat="carpenter"] .quick-icon-circle{ background:#C68B59; border-color:#A9714A; }
+.category-card[data-cat="carpenter"]{ border-bottom-color:#A9714A; }
+
+.category-icon[data-cat="plumber"], .quick-icon-item[data-cat="plumber"] .quick-icon-circle{ background:#6FA8DC; border-color:#4A90D9; }
+.category-card[data-cat="plumber"]{ border-bottom-color:#4A90D9; }
+
+.category-icon[data-cat="electrician"], .quick-icon-item[data-cat="electrician"] .quick-icon-circle{ background:#B0B0B0; border-color:#8E8E8E; }
+.category-card[data-cat="electrician"]{ border-bottom-color:#8E8E8E; }
+
+.category-icon[data-cat="painter"], .quick-icon-item[data-cat="painter"] .quick-icon-circle{ background:#E57373; border-color:#D25454; }
+.category-card[data-cat="painter"]{ border-bottom-color:#D25454; }
+
+.category-icon[data-cat="cleaning"], .quick-icon-item[data-cat="cleaning"] .quick-icon-circle{ background:#F2C94C; border-color:#DAAE2E; }
+.category-card[data-cat="cleaning"]{ border-bottom-color:#DAAE2E; }
 
 .category-head{
   display:flex;
