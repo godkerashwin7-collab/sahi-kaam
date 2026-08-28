@@ -302,8 +302,15 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   background: linear-gradient(135deg, #FDF0F5, #F3E8FA);
   border-top:1px solid #EAC7DC;
   border-bottom:1px solid #EAC7DC;
-  padding:12px 18px;
+  padding:16px 18px;
   text-align:center;
+}
+.cause-banner-illustration{
+  display:block;
+  width:100%;
+  max-width:280px;
+  margin:0 auto 10px;
+  border-radius:14px;
 }
 .cause-donate-btn{
   display:block;

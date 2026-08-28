@@ -1,0 +1,52 @@
+<svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of a brother and sister holding hands, in memory of a beloved sister">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FDF0F5"/>
+      <stop offset="100%" stop-color="#F3E8FA"/>
+    </linearGradient>
+    <linearGradient id="figA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C98BA8"/>
+      <stop offset="100%" stop-color="#B06E90"/>
+    </linearGradient>
+    <linearGradient id="figB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8FA6C9"/>
+      <stop offset="100%" stop-color="#6D89B5"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="260" rx="18" fill="url(#bg)"/>
+
+  <!-- soft ground shadow -->
+  <ellipse cx="200" cy="228" rx="120" ry="10" fill="#00000010"/>
+
+  <!-- taller sibling silhouette -->
+  <g>
+    <circle cx="160" cy="110" r="24" fill="url(#figA)"/>
+    <path d="M120 225
+             C118 165, 130 140, 160 136
+             C190 140, 202 165, 200 225 Z" fill="url(#figA)"/>
+  </g>
+
+  <!-- smaller sibling silhouette -->
+  <g>
+    <circle cx="235" cy="126" r="19" fill="url(#figB)"/>
+    <path d="M205 225
+             C204 178, 213 158, 235 155
+             C257 158, 266 178, 265 225 Z" fill="url(#figB)"/>
+  </g>
+
+  <!-- joined hands -->
+  <circle cx="200" cy="196" r="7" fill="#F7E7EE"/>
+
+  <!-- pink ribbon, floating above, cancer awareness -->
+  <g transform="translate(196,52) scale(0.9)">
+    <path d="M0 0 C -10 14, -14 30, -4 42 C 0 34, 0 26, 0 20 C 0 26, 0 34, 4 42 C 14 30, 10 14, 0 0 Z"
+          fill="#EA7BA0" stroke="#D65C87" stroke-width="1.2"/>
+  </g>
+
+  <!-- gentle sparkle accents -->
+  <circle cx="90" cy="70" r="2.5" fill="#EA7BA0" opacity="0.55"/>
+  <circle cx="320" cy="90" r="2" fill="#8FA6C9" opacity="0.55"/>
+  <circle cx="70" cy="150" r="1.8" fill="#C98BA8" opacity="0.5"/>
+  <circle cx="330" cy="160" r="2.2" fill="#EA7BA0" opacity="0.45"/>
+</svg>
