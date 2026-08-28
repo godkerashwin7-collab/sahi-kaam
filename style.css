@@ -17,13 +17,19 @@
 }
 
 *{box-sizing:border-box;}
+html{
+  overflow-x:hidden;
+  max-width:100%;
+}
 body{
   margin:0;
   font-family: var(--font-body);
   background:
     linear-gradient(180deg, var(--paper) 0%, var(--paper) 100%);
   color:var(--ink);
-  padding-bottom:90px;
+  padding-bottom:58px; /* clears the fixed bottom nav — see .bottom-nav below */
+  overflow-x:hidden;
+  max-width:100vw;
 }
 h1,h2,h3{font-family: var(--font-display);}
 
@@ -55,7 +61,7 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   justify-content:space-between;
   gap:12px;
 }
-.brand{display:flex; align-items:center; gap:12px;}
+.brand{display:flex; align-items:center; gap:12px; min-width:0; flex-shrink:1;}
 .brand-mark{
   background: var(--safety);
   color:#14213D;
@@ -65,22 +71,33 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   padding:8px 10px;
   border-radius:8px;
   border:2px dashed rgba(20,33,61,0.35);
+  flex-shrink:0;
+}
+.brand-text{
+  min-width:0;
 }
 .brand-text h1{
   font-size:19px;
   font-weight:600;
   margin:0;
   line-height:1.1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .brand-text p{
   margin:2px 0 0;
   font-size:12px;
   color:#C9D2E3;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .header-right{
   display:flex;
   align-items:center;
   gap:10px;
+  flex-shrink:0;
 }
 .profile-avatar{
   width:34px;
@@ -706,8 +723,8 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   display:flex;
   flex-wrap:wrap;
   align-items:center;
-  justify-content:center;
-  gap:10px 16px;
+  justify-content:flex-start;
+  gap:8px 14px;
   background: linear-gradient(135deg, #FF6A3D, #FF9A56);
   border:1.5px solid rgba(255,106,61,0.5);
   border-radius:12px;
@@ -721,10 +738,12 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   font-size:12px;
   font-weight:700;
   color: #fff;
-  white-space:nowrap;
+  white-space:normal;
+  min-width:0;
 }
 .trust-mini-icon{
   font-size:14px;
+  flex-shrink:0;
 }
 .trust-mini-more{
   font-size:12.5px;
@@ -732,19 +751,20 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   color:#FF6A3D;
   text-decoration:none;
   white-space:nowrap;
-  margin-left:auto;
   background:#fff;
   border:1px solid #fff;
-  padding:4px 10px;
+  padding:6px 10px;
   border-radius:20px;
+  /* Always its own full-width row below the three badges — never crammed
+     onto the same line, which is what was pushing the page wider than
+     the screen and clipping everything to its right. */
+  flex:1 0 100%;
+  text-align:center;
+  margin-top:2px;
 }
 .trust-mini-more:hover{
   background:#14213D;
   color:#fff;
-}
-@media (max-width:420px){
-  .trust-mini-inner{ justify-content:flex-start; }
-  .trust-mini-more{ margin-left:0; }
 }
 
 /* ---- Trust section ---- */
@@ -1555,9 +1575,6 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
 }
 
 /* ---- Bottom navigation bar ---- */
-body{
-  padding-bottom:58px; /* keeps content clear of the fixed bottom nav */
-}
 .bottom-nav{
   position:fixed;
   bottom:0;
