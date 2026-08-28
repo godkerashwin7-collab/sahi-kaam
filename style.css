@@ -1527,32 +1527,18 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   .intro{ text-align:left; }
 }
 
-/* ---- How it works sliding sheet ---- */
-#how-it-works-overlay.sr-overlay{
-  align-items:flex-end;
-}
-.sr-sheet{
-  max-width:640px;
-  width:100%;
-  border-radius:18px 18px 0 0;
-  animation: sr-slide-up 0.22s ease-out;
-  padding:24px 22px 28px;
-}
-.sr-sheet .sheet-title{
+/* ---- How it works pop-up ---- */
+.sheet-title{
   font-size:19px;
   font-weight:700;
   margin:4px 0 8px;
   color: var(--navy);
 }
-.sr-sheet .sheet-text{
+.sheet-text{
   color:var(--muted);
   font-size:14px;
   line-height:1.6;
   margin:0;
-}
-@keyframes sr-slide-up {
-  from { opacity:0; transform: translateY(40px); }
-  to   { opacity:1; transform: translateY(0); }
 }
 
 /* ---- Category grid ---- */
