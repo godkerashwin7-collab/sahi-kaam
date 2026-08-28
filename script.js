@@ -242,7 +242,15 @@ function categoryMatchesSearch(cat, query) {
   return cat.services.some(s => s.toLowerCase().includes(q));
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function onDomReady(fn) {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", fn);
+  } else {
+    fn();
+  }
+}
+
+onDomReady(() => {
   const searchInput = document.getElementById("serviceSearch");
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
@@ -286,6 +294,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// ---- Quick category icons (Uber-style "For you" row) ----
+function renderQuickIcons() {
+  const row = document.getElementById("quickIcons");
+  if (!row) return;
+  row.innerHTML = CATALOG.filter(cat => cat.active).map(cat => `
+    <button type="button" class="quick-icon-item" data-cat="${cat.id}">
+      <span class="quick-icon-circle">${cat.icon}</span>
+      <span class="quick-icon-label">${cat.name}</span>
+    </button>
+  `).join("");
+
+  row.querySelectorAll(".quick-icon-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const catId = btn.getAttribute("data-cat");
+      const card = document.getElementById(`card-${catId}`);
+      if (!card) return;
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (!card.classList.contains("open")) {
+        const head = card.querySelector(".category-head");
+        if (head) head.click();
+      }
+    });
+  });
+}
 
 // ---- Render ----
 const GROUP_LABELS = {
@@ -499,3 +532,4 @@ document.getElementById("continueBtn").addEventListener("click", () => {
 });
 
 render();
+renderQuickIcons();

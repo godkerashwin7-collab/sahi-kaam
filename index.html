@@ -10,6 +10,7 @@
 <script src="business-info.js"></script>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="verify.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 <body>
 
@@ -48,6 +49,9 @@
   <div class="search-bar-wrap search-bar-top">
     <input type="text" id="serviceSearch" class="search-bar" placeholder="🔍 Search services — e.g. tap repair, wiring, deep cleaning">
   </div>
+
+  <!-- Quick category icons — populated from CATALOG in script.js -->
+  <div class="quick-icons" id="quickIcons"></div>
 
   <section class="hero">
     <div class="hero-media">
@@ -235,6 +239,33 @@
     </p>
   </footer>
 
+  <!-- Activity — recent requests for the logged-in customer -->
+  <div id="activity-overlay" class="sr-overlay sr-hidden">
+    <div class="sr-modal">
+      <button type="button" class="sr-close" id="activity-close">&times;</button>
+      <h2>Your Activity</h2>
+      <div id="activity-list" class="activity-list">
+        <p class="activity-empty">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom navigation bar -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <button type="button" class="bn-item" id="bnHome">
+      <span class="bn-icon">🏠</span><span class="bn-label">Home</span>
+    </button>
+    <button type="button" class="bn-item" id="bnServices">
+      <span class="bn-icon">🧰</span><span class="bn-label">Services</span>
+    </button>
+    <button type="button" class="bn-item" id="bnActivity">
+      <span class="bn-icon">🕘</span><span class="bn-label">Activity</span>
+    </button>
+    <button type="button" class="bn-item" id="bnAccount">
+      <span class="bn-icon">👤</span><span class="bn-label">Account</span>
+    </button>
+  </nav>
+
   <!-- Profile panel (shown when the avatar is tapped while logged in) -->
   <div id="profile-overlay" class="sr-overlay sr-hidden">
     <div class="sr-modal">
@@ -254,7 +285,15 @@
       <div id="booking-services-list" class="booking-services-list"></div>
 
       <label>Address</label>
-      <textarea id="booking-address" placeholder="Flat/House no., building, street, landmark"></textarea>
+      <div class="addr-search-wrap">
+        <input type="text" id="addr-search" placeholder="🔍 Search your address or area" autocomplete="off">
+        <div id="addr-suggestions" class="addr-suggestions sr-hidden"></div>
+      </div>
+      <button type="button" id="addr-locate-btn" class="addr-locate-btn">📍 Use my current location</button>
+      <div id="addr-map" class="addr-map"></div>
+      <textarea id="booking-address" placeholder="Flat/House no., building, street, landmark — confirm or edit the full address here"></textarea>
+      <input type="hidden" id="booking-lat">
+      <input type="hidden" id="booking-lng">
       <p class="sk-error-text" id="booking-addressError">Enter your full address (at least 10 characters).</p>
 
       <label>Preferred Date</label>
@@ -281,6 +320,8 @@
   <script src="payment.js"></script>
   <script src="chatbot.js"></script>
   <script src="script.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="address-map.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import {
@@ -288,7 +329,8 @@
       signInWithEmailAndPassword, updateProfile, signOut
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import {
-      getFirestore, doc, setDoc, getDoc, addDoc, collection
+      getFirestore, doc, setDoc, getDoc, addDoc, collection,
+      query, where, orderBy, limit, getDocs
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -323,6 +365,80 @@
     document.getElementById("profile-logout-btn").addEventListener("click", () => {
       SahiAuth.logout();
       profileOverlay.classList.add("sr-hidden");
+    });
+
+    // ---- Activity panel — recent requests for the logged-in customer ----
+    const activityOverlay = document.getElementById("activity-overlay");
+    const activityList = document.getElementById("activity-list");
+
+    document.getElementById("activity-close").addEventListener("click", () => {
+      activityOverlay.classList.add("sr-hidden");
+    });
+    activityOverlay.addEventListener("click", (e) => {
+      if (e.target === activityOverlay) activityOverlay.classList.add("sr-hidden");
+    });
+
+    async function openActivityPanel() {
+      activityOverlay.classList.remove("sr-hidden");
+      activityList.innerHTML = `<p class="activity-empty">Loading...</p>`;
+
+      const user = SahiAuth.getUser();
+      if (!user) {
+        activityList.innerHTML = `<p class="activity-empty">Log in to see your requests.</p>`;
+        return;
+      }
+
+      try {
+        const q = query(
+          collection(db, "bookings"),
+          where("uid", "==", user.uid),
+          orderBy("submittedAt", "desc"),
+          limit(10)
+        );
+        const snap = await getDocs(q);
+        if (snap.empty) {
+          activityList.innerHTML = `<p class="activity-empty">No requests yet — book a service to see it here.</p>`;
+          return;
+        }
+        let html = "";
+        snap.forEach(docSnap => {
+          const b = docSnap.data();
+          const serviceNames = Object.values(b.services || {}).flat().join(", ") || "Service request";
+          const dateLabel = b.preferredDate ? `${b.preferredDate} ${b.preferredTime || ""}` : "";
+          html += `
+            <div class="activity-item">
+              <div class="activity-item-top">
+                <strong>${serviceNames}</strong>
+                <span class="activity-status activity-status-${(b.status || "submitted")}">${b.status || "submitted"}</span>
+              </div>
+              <p class="activity-item-meta">${dateLabel}${b.address ? " · " + b.address : ""}</p>
+              <p class="activity-item-total">₹${b.estimatedTotal || 0} estimated</p>
+            </div>`;
+        });
+        activityList.innerHTML = html;
+      } catch (err) {
+        console.log(err);
+        activityList.innerHTML = `<p class="activity-empty">Couldn't load your activity right now. Please try again.</p>`;
+      }
+    }
+
+    // ---- Bottom navigation bar ----
+    document.getElementById("bnHome").addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    document.getElementById("bnServices").addEventListener("click", () => {
+      const grid = document.getElementById("categoryGrid");
+      if (grid) grid.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    document.getElementById("bnActivity").addEventListener("click", () => {
+      if (SahiAuth.isLoggedIn()) {
+        openActivityPanel();
+      } else {
+        SahiAuth.open("login", openActivityPanel);
+      }
+    });
+    document.getElementById("bnAccount").addEventListener("click", () => {
+      profileBtn.click();
     });
 
     SahiAuth.init({
@@ -400,6 +516,10 @@
       listEl.innerHTML = html;
 
       document.getElementById("booking-address").value = "";
+      document.getElementById("booking-lat").value = "";
+      document.getElementById("booking-lng").value = "";
+      const addrSearchEl = document.getElementById("addr-search");
+      if (addrSearchEl) addrSearchEl.value = "";
       const dateInput = document.getElementById("booking-date");
       dateInput.value = "";
       dateInput.min = new Date().toISOString().split("T")[0];
@@ -412,6 +532,10 @@
       document.getElementById("booking-confirm-btn").textContent = "Confirm Booking";
 
       bookingOverlay.classList.remove("sr-hidden");
+
+      // Init/refresh the address map now that the overlay is visible
+      // (Leaflet needs visible dimensions to size itself correctly).
+      setTimeout(() => window.SahiAddressMap && window.SahiAddressMap.init(), 50);
 
       // Stash for the confirm handler
       window.__sahiPendingSelected = selected;
@@ -457,12 +581,16 @@
 
     async function saveBooking(user, extra, statusEl, confirmBtn, successMsg) {
       try {
+        const lat = document.getElementById("booking-lat").value;
+        const lng = document.getElementById("booking-lng").value;
         const bookingData = Object.assign({
           uid: user.uid,
           customerName: user.displayName || "",
           customerEmail: user.email || "",
           services: window.__sahiPendingSelected,
           address: document.getElementById("booking-address").value.trim(),
+          addressLat: lat ? parseFloat(lat) : null,
+          addressLng: lng ? parseFloat(lng) : null,
           preferredDate: document.getElementById("booking-date").value,
           preferredTime: document.getElementById("booking-time").value,
           estimatedTotal: window.__sahiPendingTotal || 0,
@@ -476,11 +604,14 @@
         const serviceLines = Object.entries(window.__sahiPendingSelected || {})
           .map(([catId, services]) => `- ${catId}: ${services.join(", ")}`)
           .join("\n");
+        const mapLink = (bookingData.addressLat && bookingData.addressLng)
+          ? `\nMap: https://maps.google.com/?q=${bookingData.addressLat},${bookingData.addressLng}`
+          : "";
         notifyBusinessOnWhatsApp(
           `🔔 New booking on Sahi Kaamwala\n` +
           `Name: ${bookingData.customerName || "N/A"}\n` +
           `Email: ${bookingData.customerEmail || "N/A"}\n` +
-          `Address: ${bookingData.address}\n` +
+          `Address: ${bookingData.address}${mapLink}\n` +
           `Date/Time: ${bookingData.preferredDate} ${bookingData.preferredTime}\n` +
           `Services:\n${serviceLines}\n` +
           `Estimated total: ₹${bookingData.estimatedTotal}\n` +
