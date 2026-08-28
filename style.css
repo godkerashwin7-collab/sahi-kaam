@@ -171,7 +171,7 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
 
 /* ---- Slide-out nav drawer ---- */
 .nav-drawer-overlay{
-  align-items:stretch;
+  align-items:flex-start;
   justify-content:flex-start;
   padding:0;
 }
@@ -179,13 +179,15 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   position:relative;
   width:80%;
   max-width:320px;
-  height:100%;
+  height:auto;
+  max-height:100vh;
   background:#fff;
   padding:18px 20px 24px;
   overflow-y:auto;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
+  border-radius:0 16px 16px 0;
   animation: nav-drawer-slide-in 0.22s ease-out;
 }
 @keyframes nav-drawer-slide-in{
@@ -193,7 +195,6 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   to{ transform:translateX(0); }
 }
 .nav-drawer-footer{
-  margin-top:auto;
   padding-top:14px;
 }
 .nav-drawer-head{

@@ -594,3 +594,24 @@ body.sk-verified .sk-verify-hint {
   margin: 0 0 10px;
   line-height: 1.4;
 }
+.slot-picker-buttons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:6px 0 4px;
+}
+.slot-btn{
+  padding:9px 14px;
+  border:1px solid #ddd;
+  border-radius:20px;
+  background:#fff;
+  font-size:13px;
+  font-weight:600;
+  color:#333;
+  cursor:pointer;
+}
+.slot-btn-active{
+  background: var(--safety, #FF6A3D);
+  border-color: var(--safety, #FF6A3D);
+  color:#fff;
+}

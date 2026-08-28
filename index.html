@@ -710,8 +710,10 @@
       <p class="sk-error-text" id="booking-dateError">Pick a valid date (today or later).</p>
 
       <label>Preferred Time</label>
-      <input type="time" id="booking-time">
-      <p class="sk-error-text" id="booking-timeError">Pick a preferred time.</p>
+      <p id="slotPickerHint" class="addr-hint">Pick a date above to see available time slots.</p>
+      <div id="slotPickerButtons" class="slot-picker-buttons"></div>
+      <input type="hidden" id="booking-time">
+      <p class="sk-error-text" id="booking-timeError">Pick an available time slot.</p>
 
       <label>How will you pay?</label>
       <div class="payment-method-toggle">
@@ -1360,6 +1362,7 @@
 
     // ---- Booking review & confirm ----
     const bookingOverlay = document.getElementById("booking-overlay");
+    const bookingDateInput = document.getElementById("booking-date");
 
     function isValidAddress(addr) { return addr.trim().length >= 10; }
     function isValidBookingDate(dateStr) {
@@ -1373,6 +1376,134 @@
       document.getElementById(inputId).classList.toggle("sk-field-error", !ok);
       document.getElementById(errId).classList.toggle("sk-show", !ok);
     }
+
+    // ---- Real worker-availability slot picker ----
+    // Only shows time slots where every trade the customer needs actually
+    // has a professional free — pulled from worker_schedules, set by
+    // workers themselves in worker-schedule.html.
+    const WORKER_DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+
+    function toMinutes(hhmm) {
+      const [h, m] = hhmm.split(":").map(Number);
+      return h * 60 + m;
+    }
+    function mergeWindows(wins) {
+      const sorted = wins.slice().sort((a, b) => a[0] - b[0]);
+      const merged = [];
+      sorted.forEach(([s, e]) => {
+        if (merged.length && s <= merged[merged.length - 1][1]) {
+          merged[merged.length - 1][1] = Math.max(merged[merged.length - 1][1], e);
+        } else {
+          merged.push([s, e]);
+        }
+      });
+      return merged;
+    }
+    function intersectWindows(a, b) {
+      const result = [];
+      a.forEach(([as, ae]) => {
+        b.forEach(([bs, be]) => {
+          const s = Math.max(as, bs), e = Math.min(ae, be);
+          if (s < e) result.push([s, e]);
+        });
+      });
+      return result;
+    }
+
+    async function loadSlotsForDate(dateStr) {
+      const slotBox = document.getElementById("slotPickerButtons");
+      const hint = document.getElementById("slotPickerHint");
+      const timeInput = document.getElementById("booking-time");
+      timeInput.value = "";
+      slotBox.innerHTML = "";
+      toggleBookingErr("booking-time", "booking-timeError", true);
+
+      if (!dateStr) {
+        hint.textContent = "Pick a date above to see available time slots.";
+        return;
+      }
+
+      const selected = window.__sahiCurrentSelected || {};
+      const trades = Object.keys(selected).filter(catId => selected[catId] && selected[catId].length);
+      if (!trades.length) {
+        hint.textContent = "Select a service first.";
+        return;
+      }
+
+      hint.textContent = "Checking professionals' availability...";
+
+      try {
+        const q = query(collection(db, "worker_schedules"), where("trade", "in", trades.slice(0, 10)));
+        const snap = await getDocs(q);
+
+        const dayKey = WORKER_DAY_KEYS[new Date(dateStr + "T00:00:00").getDay()];
+        const windowsByTrade = {};
+        trades.forEach(t => windowsByTrade[t] = []);
+        snap.forEach(docSnap => {
+          const w = docSnap.data();
+          const day = w.availability && w.availability[dayKey];
+          if (day && day.available && day.start && day.end && windowsByTrade[w.trade]) {
+            windowsByTrade[w.trade].push([toMinutes(day.start), toMinutes(day.end)]);
+          }
+        });
+
+        const missingTrade = trades.find(t => windowsByTrade[t].length === 0);
+        if (missingTrade) {
+          hint.textContent = "No professionals available for one or more of your selected services on this date — try another date.";
+          return;
+        }
+
+        let combined = mergeWindows(windowsByTrade[trades[0]]);
+        for (let i = 1; i < trades.length; i++) {
+          combined = intersectWindows(combined, mergeWindows(windowsByTrade[trades[i]]));
+        }
+
+        if (!combined.length) {
+          hint.textContent = "No overlapping availability across your selected services on this date — try another date.";
+          return;
+        }
+
+        const now = new Date();
+        const isToday = dateStr === now.toISOString().split("T")[0];
+        const nowMin = now.getHours() * 60 + now.getMinutes();
+
+        const slotMins = [];
+        combined.forEach(([s, e]) => {
+          let t = Math.ceil(s / 60) * 60;
+          while (t + 60 <= e) {
+            if (!isToday || t > nowMin + 30) slotMins.push(t);
+            t += 60;
+          }
+        });
+
+        if (!slotMins.length) {
+          hint.textContent = "No time slots left for this date — try another date.";
+          return;
+        }
+
+        hint.textContent = "Tap a time slot:";
+        slotBox.innerHTML = slotMins.map(mins => {
+          const h = Math.floor(mins / 60), m = mins % 60;
+          const label = new Date(2000, 0, 1, h, m).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+          const val = String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+          return `<button type="button" class="slot-btn" data-time="${val}">${label}</button>`;
+        }).join("");
+
+        slotBox.querySelectorAll(".slot-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            slotBox.querySelectorAll(".slot-btn").forEach(b => b.classList.remove("slot-btn-active"));
+            btn.classList.add("slot-btn-active");
+            timeInput.value = btn.dataset.time;
+            toggleBookingErr("booking-time", "booking-timeError", true);
+          });
+        });
+      } catch (err) {
+        hint.textContent = "Couldn't check availability right now — please try again.";
+        console.error(err);
+      }
+    }
+
+    bookingDateInput.addEventListener("change", () => loadSlotsForDate(bookingDateInput.value));
 
     // ---- Location pickers ----
     // Home page: always-visible map, sets the customer's general location.
@@ -1444,10 +1575,13 @@
       document.getElementById("booking-lng").value = "";
       const addrSearchEl = document.getElementById("addr-search");
       if (addrSearchEl) addrSearchEl.value = "";
-      const dateInput = document.getElementById("booking-date");
-      dateInput.value = "";
-      dateInput.min = new Date().toISOString().split("T")[0];
+      bookingDateInput.value = "";
+      bookingDateInput.min = new Date().toISOString().split("T")[0];
+      bookingDateInput.max = new Date(Date.now() + 13 * 86400000).toISOString().split("T")[0];
       document.getElementById("booking-time").value = "";
+      document.getElementById("slotPickerButtons").innerHTML = "";
+      document.getElementById("slotPickerHint").textContent = "Pick a date above to see available time slots.";
+      window.__sahiCurrentSelected = selected;
       document.getElementById("booking-status").textContent = "";
       document.getElementById("booking-whatsapp-cta").classList.add("sr-hidden");
 
