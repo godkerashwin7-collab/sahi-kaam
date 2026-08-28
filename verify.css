@@ -209,6 +209,20 @@ body.sk-verified .sk-verify-hint {
 }
 .sr-status-ok { color: #2e7d32; }
 .sr-status-error { color: #c62828; }
+.whatsapp-cta{
+  display:block;
+  text-align:center;
+  background:#25D366;
+  color:#fff;
+  padding:14px;
+  border-radius:8px;
+  font-weight:800;
+  text-decoration:none;
+  margin-top:12px;
+}
+.whatsapp-cta:active{
+  background:#1EBE5A;
+}
 
 /* ---- Auth modal tabs ---- */
 .sa-tabs {
@@ -466,4 +480,92 @@ body.sk-verified .sk-verify-hint {
   gap: 8px;
   padding-top: 12px;
   border-top: 1px solid #eee;
+}
+
+/* ---- Address search + map picker ---- */
+.addr-search-wrap {
+  position: relative;
+  margin-top: 6px;
+}
+.addr-search-wrap input {
+  margin-top: 0;
+}
+.addr-suggestions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1200;
+}
+.addr-suggestion-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.addr-suggestion-item:last-child {
+  border-bottom: none;
+}
+.addr-suggestion-item:active {
+  background: #f5f5f5;
+}
+.addr-suggestion-empty {
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: #888;
+}
+.addr-locate-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  background: #EAF2FF;
+  color: #1565c0;
+  border: 1px solid #C7DBFA;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.addr-locate-btn:disabled {
+  opacity: 0.6;
+}
+.addr-map {
+  width: 100%;
+  height: 200px;
+  border-radius: 10px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  overflow: hidden;
+  z-index: 1;
+}
+.addr-hint {
+  font-size: 12px;
+  color: #777;
+  margin: 2px 0 8px;
+  line-height: 1.4;
+}
+.addr-carried-note {
+  font-size: 12px;
+  color: #2e7d32;
+  background: #E8F5E9;
+  border: 1px solid #C8E6C9;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 0 0 10px;
+  line-height: 1.4;
 }

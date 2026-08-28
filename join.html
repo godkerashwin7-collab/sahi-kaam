@@ -96,6 +96,7 @@
 </fieldset>
 
 <p id="status"></p>
+<a href="#" id="whatsappCta" target="_blank" rel="noopener" style="display:none; margin-top:12px; text-align:center; background:#25D366; color:#fff; padding:14px; border-radius:8px; font-weight:800; text-decoration:none;">📲 Tap to notify us on WhatsApp</a>
 
 <script src="verify.js"></script>
 <script src="chatbot.js"></script>
@@ -196,8 +197,22 @@
         registrationPaymentId: null,
         submittedAt: new Date().toISOString()
       });
-      statusEl.innerText = "Application submitted — thank you! We'll verify and contact you soon.";
+      statusEl.innerText = "✅ Application submitted — thank you! We'll verify and contact you soon.";
       statusEl.style.color = "green";
+
+      // Show a real, tappable WhatsApp link instead of trying to open one
+      // automatically — mobile browsers routinely block window.open() calls
+      // that happen after an `await` (like this database save), since by
+      // then it's no longer considered a direct result of the tap.
+      const waNumber = (window.SAHI_BUSINESS && window.SAHI_BUSINESS.whatsappNumber) || "";
+      const waCta = document.getElementById("whatsappCta");
+      if (waNumber && waNumber.indexOf("REPLACE_ME") === -1) {
+        const msg = `🔔 New worker application on Sahi Kaamwala\nName: ${name}\nSkill: ${skill}\nArea: ${area}\nPhone: ${verifiedPhone}\nID: ${idType} (${idNumber})`;
+        waCta.href = "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(msg);
+        waCta.style.display = "block";
+      } else {
+        console.warn("SAHI_BUSINESS.whatsappNumber is not set — fill it in business-info.js.");
+      }
       nameEl.value = "";
       emailEl.value = "";
       addressEl.value = "";
