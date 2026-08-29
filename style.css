@@ -20,9 +20,17 @@
 *{box-sizing:border-box;}
 
 .tricolor-stripe{
-  height:5px;
+  height:20px;
   width:100%;
-  background: linear-gradient(90deg, var(--safety) 0 33.33%, #fff 33.33% 66.66%, var(--green) 66.66% 100%);
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMjEiIHZpZXdCb3g9IjAgMCAxMDAgMjEiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPgogIDxwYXRoIGQ9Ik0wLDAgTDEwMCwwIEwxMDAsNyBROTMuOCw5LjIgODcuNSw3IFE4MS4yLDQuOCA3NSw3IFE2OC44LDkuMiA2Mi41LDcgUTU2LjIsNC44IDUwLDcgUTQzLjgsOS4yIDM3LjUsNyBRMzEuMiw0LjggMjUsNyBRMTguOCw5LjIgMTIuNSw3IFE2LjIsNC44IDAsNyBaIiBmaWxsPSIjRkY5OTMzIi8+CiAgPHBhdGggZD0iTTAsNyBRNi4yLDQuOCAxMi41LDcgUTE4LjgsOS4yIDI1LDcgUTMxLjIsNC44IDM3LjUsNyBRNDMuOCw5LjIgNTAsNyBRNTYuMiw0LjggNjIuNSw3IFE2OC44LDkuMiA3NSw3IFE4MS4yLDQuOCA4Ny41LDcgUTkzLjgsOS4yIDEwMCw3IEwxMDAsMTQgUTkzLjgsMTEuOCA4Ny41LDE0IFE4MS4yLDE2LjIgNzUsMTQgUTY4LjgsMTEuOCA2Mi41LDE0IFE1Ni4yLDE2LjIgNTAsMTQgUTQzLjgsMTEuOCAzNy41LDE0IFEzMS4yLDE2LjIgMjUsMTQgUTE4LjgsMTEuOCAxMi41LDE0IFE2LjIsMTYuMiAwLDE0IFoiIGZpbGw9IiNGRkZGRkYiLz4KICA8cGF0aCBkPSJNMCwxNCBRNi4yLDE2LjIgMTIuNSwxNCBRMTguOCwxMS44IDI1LDE0IFEzMS4yLDE2LjIgMzcuNSwxNCBRNDMuOCwxMS44IDUwLDE0IFE1Ni4yLDE2LjIgNjIuNSwxNCBRNjguOCwxMS44IDc1LDE0IFE4MS4yLDE2LjIgODcuNSwxNCBROTMuOCwxMS44IDEwMCwxNCBMMTAwLDIxIEwwLDIxIFoiIGZpbGw9IiMxMzg4MDgiLz4KPC9zdmc+Cg==");
+  background-repeat: repeat-x;
+  background-size: 100px 100%;
+  animation: flag-wave-scroll 2.2s linear infinite;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+@keyframes flag-wave-scroll{
+  from{ background-position-x: 0; }
+  to{ background-position-x: -100px; }
 }
 
 /* ---- Indian flag colors on every field, unmistakably ---- */
@@ -311,33 +319,18 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
 }
 
 /* ---- Cause banner ---- */
-.cause-banner{
-  padding:14px 16px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  max-width:720px;
-  margin:0 auto;
-}
-.cause-banner .search-bar-top{
-  flex:1;
-  min-width:0;
-  margin:0;
-  padding:0;
-}
 .cause-card{
-  display:flex;
-  align-items:center;
-  max-width:300px;
-  flex:0 0 auto;
+  display:block;
+  max-width:400px;
+  margin:16px auto 0;
   background: linear-gradient(135deg, #2B0A1F, #4A1030);
   border:1px solid #FFB6D580;
   border-radius:16px;
   padding:14px 16px;
+  text-align:center;
   box-shadow: 0 0 18px rgba(255,143,177,0.35), 0 0 30px rgba(255,178,56,0.10);
 }
 .cause-card-text{
-  flex:1;
   min-width:0;
 }
 .cause-card-text em{
@@ -363,15 +356,6 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   cursor:pointer;
   text-shadow: 0 0 6px rgba(255,201,122,0.6);
   box-shadow: 0 0 10px rgba(255,201,122,0.25);
-}
-@media (max-width:560px){
-  .cause-banner{
-    flex-direction:column;
-    align-items:stretch;
-  }
-  .cause-card{
-    max-width:none;
-  }
 }
 .donate-amount-row{
   display:grid;

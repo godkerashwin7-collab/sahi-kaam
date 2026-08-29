@@ -75,16 +75,8 @@
     🌐 <span>Change language</span> · <span lang="hi">भाषा बदलें</span> · <span lang="mr">भाषा बदला</span> · <span lang="te">భాష మార్చండి</span> · <span lang="kn">ಭಾಷೆ ಬದಲಿಸಿ</span>
   </div>
 
-  <div class="cause-banner">
-    <div class="search-bar-wrap search-bar-top">
-      <input type="text" id="serviceSearch" class="search-bar" placeholder="🔍 Search services — e.g. tap repair, wiring, deep cleaning" data-i18n-placeholder="searchPlaceholder">
-    </div>
-    <div class="cause-card">
-      <div class="cause-card-text">
-        <em>🎗️ In memory of my sister — a share of every booking supports cancer patients and their care.</em>
-        <button type="button" class="cause-donate-btn" id="causeDonateBtn">❤️ Donate Directly</button>
-      </div>
-    </div>
+  <div class="search-bar-wrap search-bar-top">
+    <input type="text" id="serviceSearch" class="search-bar" placeholder="🔍 Search services — e.g. tap repair, wiring, deep cleaning" data-i18n-placeholder="searchPlaceholder">
   </div>
 
   <!-- Direct donation box -->
@@ -783,6 +775,14 @@
       <p id="booking-status" class="sr-status"></p>
       <a href="#" id="booking-whatsapp-cta" class="whatsapp-cta sr-hidden" target="_blank" rel="noopener">📲 Tap to notify us on WhatsApp</a>
       <a href="#" id="customer-whatsapp-cta" class="whatsapp-cta whatsapp-cta-customer sr-hidden" target="_blank" rel="noopener">📲 Save my booking confirmation to WhatsApp</a>
+
+      <!-- Shown only after a successful booking — donating is optional -->
+      <div class="cause-card sr-hidden" id="postBookingCauseCard">
+        <div class="cause-card-text">
+          <em>🎗️ Since you're here — in memory of my sister, a share of every booking already supports cancer patients and their care. Feeling extra generous today?</em>
+          <button type="button" class="cause-donate-btn" id="causeDonateBtn">❤️ Donate Directly</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1823,6 +1823,7 @@
       document.getElementById("booking-status").textContent = "";
       document.getElementById("booking-whatsapp-cta").classList.add("sr-hidden");
       document.getElementById("customer-whatsapp-cta").classList.add("sr-hidden");
+      document.getElementById("postBookingCauseCard").classList.add("sr-hidden");
 
       selectedPaymentMethod = null;
       document.getElementById("pm-online").classList.remove("pm-btn-active");
@@ -1923,6 +1924,7 @@
         const docRef = await addDoc(collection(db, "bookings"), bookingData);
         statusEl.textContent = "✅ " + successMsg + " Saved to your Activity — check there anytime.";
         statusEl.className = "sr-status sr-status-ok";
+        document.getElementById("postBookingCauseCard").classList.remove("sr-hidden");
 
         const serviceLines = Object.entries(window.__sahiPendingSelected || {})
           .map(([catId, services]) => `- ${catId}: ${services.join(", ")}`)
