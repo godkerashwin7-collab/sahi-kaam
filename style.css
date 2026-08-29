@@ -20,15 +20,40 @@
 *{box-sizing:border-box;}
 
 .tricolor-stripe{
-  height:24px;
-  min-height:24px;
-  max-height:24px;
+  height:32px;
+  min-height:32px;
+  max-height:32px;
   flex-shrink:0;
   width:100%;
   position:relative;
   overflow:hidden;
   background: linear-gradient(90deg, #FF9933 0 33.33%, #FFFFFF 33.33% 66.66%, #138808 66.66% 100%);
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  animation: flag-ripple 2.4s ease-in-out infinite;
+  clip-path: polygon(
+    0% 10%, 8% 2%, 16% 10%, 24% 2%, 32% 10%, 40% 2%, 48% 10%,
+    56% 2%, 64% 10%, 72% 2%, 80% 10%, 88% 2%, 96% 10%, 100% 2%,
+    100% 92%, 92% 100%, 84% 92%, 76% 100%, 68% 92%, 60% 100%, 52% 92%,
+    44% 100%, 36% 92%, 28% 100%, 20% 92%, 12% 100%, 4% 92%, 0% 100%
+  );
+}
+@keyframes flag-ripple{
+  0%, 100%{
+    clip-path: polygon(
+      0% 10%, 8% 2%, 16% 10%, 24% 2%, 32% 10%, 40% 2%, 48% 10%,
+      56% 2%, 64% 10%, 72% 2%, 80% 10%, 88% 2%, 96% 10%, 100% 2%,
+      100% 92%, 92% 100%, 84% 92%, 76% 100%, 68% 92%, 60% 100%, 52% 92%,
+      44% 100%, 36% 92%, 28% 100%, 20% 92%, 12% 100%, 4% 92%, 0% 100%
+    );
+  }
+  50%{
+    clip-path: polygon(
+      0% 2%, 8% 10%, 16% 2%, 24% 10%, 32% 2%, 40% 10%, 48% 2%,
+      56% 10%, 64% 2%, 72% 10%, 80% 2%, 88% 10%, 96% 2%, 100% 10%,
+      100% 100%, 92% 92%, 84% 100%, 76% 92%, 68% 100%, 60% 92%, 52% 100%,
+      44% 92%, 36% 100%, 28% 92%, 20% 100%, 12% 92%, 4% 100%, 0% 92%
+    );
+  }
 }
 .tricolor-stripe::after{
   content:"";
@@ -36,8 +61,16 @@
   top:0; left:-50%;
   width:60%;
   height:100%;
-  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%);
   animation: flag-shimmer 2.6s ease-in-out infinite;
+  pointer-events:none;
+}
+.ashoka-chakra{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  z-index:1;
 }
 @keyframes flag-shimmer{
   0%{ left:-60%; }
