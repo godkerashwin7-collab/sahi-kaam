@@ -20,26 +20,28 @@
 *{box-sizing:border-box;}
 
 .tricolor-stripe{
-  height:30px;
+  height:24px;
+  min-height:24px;
+  max-height:24px;
+  flex-shrink:0;
   width:100%;
+  position:relative;
   overflow:hidden;
+  background: linear-gradient(90deg, #FF9933 0 33.33%, #FFFFFF 33.33% 66.66%, #138808 66.66% 100%);
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-.flag-wave-track{
-  display:flex;
-  width:200%;
+.tricolor-stripe::after{
+  content:"";
+  position:absolute;
+  top:0; left:-50%;
+  width:60%;
   height:100%;
-  animation: flag-wave-scroll 2.4s linear infinite;
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+  animation: flag-shimmer 2.6s ease-in-out infinite;
 }
-.flag-wave-svg{
-  display:block;
-  width:50%;
-  height:100%;
-  flex:0 0 auto;
-}
-@keyframes flag-wave-scroll{
-  from{ transform: translateX(0); }
-  to{ transform: translateX(-50%); }
+@keyframes flag-shimmer{
+  0%{ left:-60%; }
+  100%{ left:110%; }
 }
 
 /* ---- Indian flag colors on every field, unmistakably ---- */
@@ -496,12 +498,12 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   width:64px;
 }
 .quick-icon-circle{
-  width:76px;
-  height:76px;
+  width:92px;
+  height:92px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:36px;
+  font-size:44px;
   background: linear-gradient(135deg, #FFF3EC, #FFE4D6);
   border:1px solid rgba(255,153,51,0.25);
   border-radius:50%;
@@ -1769,10 +1771,10 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   gap:14px;
 }
 .category-icon{
-  font-size:28px;
-  width:54px;
-  height:54px;
-  min-width:54px;
+  font-size:34px;
+  width:64px;
+  height:64px;
+  min-width:64px;
   display:flex;
   align-items:center;
   justify-content:center;
