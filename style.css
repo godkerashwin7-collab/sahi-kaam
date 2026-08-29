@@ -2091,7 +2091,7 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
 .cta-bold{
   font-weight:800 !important;
   font-style:italic !important;
-  box-shadow: 0 4px 14px rgba(21,101,192,0.4);
+  box-shadow: 0 4px 14px rgba(11,61,145,0.4);
 }
 
 /* ---- Footer ---- */
@@ -2185,7 +2185,7 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   padding:3px 8px;
   border-radius:20px;
   background:#EAF2FF;
-  color:#1565c0;
+  color:#0B3D91;
   white-space:nowrap;
 }
 .activity-status-submitted{
@@ -2217,7 +2217,7 @@ button, .category-head, .profile-avatar, .pm-btn, .sk-request-btn,
   margin-top:10px;
   padding:9px;
   background:#EAF2FF;
-  color:#1565c0;
+  color:#0B3D91;
   border:1px solid #C7DBFA;
   border-radius:8px;
   font-size:12.5px;

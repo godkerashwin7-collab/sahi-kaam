@@ -6,17 +6,17 @@
 <title>Before & After — Sahi Kaamwala</title>
 <script src="business-info.js"></script>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#14213D">
+<meta name="theme-color" content="#0B3D91">
 <link rel="stylesheet" href="verify.css">
 
 <style>
   body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; margin:0; }
   .wrap { max-width: 640px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
-  h1 { color: #14213D; margin-bottom:2px; }
+  h1 { color: #0B3D91; margin-bottom:2px; }
   .sk-sub { color: #555; margin-top: 0; }
-  a.back-link { display:inline-block; margin-bottom:14px; color:#1565c0; font-size:14px; text-decoration:none; }
+  a.back-link { display:inline-block; margin-bottom:14px; color:#0B3D91; font-size:14px; text-decoration:none; }
   button.sk-submit {
-    width: 100%; padding: 14px; font-size: 17px; background-color: #14213D;
+    width: 100%; padding: 14px; font-size: 17px; background-color: #0B3D91;
     color: white; border: none; border-radius: 8px; margin-top: 14px; font-weight:700;
   }
   #shareBtn { margin-bottom: 18px; }
@@ -49,6 +49,7 @@
 </style>
 </head>
 <body>
+  <div class="tricolor-stripe" style="margin:-20px -20px 20px;"></div>
 <div class="wrap">
   <a href="index.html" class="back-link">← Back to Sahi Kaamwala</a>
   <h1>Before &amp; After</h1>
@@ -188,7 +189,7 @@
     }
 
     statusEl.textContent = "Posting...";
-    statusEl.style.color = "#1565c0";
+    statusEl.style.color = "#0B3D91";
     try {
       await addDoc(collection(db, "community_showcase"), {
         uid: currentUser.uid,

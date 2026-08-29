@@ -65,7 +65,7 @@ input[type="checkbox"], input[type="radio"]{
   margin: 6px 0 0;
 }
 .sv-msg.sv-error { color: #c62828; font-weight: bold; }
-.sv-msg.sv-info { color: #1565c0; }
+.sv-msg.sv-info { color: #0B3D91; }
 .sv-verified {
   background: #e8f5e9;
   color: #2e7d32;
@@ -215,7 +215,7 @@ body.sk-verified .sk-verify-hint {
   width: 100%;
   padding: 14px;
   font-size: 17px;
-  background-color: #1565c0;
+  background-color: #0B3D91;
   color: white;
   border: none;
   border-radius: 8px;
@@ -239,7 +239,7 @@ body.sk-verified .sk-verify-hint {
   margin:0;
   background:none;
   border:none;
-  color:#1565c0;
+  color:#0B3D91;
   font-size:13px;
   font-weight:600;
   text-decoration:underline;
@@ -580,7 +580,7 @@ body.sk-verified .sk-verify-hint {
   margin-top: 8px;
   padding: 10px;
   background: #EAF2FF;
-  color: #1565c0;
+  color: #0B3D91;
   border: 1px solid #C7DBFA;
   border-radius: 8px;
   font-size: 13px;

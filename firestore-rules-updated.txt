@@ -2,6 +2,20 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Helper: is the current signed-in user an admin?
+    function isAdmin() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /admins/{adminId} {
+      // Only readable by the account itself (admin.html checks its own
+      // status this way) — nobody can list who else is an admin.
+      allow read: if request.auth != null && request.auth.uid == adminId;
+      // No client-side writes — add/remove admins only via Firebase Console.
+      allow write: if false;
+    }
+
     match /bookings/{bookingId} {
       // Anyone with the exact link can read one booking (tracking links,
       // job-board cards) without needing to be logged in.
@@ -10,59 +24,69 @@ service cloud.firestore {
       // Listing (querying many bookings at once) is only for:
       // - a logged-in customer, filtered to their own bookings (Activity panel)
       // - a logged-in, registered worker (Available Jobs board)
+      // - an admin (full dashboard view)
       allow list: if request.auth != null && (
                      resource.data.uid == request.auth.uid ||
-                     exists(/databases/$(database)/documents/worker_schedules/$(request.auth.uid))
+                     exists(/databases/$(database)/documents/worker_schedules/$(request.auth.uid)) ||
+                     isAdmin()
                    );
 
       allow create: if true;
 
       // Registered workers can update a booking (accept/decline/tracking status).
-      // Note: this doesn't lock down which specific fields they can change —
-      // a more advanced rule could restrict that further if it becomes a problem.
-      allow update: if request.auth != null &&
-                      exists(/databases/$(database)/documents/worker_schedules/$(request.auth.uid));
+      // Admins can update/manage any booking.
+      allow update: if request.auth != null && (
+                      exists(/databases/$(database)/documents/worker_schedules/$(request.auth.uid)) ||
+                      isAdmin()
+                    );
+      allow delete: if isAdmin();
     }
 
     match /worker_schedules/{workerId} {
       // Publicly readable — customers need to see every worker's
-      // availability to check open time slots when booking. Only the
-      // worker themself can create/edit their own schedule.
+      // availability to check open time slots when booking.
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == workerId;
+      // The worker themself, or an admin, can create/edit a schedule.
+      allow write: if request.auth != null &&
+                     (request.auth.uid == workerId || isAdmin());
     }
 
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null &&
+                            (request.auth.uid == userId || isAdmin());
     }
 
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if request.auth != null;
+      allow delete: if isAdmin();
     }
 
     match /worker_applications/{docId} {
-      allow read: if false;
+      // Private — only admins can review applications.
+      allow read: if isAdmin();
       allow create: if true;
+      allow update: if isAdmin();
     }
 
     match /community_showcase/{postId} {
       // Public gallery — anyone can view; only logged-in users can post.
       allow read: if true;
       allow create: if request.auth != null;
+      allow delete: if isAdmin();
     }
 
     match /community_feedback/{tipId} {
-      // Private suggestions box — only readable by you in the Firebase
-      // Console (rules don't apply there), not shown anywhere on the site.
-      allow read: if false;
+      // Private suggestions box — only admins can read it in the app
+      // (or you directly in the Firebase Console, which bypasses rules).
+      allow read: if isAdmin();
       allow create: if request.auth != null;
     }
 
     match /donations/{donationId} {
       // Donations don't require login (giving should be frictionless).
-      // Records are private — view them in the Firebase Console.
-      allow read: if false;
+      // Records are private — only admins can view them in the app.
+      allow read: if isAdmin();
       allow create: if true;
     }
   }

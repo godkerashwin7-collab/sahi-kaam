@@ -6,12 +6,12 @@
 <title>My Schedule — Sahi Kaamwala</title>
 <script src="business-info.js"></script>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#14213D">
+<meta name="theme-color" content="#0B3D91">
 <link rel="stylesheet" href="verify.css">
 
 <style>
   body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
-  h1 { color: #14213D; margin-bottom:2px; }
+  h1 { color: #0B3D91; margin-bottom:2px; }
   .sk-sub { color: #555; margin-top: 0; }
   input, select {
     width: 100%; padding: 12px; font-size: 16px; margin: 8px 0 2px;
@@ -59,7 +59,7 @@
     pointer-events:none;
   }
   button.sk-submit {
-    width: 100%; padding: 14px; font-size: 18px; background-color: #14213D;
+    width: 100%; padding: 14px; font-size: 18px; background-color: #0B3D91;
     color: white; border: none; border-radius: 8px; margin-top: 18px;
   }
   #status { margin-top: 15px; font-weight: bold; }
@@ -77,7 +77,7 @@
     font-size:14px;
     margin:4px 0;
   }
-  .job-card-row strong{ color:#14213D; }
+  .job-card-row strong{ color:#0B3D91; }
   .job-card-services{
     font-size:13px;
     color:#555;
@@ -104,6 +104,7 @@
 </style>
 </head>
 <body>
+  <div class="tricolor-stripe" style="margin:-20px -20px 20px;"></div>
 
 <h1>My Schedule</h1>
 <p class="sk-sub">Set the days and hours you're available. Customers will only be able to book you during these windows.</p>
@@ -287,7 +288,7 @@
     }
 
     statusEl.textContent = "Saving...";
-    statusEl.style.color = "#1565c0";
+    statusEl.style.color = "#0B3D91";
     try {
       await setDoc(doc(db, "worker_schedules", currentUser.uid), {
         name, phone, trade, availability,
@@ -387,7 +388,7 @@
   async function acceptJob(jobId, trade) {
     const msgEl = document.getElementById(`job-status-${jobId}`);
     msgEl.textContent = "Accepting...";
-    msgEl.style.color = "#1565c0";
+    msgEl.style.color = "#0B3D91";
     try {
       await runTransaction(db, async (transaction) => {
         const ref = doc(db, "bookings", jobId);
